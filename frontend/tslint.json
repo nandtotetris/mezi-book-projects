@@ -1,0 +1,21 @@
+{
+  "defaultSeverity": "error",
+  "rulesDirectory": ["tslint-plugin-prettier"],
+  "extends": ["tslint:recommended", "tslint-react", "tslint-config-prettier", "tslint-no-circular-imports"],
+  "linterOptions": {
+    "exclude": ["config/**/*.js", "node_modules/**/*.ts"]
+  },
+  "rules": {
+    "jsx-boolean-value": false,
+    "member-access": false,
+    "no-console": {
+      "severity": "warning"
+    },
+    "no-empty": false,
+    "no-empty-interface": false,
+    "no-unused-expression": {
+      "options": "allow-fast-null-checks"
+    },
+    "prettier": true
+  }
+}

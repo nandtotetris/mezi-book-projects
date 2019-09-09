@@ -1,0 +1,37 @@
+type Address {
+  id: ID
+  siret: String
+  address1: String
+  address2: String
+  zipcode: Int
+  city: String
+  country: String
+}
+
+type Addresses {
+  total: Int,
+  rows: [Address]
+}
+
+enum AddressOrder {
+  createdAt_ASC
+  createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+}
+
+input AddressInput {
+  id: ID
+  siret: String
+  address1: String
+  address2: String
+  zipcode: Int
+  city: String
+  country: String
+  companyId: ID
+}
+
+type Mutation {
+  createOrUpdateAddress(input: AddressInput!): Address
+  removeAddress(id: ID!): Address
+}

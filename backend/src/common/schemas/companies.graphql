@@ -1,0 +1,157 @@
+scalar Date
+
+enum Status {
+  UNKNOWN
+  EXIST
+  ALREADY
+  SELF
+}
+
+enum KycStatus {
+  PENDING
+  VALIDATED
+  REFUSED
+}
+
+input CompanyInput {
+  siren: String
+  siret: String
+  name: String
+  templatePreference: Int
+  logoUrl: String
+  brandName: String
+  slogan: String
+  domainName: String
+  naf: String
+  nafNorm: String
+  numberEmployees: String
+  legalForm: String
+  category: String
+  incorporationAt: Date
+  vatNumber: String
+  capital: Int
+  legalAnnualTurnOver: String
+  legalNetIncomeRange: String
+  phone: String
+  provisionningStrategy: CompanyProvisionningStrategies
+  addresses: [AddressInput]
+}
+
+type Company {
+  id: ID
+  siren: String
+  siret: String
+  name: String
+  brandName: String
+  templatePreference: Int
+  logoUrl: String
+  slogan: String
+  domainName: String
+  naf: String
+  nafNorm: String
+  numberEmployees: String
+  legalForm: String
+  category: String
+  incorporationAt: Date
+  vatNumber: String
+  source: String
+  treezorEmail: String
+  treezorUserId: Int
+  treezorWalletId: Int
+  treezorIban: String
+  treezorBic: String
+  claimer: User
+  status: Status
+  kycStatus: KycStatus
+  kycStep: String
+  capital: Int
+  legalAnnualTurnOver: String
+  legalNetIncomeRange: String
+  phone: String
+  invoicesSent: Int
+  invoicesReceived: Int
+  contacts(limit: Int, offset: Int, orderBy: ContactOrder): Contacts
+  addresses(limit: Int, offset: Int, orderBy: AddressOrder): Addresses
+  ibans: Ibans
+  createdAt: Date
+  updatedAt: Date
+  provisionningStrategy: CompanyProvisionningStrategies
+}
+
+enum CompanyProvisionningStrategies {
+  TOPUP
+  AUTOLOAD
+}
+
+type Companies {
+  total: Int
+  rows: [Company]
+}
+
+type Representative {
+  """
+  Representative's first name.
+  """
+  firstname: String
+  """
+  Representative's last name.
+  """
+  lastname: String
+  """
+  Representative's full names.
+  """
+  fullnames: String
+  """
+  Representative's birthdate. Format YYYY-MM-DD
+  """
+  birthday: String
+  """
+  Representative's position in company
+  """
+  parentType: String
+  """
+  Representative's type. Possible values:
+  1	Natural person (default)
+  2	Business entity
+  3	Non - governmental organization
+  4	Governmental organization
+  """
+  userTypeId: Int
+}
+
+type Representatives {
+  total: Int
+  rows: [Representative]
+}
+
+type ComplementaryInfos {
+  "Business share capital"
+  capital: Int
+  "Business annual turnover range in k€. = ['', '0-39', '40-99', '100-249', '250-999', '1000-2999', '3000-9999', '10000-99999', '100000-*']"
+  legalAnnualTurnOver: String
+  "Business workforce. = ['', '0', '1-9', '10-99', '100-249', '250-*']"
+  numberEmployees: String
+  "Business annual netincome in k€. = ['', '0-4', '5-9', '10-49', '50-149', '150-499', '500-*']"
+  legalNetIncomeRange: String
+  "Business phone number"
+  phone: String
+  "Business' address"
+  addresses: Addresses
+}
+
+type Query {
+  searchCompanies(query: String!, limit: Int, offset: Int): Companies
+  contract: String
+  company: Company
+  representatives: Representatives
+  companyWithComplementaryInfos(siren: String!): ComplementaryInfos
+}
+
+type Mutation {
+  createOrUpdateCompany(id: ID, input: CompanyInput): Company
+  signContract: Boolean
+  updateKycStatus(status: KycStatus): Company
+  updateKycStep(step: String): Company
+  removeDocument(id: Int!): Document
+  uploadLogo(file: Upload!): String
+}

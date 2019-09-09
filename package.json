@@ -1,0 +1,31 @@
+{
+  "name": "dismantleproject",
+  "version": "0.2.0",
+  "private": true,
+  "scripts": {
+    "doco": "docker-compose -f docker-compose.dev.yml",
+    "up": "yarn doco up",
+    "down": "yarn doco down",
+    "logs": "yarn doco logs -f api"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "yarn workspaces run precommit"
+    }
+  },
+  "workspaces": {
+    "packages": [
+      "frontend",
+      "backend"
+    ],
+    "nohoist": [
+      "**/husky",
+      "**/husky/**",
+      "**/lint-staged",
+      "**/lint-staged/**"
+    ]
+  },
+  "dependencies": {
+    "react-app-rewire-react-svg-loader": "^1.0.1"
+  }
+}

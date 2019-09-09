@@ -1,0 +1,12 @@
+{
+  "error_payment_wh_sync_subject": "Paiement en erreur",
+  "error_payment_wh_sync_comment": "Le paiement {{ paymentId }} est retourné en erreur par treezor et demande une investiguation.\nLe paiement sera retenté automatiquement.",
+  "error_pyament_wh_sync_balance_subject": "Paiement sans solde",
+  "error_pyament_wh_sync_balance_comment": "Le paiement {{ paymentId }} a été envoyé sans solde à treezor et n'a pas pu être accepté.\nLe paiement sera retenté automatiquement.",
+  "error_payment_wh_async_subject": "Paiement en erreur",
+  "error_payment_wh_async_comment": "Le paiement {{ paymentId }} a été envoyé sans solde à treezor et n'a pas pu être accepté.\nLe paiement sera retenté automatiquement.",
+  "error_payment_wh_async_balance_subject": "Paiement PENDING sans solde",
+  "error_payment_wh_async_balance_comment": "Le paiement {{ paymentId }} a été envoyé à treezor et n'a pas pu être validé par la suite par faute de solde suffisant.\nLe paiement sera retenté automatiquement.",
+  "error_kyc_refused_subject": "KYC refusé",
+  "error_kyc_refused_comment": "Le KYC a été refusée pour l'entreprise {{ companyName }} et doit être investigué : \n\"kycLevel\": {{ kycLevel }},\n\"kycReview\": {{ kycReview }},\n\"kycReviewComment\": {{ kycReviewComment }}"
+}

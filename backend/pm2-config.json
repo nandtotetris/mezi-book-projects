@@ -1,0 +1,10 @@
+{
+  "name": "libeo",
+  "script": "dist/main.js",
+  "nodeArgs": ["--harmony"],
+  "log_date_format" : "YYYY-MM-DD HH:mm Z",
+  "exec_mode": "fork",
+  "env": {
+    "PORT": "9000"
+  }
+}

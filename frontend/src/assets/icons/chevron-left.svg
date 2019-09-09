@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="4px" height="6px" viewBox="0 0 4 6" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.5 (67469) - http://www.bohemiancoding.com/sketch -->
+    <defs>
+        <path d="M7.70978262,8.29184784 C7.85760871,8.4304348 7.85760871,8.67065219 7.71902175,8.81847828 C7.6451087,8.89239132 7.54347827,8.92934784 7.45108696,8.92934784 C7.35869566,8.92934784 7.26630435,8.89239132 7.19239131,8.82771741 L4.79021738,6.51793478 C4.71630434,6.44402174 4.67934782,6.35163044 4.67934782,6.25 C4.67934782,6.14836956 4.71630434,6.05597826 4.79021738,5.98206522 L7.19239131,3.67228259 C7.3402174,3.53369564 7.57119566,3.53369564 7.71902175,3.68152172 C7.85760871,3.82934781 7.85760871,4.06032607 7.70978262,4.20815216 L5.5847826,6.25 L7.70978262,8.29184784 Z" id="chevron-left-1"></path>
+    </defs>
+    <g id="Symbols" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Molecule/SIDEBAR-Achat-Open" transform="translate(-151.000000, -11.000000)">
+            <g id="Hide" transform="translate(147.000000, 5.000000)">
+                <g id="Arrows/chevron-left" transform="translate(0.000000, 3.000000)">
+                    <mask id="mask-chevron-left-2" fill="white">
+                        <use xlink:href="#chevron-left-1"></use>
+                    </mask>
+                    <use id="chevron-left" fill="currentColor" fill-rule="evenodd" xlink:href="#chevron-left-1"></use>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

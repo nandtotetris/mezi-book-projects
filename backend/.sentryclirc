@@ -1,0 +1,7 @@
+[defaults]
+url=https://sentry.io
+project=apilibeo
+org=libeo-pz
+
+[auth]
+token = deb45fa784e346b3a8625aeb2c1cb7683ce013010fbd427e911ce48d58d0c671

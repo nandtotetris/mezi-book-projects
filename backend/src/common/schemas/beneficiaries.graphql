@@ -1,0 +1,240 @@
+scalar Date
+
+enum DocumentStatus {
+  PENDING
+  CANCELED
+  VALIDATED
+}
+
+enum UserTitle {
+  M
+  MME
+  MLLE
+}
+
+input BeneficiaryInput {
+  userId: Int
+  title: UserTitle
+  firstname: String
+  lastname: String
+  nationality: String
+  placeOfBirth: String
+  birthCountry: String
+  birthday: String
+  specifiedUSPerson: Int
+  incomeRange: String
+  personalAssets: String
+  occupation: String
+  controllingPersonType: Int
+  employeeType: Int
+  isCurrentUser: Boolean
+  isHosted: Boolean
+  phone: String
+  address1: String
+  address2: String
+  postcode: String
+  city: String
+  country: String
+  taxResidence: String
+  documents: [DocumentInput]
+}
+
+input DocumentInput {
+  # userId: Int!
+  documentTypeId: Int!
+  name: String!
+  file: Upload
+}
+
+type Beneficiary {
+  userId: Int
+  """
+  User's type. Possible values:
+  1	Natural person (default)
+  2	Business entity
+  3	Non - governmental organization
+  4	Governmental organization
+  """
+  userTypeId: Int
+  userStatus: String
+  "Custom data."
+  userTag: String
+  "User id of user's parent if any."
+  parentUserId: Int
+  parentType: String
+  specifiedUSPerson: Int
+  """
+  Type of relationship:
+  1	Shareholder
+  2	Other_relationship
+  3	Director
+  4	None (default)
+  """
+  controllingPersonType: Int
+  """
+  Type of user's role:
+  1	Leader
+  2	Employee
+  3	None (default)
+  """
+  employeeType: Int
+  """
+  User's title. Possible values:
+  M
+  MME
+  MLLE
+  """
+  title: String
+  "User's first name"
+  firstname: String
+  "User's last name"
+  lastname: String
+  "User's middle names"
+  middleNames: String
+  "User's birth date. Format YYYY-MM-DD"
+  birthday: String
+  "User's email address (must be valid)."
+  email: String
+  "User's postal address (main). Can not contain carriage return."
+  address1: String
+  "User's postal address (complement). Can not contain carriage return."
+  address2: String
+  "User's postcode"
+  postcode: String
+  "User's city"
+  city: String
+  "User's state"
+  state: String
+  "User's country"
+  country: String
+  countryName: String
+  "User's phone number"
+  phone: String
+  "User's mobile phone number"
+  mobile: String
+  "User's nationality"
+  nationality: String
+  "User's other nationality"
+  nationalityOther: String
+  "User's place of birth"
+  placeOfBirth: String
+  "User's country of birth"
+  birthCountry: String
+  "User's occupation"
+  occupation: String
+  """
+  Customer income range
+  0-18
+  19-23
+  24-27
+  28-35
+  36-56
+  57-*
+  """
+  incomeRange: String
+  "Business name"
+  legalName: String
+  legalNameEmbossed: String
+  "Business registration number"
+  legalRegistrationNumber: String
+  "Business VAT number"
+  legalTvaNumber: String
+  "Business registration date Format YYYY-MM-DD"
+  legalRegistrationDate: String
+  legalForm: String
+  legalShareCapital: Int
+  legalSector: String
+  legalAnnualTurnOver: String
+  legalNetIncomeRange: String
+  legalNumberOfEmployeeRange: String
+  effectiveBeneficiary: Int
+  """
+  0	NONE
+  1	LIGHT
+  2	REGULAR
+  4	REFUSED
+  """
+  kycLevel: Int
+  """
+  0	NONE
+  1	PENDING
+  2	VALIDATED
+  3	REFUSED
+  """
+  kycReview: Int
+  kycReviewComment: String
+  isFreezed: Int
+  language: String
+  optInMailing: Int
+  sepaCreditorIdentifier: String
+  taxNumber: String
+  taxResidence: String
+  position: String
+  """
+  User's personal assets range exprimed in K€.
+  0-2
+  3-22
+  23-128
+  129-319
+  320-464
+  465-
+  """
+  personalAssets: String
+  "Format YYYY-MM-DD HH:MM:SS"
+  createdDate: String
+  "Format YYYY-MM-DD HH:MM:SS"
+  modifiedDate: String
+  walletCount: Int
+  payinCount: Int
+  documents(limit: Int offset: Int): Documents
+}
+
+type Documents {
+  total: Int
+  rows: [Document]
+}
+
+type Document {
+  documentId: Int
+  documentTag: String
+  documentStatus: DocumentStatus
+  documentTypeId: Int
+  documentType: String
+  residenceId: Int
+  clientId: Int
+  userId: Int
+  userLastname: String
+  userFirstname: String
+  fileName: String
+  temporaryUrl: String
+  temporaryUrlThumb: String
+  createdDate: String
+  modifiedDate: String
+}
+
+type Beneficiaries {
+  total: Int
+  rows: [Beneficiary]
+}
+
+type TaxResidence {
+  id: Int
+  userId: Int
+  country: String
+  taxPayerId: String
+  liabilityWaiver: Boolean
+  createdDate: String
+  lastUpdate: String
+  deletedDate: String
+  isDeleted: Boolean
+}
+
+type Query {
+  beneficiaries(limit: Int, page: Int): Beneficiaries
+  taxResidence(userId: Int, country: String): TaxResidence
+}
+
+type Mutation {
+  createBeneficiary(input: BeneficiaryInput!): Beneficiary
+  removeBeneficiary(id: Int!): Beneficiary
+}

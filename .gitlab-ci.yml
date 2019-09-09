@@ -1,0 +1,84 @@
+stages:
+  - Build
+  - Test
+  - Docker
+  - Sentry
+
+cache:
+  untracked: true
+  paths:
+    - .env
+    - node_modules/
+    - backend/node_modules/
+    - frontend/node_modules/
+
+Build:
+  stage: Build
+  image: node:11-alpine
+  script:
+    - apk add --no-cache git
+    - yarn workspaces run install --frozen-lockfile
+    - yarn workspaces run build
+  artifacts:
+    paths:
+      - frontend/build
+      - backend/dist
+    expire_in: 3 mos
+    when: always
+
+Jest:
+  stage: Build
+  image: node:11-alpine
+  script:
+    - apk add --no-cache git
+    - yarn workspaces run install --frozen-lockfile
+    - cp .env.dist  ./backend/.env
+    - yarn workspace backend run lint
+    - yarn workspace backend run test:ci
+    - yarn workspace backend run test:e2e
+
+Cypress:
+  stage: Test
+  image: cypress/base:10
+  before_script:
+    - ./node_modules/.bin/cypress install
+    - yarn workspace frontend start:test:server
+  script:
+    - yarn workspace frontend run lint
+    - yarn workspace frontend run test
+  after_script:
+    - yarn workspace frontend stop:test:server
+  artifacts:
+    paths:
+      - frontend/cypress
+    expire_in: 3 mos
+    when: always
+
+Docker:
+  stage: Docker
+  image: registry.gitlab.com/backend/docker-images/docker:stable
+  services:
+    - docker:dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_DRIVER: overlay2
+  script:
+    - docker login -u "${CI_REGISTRY_USER}" -p "${CI_REGISTRY_PASSWORD}" "${CI_REGISTRY}"
+    - docker build -t "${CI_REGISTRY_IMAGE}/api:${CI_COMMIT_SHA}" -f config/docker/node/Dockerfile .
+    - docker build -t "${CI_REGISTRY_IMAGE}/web:${CI_COMMIT_SHA}" -f config/docker/httpd/Dockerfile . --build-arg LIBEO_VERSION=${CI_COMMIT_SHA}
+    - docker push "${CI_REGISTRY_IMAGE}/api:${CI_COMMIT_SHA}"
+    - docker push "${CI_REGISTRY_IMAGE}/web:${CI_COMMIT_SHA}"
+  only:
+    - develop
+    - master
+  allow_failure: false
+
+Sentry:
+  stage: Sentry
+  image: node:11-alpine
+  script:
+    - yarn workspace frontend run sentry
+  only:
+    - develop
+    - master
+  allow_failure: false

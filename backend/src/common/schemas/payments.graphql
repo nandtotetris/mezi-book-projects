@@ -1,0 +1,4 @@
+type Mutation {
+  payout(invoiceId: ID!, date: String, code: String): [Invoice]
+  payoutContacts(invoiceId: ID!, contactIds: [ID]): Boolean
+}

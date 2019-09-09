@@ -1,0 +1,17 @@
+[
+  {
+    "id" : "fa085838-5286-4ebd-a964-81e7928b353c",
+    "last_cgu_accept" : "2019-04-08 14:15:52.573",
+    "lastname" : "46a87af90c374d28f50bb0309d09f1b6",
+    "created_at" : "2019-04-08 14:15:52.731365",
+    "current_company_id" : "d973fe4e-6486-48bd-88be-d71a78b2a57a",
+    "firstname" : "0fdb2c682b7f2e9200f33f2610f9973b",
+    "last_login" : "2019-04-08 14:15:52.573",
+    "password" : "$2a$10$9jOeU.wlZZTt.wu2euPoneq\/3Axh.H0SQlVeG3hTbOSB9vxc9A6.S",
+    "token" : null,
+    "enabled" : true,
+    "updated_at" : "2019-04-08 14:27:17.164572",
+    "confirmation_token" : null,
+    "email" : "5a5ce1671751183075a54084e83b8c82"
+  }
+]

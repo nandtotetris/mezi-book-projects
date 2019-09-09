@@ -1,0 +1,122 @@
+.content-secondary {
+  background: @primary-color;
+  margin: 0;
+  min-height: 100%;
+  width: 100%;
+  padding: 24px 24px 0;
+  color: white;
+  display: flex;
+  flex-direction: column;
+
+  .ant-btn {
+
+    &.ant-btn-primary {
+      color: @primary-color;
+      background: white;
+    }
+  }
+
+  .H1 {
+    color: white;
+  }
+
+  .heading-description {
+    color: white;
+  }
+
+  .form-item-text.active .ant-form-item-label:before,
+  .form-item-password.active .ant-form-item-label:before,
+  .form-item-date.active .ant-form-item-label:before,
+  .form-item-select.active .ant-form-item-label:before,
+  .search-autocomplete .form-item-search.active .ant-form-item-label:before,
+  .form-item-email.active .ant-form-item-label:before {
+    content: ' ';
+    background: @primary-color;
+  }
+
+  .form-item-text.active .ant-form-item-label label,
+  .form-item-password.active .ant-form-item-label label,
+  .form-item-date.active .ant-form-item-label label,
+  .form-item-select.active .ant-form-item-label label,
+  .search-autocomplete .form-item-search.active .ant-form-item-label label,
+  .form-item-email.active .ant-form-item-label label,
+  .form-item-text.active .ant-form-item-required:before,
+  .form-item-password.active .ant-form-item-required:before,
+  .form-item-date.active .ant-form-item-required:before,
+  .form-item-select.active .ant-form-item-required:before,
+  .search-autocomplete .form-item-search.active .ant-form-item-required:before,
+  .form-item-email.active .ant-form-item-required:before  {
+    color: white;
+  }
+
+  .form-item .ant-form-item-label label {
+    color: rgba(255, 255, 255, 0.5);
+    &:before {
+      color: rgba(255, 255, 255, 0.5);
+    }
+  }
+
+  .ant-input {
+    border-color: white !important;
+  }
+
+  .ant-btn-primary {
+    border-color: white;
+    box-shadow: none;
+  }
+
+  .floating-action-footer .ant-btn-primary {
+    border: 1px solid @primary-color !important;
+    border-color: white;
+    box-shadow: none;
+  }
+
+  .ant-btn-default:not([disabled]) {
+    background-color: @primary-color;
+    color: white;
+    box-shadow: 0 11px 15px -10px rgba(0, 83, 250, 0.25);
+  }
+
+  .ant-calendar-picker-input.ant-input,
+  .ant-input-affix-wrapper .ant-input,
+  .ant-select .ant-select-selection {
+    color: white;
+    border-color: white;
+  }
+
+  .ant-select-arrow svg {
+    color: white;
+  }
+
+  .ant-calendar-picker-icon {
+    color: rgba(255, 255, 255, 0.25);
+  }
+
+  .ant-checkbox-wrapper,
+  .ant-checkbox-wrapper .ant-radio,
+  .ant-radio-wrapper,
+  .ant-radio-wrapper .ant-radio {
+    color: white;
+  }
+
+  .ant-checkbox.ant-checkbox-checked .ant-checkbox-inner {
+    background-color: white;
+    color: @primary-color;
+  }
+
+  .ant-checkbox-checked .ant-checkbox-inner:after {
+    border-color: @primary-color;
+  }
+
+  .has-error .ant-form-explain {
+    color: white;
+  }
+
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active {
+    box-shadow: 0 0 0 30px @primary-color inset !important;
+    -webkit-text-fill-color: white !important;
+  }
+}

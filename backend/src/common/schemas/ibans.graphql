@@ -1,0 +1,128 @@
+scalar Date
+
+type Iban {
+  "Iban's id"
+  id: String
+  "Iban"
+  iban: String
+  "Reader company"
+  readerCompany: Company
+  "Beneficiary's id at Treezor"
+  treezorBeneficiaryId: Int
+  "User"
+  createdBy: User
+  "Company"
+  company: Company
+  "'passed' or 'failed' - for a formally correct or incorrect IBAN"
+  result: String
+  """
+  The field a condensed numerical representation of the results of various checks. Not all checks are always carried out.
+  Possible values:
+  0 = all supported checks were done and passed.
+  1 = a subaccount number was automatically appended.
+  2 = Account number does not contain a checksum.
+  4 = Checksum was not checked.
+  8 = Bank code was not checked.
+  32 = Warning: a subaccount number may need to be appended, but the necessity of this could not be automatically verified. Please verify manually.
+  128 = Checksum error in account number.
+  256 = Bankcode not found in directory.
+  512 = IBAN has incorrect length.
+  1024 = Bank code has incorrect length.
+  2048 = The IBAN checksum is incorrect (3rd and 4th characters of the IBAN)
+  4096 = Missing input data (for example, the country code).
+  8192 = Country not yet supported.
+
+  Interpretation: if the sum is:
+  < 32. Result can be assumed correct;
+  32 ≤ sum ≤ 127. Result might be correct but should be verified;
+  ≥ 128. There may be a more serious error.
+  = 65536. The return code is not set at all, which should not happen - please notify us of this error.
+  """
+  returnCode: Int
+  bic: String
+  """
+  an array of BICs that can be associated with the given domestic bank code. May be empty or may contain one or more elements. Each BIC element is itself a complex data type that has the attributes 'bic', 'wwwcount', 'sampleurl', and 'city'.
+  Interpretation: If
+  wwwcount > 0. The BIC was harvested from the web (and found on as many pages as indicated by 'wwwcount', for example on the page indicated by 'sampleurl').
+  wwwcount = 0. The BIC comes from a national bank or the ECB.
+  If 'city' is given, this also indicates that the BIC comes from a national bank or the ECB.
+  Note: The given city does not necessarily reflect the location of the given branch - it can also be the location of the headquarters.
+  """
+  bicCondidates: JSON #[BicCondidate]
+  """
+  The ISO country code (first two letters of the IBAN)
+  """
+  country: String
+  """
+  The domestic bank code, if it exists. Returns first 4 characters of the BIC for NL (where no domestic bank codes exist), or the BC-Number for Switzerland.
+  """
+  bankCode: String
+  """
+  Bank name, if known.
+  """
+  bank: String
+  """
+  Bank address, if known.
+  """
+  bankAddress: String
+  """
+  Branch name, if known.
+  """
+  branch: String
+  """
+  Branch code, if known.
+  """
+  branchCode: String
+  """
+  If at least one BIC is returned (that is, if the array bic_candidates, which is mentioned above, contains at least one element), this field is set to 'yes' or 'no', depending on whether the first returned BIC is listed in the German Bundesbank's SCL directory. If no BIC is returned, this field is left blank.
+  """
+  inSclDirectory: String
+  """
+  if in_scl_directory is set to 'yes', this field is set to 'yes' if a SEPA Credit Transfer is supported for the first returned BIC. If no SCT is supported, the field is set to 'no'. If no BIC is returned, the field is left blank.
+  """
+  sct: String
+  """
+  if in_scl_directory is set to 'yes', this field is set to 'yes' if SEPA Direct Debit is supported for the first returned BIC. If no SDD is supported, the field is set to 'no'. If no BIC is returned, the field is left blank.
+  """
+  sdd: String
+  """
+  if in_scl_directory is set to 'yes', this field is set to 'yes' if Core 1 Direct Debit is supported for the first returned BIC. If no Core 1 is supported, the field is set to 'no'.
+  """
+  cor1: String
+  """
+  if in_scl_directory is set to 'yes', this field is set to 'yes' if SEPA Business to Business is supported for the first returned BIC. If no B2B is supported, the field is set to 'no'. If no BIC is returned, the field is left blank.
+  """
+  b2b: String
+  """
+  if in_scl_directory is set to 'yes', this field is set to 'yes' if SEPA Card Clearing is supported for the first returned BIC. If no SCC is supported, the field is set to 'no'.
+  """
+  scc: String
+  jsonIbanBic: JSON
+  createdAt: Date
+  updatedAt: Date
+}
+
+type BicCondidate {
+  bic: String
+  zip: String
+  city: String
+  wwwcount: Int,
+  sampleurl: String
+}
+
+type Ibans {
+  total: Int
+  rows: [Iban]
+}
+
+type CheckIban {
+  iban: String
+  bic: String
+  status: String
+  name: String
+}
+
+type Query {
+  checkIban(iban: String!): CheckIban
+  ibans(siren: String!): Ibans
+}

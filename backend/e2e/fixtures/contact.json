@@ -1,0 +1,12 @@
+[
+  {
+    "id" : "6270ddad-56ee-4016-9359-1eac7241cd12",
+    "lastname" : "Un",
+    "firstname" : "Tech",
+    "visible_only_company" : "d973fe4e-6486-48bd-88be-d71a78b2a57a",
+    "created_at" : "2019-04-08 14:33:01.613774",
+    "user_id" : "fa085838-5286-4ebd-a964-81e7928b353c",
+    "updated_at" : "2019-04-08 14:33:04.431647",
+    "company_id" : "d973fe4e-6486-48bd-88be-d71a78b2a57a"
+  }
+]

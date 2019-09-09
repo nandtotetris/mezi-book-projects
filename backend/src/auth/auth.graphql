@@ -1,0 +1,35 @@
+type PasswordReset {
+  status: Boolean!
+}
+
+input SignInInput {
+  email: String!
+  password: String!
+}
+
+input SignUpInput {
+  firstname: String!
+  lastname: String!
+  email: String!
+  password: String!
+  passwordConfirmation: String!
+  cgu: Boolean!
+}
+
+input SendResetPasswordEmailInput {
+  email: String!
+}
+
+input PasswordResetInput {
+  password: String!
+  confirmPassword: String!
+  confirmationToken: String!
+}
+
+type Mutation {
+  signin(input: SignInInput!): User
+  signup(input: SignUpInput!): User
+  sendPasswordResetEmail(input: SendResetPasswordEmailInput!): PasswordReset
+  resetPassword(input: PasswordResetInput!): Boolean
+  logout: Boolean
+}

@@ -1,0 +1,77 @@
+
+============== READING COMPONENTS FROM A WORKING OR A BUILTIN
+               DIRECTORY ====================================
+
+= In the java implementation, custom components (built by the user, user-defined) were read, as encountered in the HDL specification, from whatever is recorded as the current working directory (often this is the directory from which either the test script, or the program file, is loaded from).
+
+= In the web app, what is the working directory? ... There is no such thing. Maybe local storage: put all components into local storage as soon as they are uploaded. Actually, there is no other option if the components are not known ahead of time. In the long run, these component specifications can be uploaded into some central repository, or into a database that is allocated to a specific customer, or user. The repository, or the database, could also be potentially where the builtin component specifications will be stored, like the npm repository, remember?
+
+= So when trying to decide between a builtin and a user-defined component, first look for the component in the local storage (in case the user has uploaded one). Which also mean that the user would have to upload all the required components (the entire directory of components), or all his components (especially if he desires for his custom components to be used instead of the builtin versions), into local storage.
+
+= And wherever the java implementations fetches content by reading a file, provide a similar content either from local storage or from an imported json file, or from a database/repository, or from whatever source seems appropriate, and fitting, to the situation at hand.
+
+=============== INTERACTING WITH USER INTERFACE FROM
+                ANY CLASS ==========================
+
+= In the java implementation, any code from any class can update a GUI, as long as it holds a reference to it. Can we do the same thing in the web app?
+
+= Of course, in the web app context as well, any code from anywhere can manipulate the dom anyway it wants to. So, there should be no reason why this can't be possible in react as well. One pattern with react is that it decouples code for the user interface and code for business logic. Business logic code can simply update the state, and the UI change will follow from the change in the component's state.
+
+= So wherever calls to UI component's are made from within a business logic in java, a corresponding state update call should be made from within react. That means you would have to not only know what state change to make to produce a similar effect, but also have to know to properly apply it wherever it is needed.
+
+= Do we have any other option? Maybe. We can simply ignore the UI manipulation calls, and focus on getting the business logic right. Then test the business logic independently, and afterwards, move on to integrating the react UI comoponent with the business logic.
+
+= There is still another option. Mock the java UI classes, and maybe do just a console log within these mocked methods. This can however get nasty later on, if we try to mock every method of some swing component. But if the nastiness is moderate, the state update calls then can be made from within these mocked methods. And the mock classes will serve as the glue between the business logic and the react UI component.
+
+= In local storage a gate might be represented with a json like this:
+{
+  "name": "Mux",
+  "hdl": "blah blah"
+}
+
+= How about the assembler? Imitate their assembler or develop one from sccratch? Their assembler might have additional features, such as parsing a compare, and or a test file, and running a comparison against it. Will these features ( a compare file, and test files) be relevant in the light of the bigger picture? I mean testing is an integral part of a sustainable development, so yeah, they will definitely be needed.
+
+= The java implementations of the translators are also interlinked with the GUI that controls their actions. When turning these into web apps, we will have to find some mechanism (say marshalling callbacks, or state values) to achieve a similar interaction.
+
+= What do we do when the java implementation extends native java classes, or interfaces?
+  -> Mock their interfaces by providing an equivalent service.
+
+= What is the equivalent of a java Thread in typescript? Javascript is normally single threaded, unless something like a web worker is used. Well they are called worker threads, they run off a javascript file (or url path) containing a function. You can exchange messages with them ... so if the need really comes to it, you can spawn a couple of them worker threads.
+
+= Now back to the assembler. How do we run it? I mean from its java code ... how do you feed it the assembly file? ... I like it when it is used on the fly by the CPU emulator.
+  --- Hehe and we have finally extracted and tested the module that is responsible for the on-the-fly translation done by the cpu emulator.
+
+|||||||||||| NOW THAT WE HAVE AN ASSEMBLER THAT CAN CONVERT OUR ASSEMBLY CODE TO MACHINE CODE
+= There are two possible next steps: Either go up and build a compiler that translates a high level language code into an assembly code, or go down and build a simulator that can run the translated machine code by simulating the underlying hardware (which can be done by reading it either from an hdl file or by employing builtin hardware definitions). The later options promises more exciting and interesting, and henece, we shall get started with it at once.
+
+= So the GUI of the hardware simulator seems divided into two main sections: the controller and the simulator. The controller gui, as its name suggests, is concerned with controlling the simulation, like setting it up, configuring it, tweaking it, and modifying it. The simulation gui on the other hand deals with displaying the dynamic evolution of the data processing that is being simulated.
+
+= How do I test the hardware simulator? Well, by giving it an HDL design of the hardware, and then by providing it with a test script that commands the hardware to do certain things, and then by comparing the hardware outputs with expected outcomes listed in a compare file.
+
+= For the time being, I don't need none of the fancy simulator or controller displays. I will just put the test script, the hdl, and the compare file in local storage, and all I want is a console.log that communicates either error or success, as the case might be.
+
+= The class <HackController> is the glue that binds the simulator and controller components. So start your development from it.
+
+= You can implement the <HardwareSimulatorComponent> by leaving out the implementation details of the interface methods, you can leave them either with an empty body or can do a simple console log of the operation, and likewise the <HardwareSimulatorControllerComponent>.
+
+= So, from which end would you like to start?  From the component's end or from the interface's end? Last time, with the assembler, I got started from the interface's end, let's this time get started from the component's end (the UI's end) and see where it will lead me, or so see whether starting from the UI end will prove rewarding or not.
+
+= I am just saying, you have to try it. A perfect and direct mapping between a java swing application and a react app. Why can't swing components be directly mapped into react components? What is the catch? You should go for it, and stop when you get stuck. But for now, focus on getting the functionality right (by manually calling what would have been invoked following a button click).
+
+-----------------------------------------------
+
+= Do I really need to build a symbol table? The symbol table is used to map function and label names to addresses, but why would I need an address? And is not after all, the symbol table built by the assembler, I don't think there is a need for doing it here, so just get rid off it.
+Or, in case it comes handy later on, for some weird reason, you can just let it sit there, you can let it be.
+
+
+=====================================
+WHILE IMPLEMENTING THE VM TRANSLATOR 
+-------------------------------------
+
+>>> If there is at least one funciton in the vm program, there would have to be a sys.init that calls it. But if there is no sys.init, while there is a function, you should add the body of sys.init with a call to the function ... The book says it is the compilers' job to ensure that there is at least one such function sys.init .
+
+---- |||| let's investigate them vm programs, and see if they are translatable ... huh?
+
+===>>> make sure sp is incremented after every push operation, and that it is decremented
+after every pop operation, (it is also decremented before accessing top of the stack value,
+but decrement not the SP, but simply use the decremented value).

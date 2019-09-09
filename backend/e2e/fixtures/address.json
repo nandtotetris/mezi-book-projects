@@ -1,0 +1,38 @@
+[
+  {
+    "city" : "PARIS 1",
+    "address1" : "14 RUE DES BOURDONNAIS",
+    "id" : "1287821b-e6b5-470a-8dda-bc65f7cb081d",
+    "zipcode" : 75001,
+    "country" : "France",
+    "siret" : "44859708800013",
+    "created_at" : "2019-04-08 14:45:35.81427",
+    "company_id" : "b6eb2bd7-2e7a-40ce-92d5-0960fd9fe160",
+    "updated_at" : "2019-04-08 14:45:35.81427",
+    "address2" : null
+  },
+  {
+    "city" : "PARIS 4",
+    "address1" : "33 RUE DES ARCHIVES",
+    "id" : "2a4a3aa6-e669-48e7-b711-84c236adbbcf",
+    "zipcode" : 75004,
+    "country" : "France",
+    "siret" : "83303913400014",
+    "created_at" : "2019-04-08 14:33:01.613774",
+    "company_id" : "d973fe4e-6486-48bd-88be-d71a78b2a57a",
+    "updated_at" : "2019-04-08 14:33:01.613774",
+    "address2" : null
+  },
+  {
+    "city" : "PARIS 12",
+    "address1" : "65 RUE BARON LE ROY",
+    "id" : "a0831c0e-d3e5-419b-b9a8-4128efc28bde",
+    "zipcode" : 75012,
+    "country" : "France",
+    "siret" : "58202701700034",
+    "created_at" : "2019-04-08 14:40:13.309637",
+    "company_id" : "bf5ef1fa-b51a-49cd-877f-8100e13040d2",
+    "updated_at" : "2019-04-08 14:40:13.309637",
+    "address2" : null
+  }
+]

@@ -1,0 +1,30 @@
+type BankAccount {
+  id: ID
+  company: Company
+  mandates: [Mandate]
+  iban: Iban
+  label: String
+  default: Boolean
+  enabled: Boolean
+}
+
+type BankAccounts {
+  total: Int
+  rows: [BankAccount]
+}
+
+input BankAccountInput {
+  label: String!
+  iban: String
+}
+
+type Query {
+  bankAccounts: BankAccounts
+  bankAccount(id: ID!): BankAccount
+}
+
+type Mutation {
+  createOrUpdateBankAccount(input: BankAccountInput!, id: ID): BankAccount
+  changeDefaultBankAccount(id: ID!): [BankAccount]
+  removeBankAccount(id: ID!): BankAccount
+}

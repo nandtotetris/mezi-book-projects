@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:11-alpine
+    environment:
+      - POSTGRES_DB=${DATABASE_NAME}
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
+      - POSTGRES_USER=${DATABASE_USER}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    networks:
+      - default
+    labels: 
+      - "traefik.enable=false"
+  api:
+    depends_on:
+      - db
+    links:
+      - db
+
+volumes:
+  db-data:

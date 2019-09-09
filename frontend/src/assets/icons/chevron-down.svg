@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="10px" height="6px" viewBox="0 0 10 6" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.5 (67469) - http://www.bohemiancoding.com/sketch -->
+    <defs>
+        <path d="M10,12.5130435 C9.8373913,12.5130435 9.68956522,12.4539131 9.57130435,12.3356522 L5.87565215,8.4921739 C5.65391302,8.25565216 5.65391302,7.88608694 5.89043476,7.6495652 C6.1269565,7.42782607 6.49652172,7.42782607 6.73304346,7.66434781 L10,11.0643478 L13.2669565,7.66434781 C13.4886957,7.42782607 13.8730435,7.42782607 14.1095652,7.6495652 C14.346087,7.87130434 14.346087,8.25565216 14.1243479,8.4921739 L10.4286957,12.3356522 C10.3104348,12.4539131 10.1626087,12.5130435 10,12.5130435 Z" id="chevron-down"></path>
+    </defs>
+    <g id="Symbols" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Molecule/HEADER" transform="translate(-1306.000000, -25.000000)">
+            <g id="Arrows/chevron-down">
+                <g transform="translate(1301.000000, 18.000000)">
+                    <mask id="mask-chevron-down-2" fill="white">
+                        <use xlink:href="#chevron-down"></use>
+                    </mask>
+                    <use id="chevron-down" fill="currentColor" fill-rule="nonzero" xlink:href="#chevron-down"></use>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

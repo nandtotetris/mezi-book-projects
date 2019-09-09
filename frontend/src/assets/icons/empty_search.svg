@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="116px" height="116px" viewBox="0 0 116 116" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.5 (67469) - http://www.bohemiancoding.com/sketch -->
+    <title>Illus/Empty State Search</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <linearGradient x1="98.1846098%" y1="50%" x2="3.43885477%" y2="50%" id="linearGradient-1">
+            <stop stop-color="#1F87FF" offset="0%"></stop>
+            <stop stop-color="#0074F9" offset="100%"></stop>
+        </linearGradient>
+        <path d="M25.9999932,53.4814803 C11.8278096,52.9556956 0.5,41.3007237 0.5,27 C0.5,12.3644541 12.3644541,0.5 27,0.5 C41.6355459,0.5 53.5,12.3644541 53.5,27 C53.5,40.9627284 42.7013245,52.4032909 29,53.4256613 L29,70.5 C29,71.3284271 28.3284271,72 27.5,72 C26.6715729,72 26,71.3284271 26,70.5 L26,53.4814806 Z M27,50.5 C39.9786916,50.5 50.5,39.9786916 50.5,27 C50.5,14.0213084 39.9786916,3.5 27,3.5 C14.0213084,3.5 3.5,14.0213084 3.5,27 C3.5,39.9786916 14.0213084,50.5 27,50.5 Z" id="empty_search-2"></path>
+        <filter x="-8.5%" y="-2.1%" width="111.3%" height="104.2%" filterUnits="objectBoundingBox" id="filter-3">
+            <feMorphology radius="2.5" operator="erode" in="SourceAlpha" result="shadowSpreadOuter1"></feMorphology>
+            <feOffset dx="0" dy="5" in="shadowSpreadOuter1" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="1.5" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.5 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+    </defs>
+    <g id="Mon-réseau" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="05_02BIS_Empty-State" transform="translate(-627.000000, -222.000000)">
+            <g id="Popin" transform="translate(440.000000, 140.000000)">
+                <g id="Illus/Empty-State-Search" transform="translate(187.000000, 82.000000)">
+                    <g id="Illus/New_Facture">
+                        <circle id="Base_Illus" fill="#F5F6FA" cx="58" cy="58" r="58"></circle>
+                        <path d="M29.431192,57.730963 L3,57.730963" id="Line" stroke="#0053FA" stroke-linecap="square" stroke-dasharray="1,4" fill-rule="nonzero"></path>
+                        <path d="M113.5,58 L79,57.730963" id="Line-Copy-2" stroke="#0053FA" stroke-linecap="square" stroke-dasharray="1,4" fill-rule="nonzero"></path>
+                        <path d="M78.7096098,53.730963 L29,53.730963" id="Line-Copy" stroke="#0053FA" stroke-width="2" stroke-linecap="square" stroke-dasharray="1,4" fill-rule="nonzero"></path>
+                    </g>
+                    <g id="Group" transform="translate(61.547727, 61.547727) rotate(-45.000000) translate(-61.547727, -61.547727) translate(34.547727, 25.547727)">
+                        <circle id="Oval" fill-opacity="0.6" fill="#FFFFFF" fill-rule="nonzero" cx="27" cy="27" r="25"></circle>
+                        <g id="Combined-Shape" fill-rule="nonzero">
+                            <use fill="black" fill-opacity="1" filter="url(#filter-3)" xlink:href="#empty_search-2"></use>
+                            <use fill="url(#linearGradient-1)" xlink:href="#empty_search-2"></use>
+                        </g>
+                        <path d="M20.7537848,9.0965554 C23.6058922,3.7629341 9.031618,13.5789442 6.92313252,22.9272077 C5.71719123,28.273916 6.71219396,34.7311991 12.0580939,41.6820215 C17.4039938,48.6328439 11.1267012,31.4250589 12.5919752,24.1775775 C13.716536,18.6153181 17.9016775,14.4301767 20.7537848,9.0965554 Z" id="empty_search-4" fill-opacity="0.5" fill="#D8D8D8" fill-rule="nonzero"></path>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

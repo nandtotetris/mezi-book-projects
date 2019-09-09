@@ -1,0 +1,128 @@
+scalar Date
+scalar Upload
+scalar JSON
+
+type Invoice {
+  id: ID
+  status: String
+  filename: String
+  filepath: String
+  importAt: Date
+  importedBy: User
+  createdBy: User
+  companyEmitter: Company
+  companyReceiver: Company
+  number: String
+  iban: Iban
+  currency: String
+  total: Float
+  totalWoT: Float
+  dueDate: Date
+  invoiceDate: Date
+  receiverTitle: String
+  emitterTitle: String
+  enabled: Boolean
+  error: Boolean
+  ocrStatus: String
+  ocrPartner: String
+  ocrSirenFeedback: JSON
+  ocrFeedback: JSON
+  history(limit: Int, offset: Int): Histories
+  purchaseAccount: AccountingPreference
+  estimatedBalance: Float
+  paymentAt: Date
+  createdAt: Date
+  updatedAt: Date
+
+  companyEmitterId: String
+  companyEmitterDetails: JSON
+  companyEmitterContactDetails: JSON
+  companyReceiverId: String
+  companyReceiverDetails: JSON
+
+  documentType: String
+  invoiceDescription: String
+  discount: Float
+  templateId: Int
+  displayLegalNotice: JSON
+  vatAmounts: JSON
+  products: JSON
+  arCreatedById: String
+  source: String
+}
+
+type Invoices {
+  total: Int
+  rows: [Invoice]
+}
+
+enum InvoiceStatus {
+  IMPORTING
+  IMPORTED
+  SCANNING
+  SCANNED
+  TO_PAY
+  PLANNED
+  AR_DRAFT
+  PAID
+}
+
+input InvoiceFilters {
+  status: [InvoiceStatus]
+  enabled: Boolean
+}
+
+input InvoiceInput {
+  file: Upload
+}
+
+input UpdateInvoiceInput {
+  receiverTitle: String
+  number: String
+  iban: String
+  currency: String
+  total: Float
+  totalWoT: Float
+  dueDate: Date
+  invoiceDate: Date
+  companyEmitter: CompanyInput
+  ocrSirenFeedback: JSON
+  ocrFeedback: JSON
+  purchaseAccount: ID
+
+  companyEmitterId: String
+  companyEmitterDetails: JSON
+  companyEmitterContactDetails: JSON
+  companyReceiverId: String
+  companyReceiverDetails: JSON
+
+  documentType: String
+  emitterTitle: String
+  invoiceDescription: String
+  discount: Float
+  templateId: Int
+  displayLegalNotice: JSON
+  vatAmounts: JSON
+  products: JSON
+  arCreatedById: String
+  source: String
+  status: String
+}
+
+type Query {
+  invoices(filters: InvoiceFilters, limit: Int, offset: Int): Invoices
+  emittedInvoices(filters: InvoiceFilters, limit: Int, offset: Int): Invoices
+  invoice(id: ID!): Invoice
+  emittedInvoice(id: ID!): Invoice
+}
+
+type Mutation {
+  createInvoice(input: InvoiceInput): Invoice
+  createOrUpdateAR(input: UpdateInvoiceInput!, id: ID): Invoice
+  updateInvoice(id: ID!, input: UpdateInvoiceInput!): Invoice
+  updateInvoiceStatus(id: ID!, status: InvoiceStatus!): [Invoice]
+  removeInvoice(id: ID!): Invoice
+  removeAll(input: Boolean): Boolean
+  generateCode(invoiceId: ID!): Invoice
+  uploadRib(file: Upload!, invoiceId: ID!): String
+}

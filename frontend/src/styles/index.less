@@ -1,0 +1,213 @@
+// @import "~antd/dist/antd.less";
+@import "~antd/lib/style/core/index.less";
+@import '~antd/lib/style/themes/default.less';
+@import '~react-dragula/dist/dragula.css';
+@import "./variables.less";
+
+html,
+body,
+#root {
+  min-height: 100%;
+  height: 100vh;
+  color: @default-color;
+  position: relative;
+  overflow-x: hidden;
+}
+
+.svg-responsive {
+  display: inline-block;
+  position: relative;
+  width: 100%;
+  padding-bottom: 100%;
+  vertical-align: middle;
+  overflow: hidden;
+
+  svg {
+    display: inline-block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    max-width: 100%;
+    max-height: 100%;
+  }
+}
+
+:focus {
+  outline: none;
+}
+
+@media (min-width: @screen-sm-min) {
+  .mobile-only {
+    display: none !important;
+  }
+}
+@media (max-width: @screen-sm) {
+  .desktop-only {
+    display: none !important;
+  }
+}
+
+.ant-col {
+  outline: none;
+}
+
+.ant-layout {
+  background: #fff;
+  display: block;
+}
+
+img {
+  object-fit: contain;
+  max-width: 100%;
+}
+
+.ant-btn {
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.ant-form-item-label label {
+  font-size: 10px;
+  text-transform: uppercase;
+}
+
+.ant-avatar-string {
+  transform: translate(-50%, 0);
+}
+
+.full-width {
+  width: 100%;
+}
+
+/* Change the white to any color ;) */
+
+.ant-badge-status-dot {
+  width: 10px;
+  height: 10px;
+}
+
+.ant-badge-status-success {
+  background: @light-green;
+}
+
+.ant-badge-status-error {
+  background: #FF5F5F;
+}
+
+body .ant-tag {
+  transition: none;
+  border-radius: 10px;
+  margin: 0 8px;
+  font-size: 9px;
+  font-weight: 600;
+  line-height: 19px;
+  background-color: #0096F3;
+  border: 0;
+  color: white;
+  text-transform: uppercase;
+
+  &:hover {
+    opacity: 1;
+  }
+
+  svg {
+    color: white;
+    margin: 0 3px;
+    height: 7px;
+  }
+}
+
+body .ant-tag-success {
+  background-color: @light-green;
+}
+
+body .ant-tag-error {
+  background-color: @dark-red;
+}
+
+body .ant-tag-warning {
+  background-color: @light-orange;
+}
+
+body .ant-tag-disabled {
+  background-color: @lighter-color;
+}
+
+body .ant-tag.primary {
+  background-color: @primary-color;
+}
+
+.main-color {
+  color: @btn-primary-bg;
+}
+
+.default-color {
+  color: @default-color;
+}
+
+a,
+a:hover,
+a:focus,
+a:active {
+  color: inherit;
+  background-color: transparent;
+  text-decoration: none;
+  outline: none;
+  cursor: pointer;
+  -webkit-transition: none;
+  transition: none;
+  -webkit-text-decoration-skip: objects;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+.row-full-height {
+  display: flex;
+  flex: 1;
+}
+
+.col-flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.ant-collapse {
+  background: #FFFFFF;
+  border: 1px solid #EAEAEA !important;
+  box-shadow: 0 5px 30px 0 rgba(13,27,42,0.10);
+
+  & > .ant-collapse-item {
+    border: 0 !important;
+  }
+
+  .ant-collapse-content {
+    border: 0;
+  }
+
+  .ant-collapse-header {
+    text-align: left;
+    font-weight: @font-semi-bold;
+    text-transform: uppercase;
+  }
+
+  .ant-collapse-content-box {
+    text-align: left;
+    font-weight: @font-medium;
+    font-size: 14px;
+    letter-spacing: 0;
+  }
+}
+
+.ant-popover-inner-content {
+  white-space: pre-wrap;
+  text-align: center;
+}
+
+@media @tablet-down {
+  html,
+  body,
+  #root {
+    min-height: inherit;
+    height: inherit;
+  }
+}

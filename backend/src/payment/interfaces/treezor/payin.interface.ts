@@ -1,0 +1,73 @@
+import { ITreezorBasePayload } from './treezor-base-payload.interface';
+
+export interface ICreatePayinParams extends ITreezorBasePayload {
+  payinTag?: string;
+  walletId: number;
+  userId?: number;
+  paymentMethodId: number;
+  oneclickcardId?: number;
+  paymentAcceptedUrl?: string;
+  paymentWaitingUrl?: string;
+  paymentRefusedUrl?: string;
+  paymentCanceledUrl?: string;
+  paymentExceptionUrl?: string;
+  amount: number;
+  distributorFee?: number;
+  currency: string;
+  messageToUser?: string;
+  language?: string;
+  createdIp?: string;
+  payinDate?: string;
+  mandateId: string;
+}
+
+export interface ITreezorPayin {
+  payinId?: number;
+  payinTag?: string;
+  payinStatus?: string;
+  codeStatus?: number;
+  informationStatus?: string;
+  walletId?: number;
+  userId?: number;
+  cartId?: number;
+  walletEventName?: string;
+  walletAlias?: string;
+  userFirstname?: string;
+  userLastname?: string;
+  messageToUser?: string;
+  paymentMethodId?: number;
+  subtotalItems?: string;
+  subtotalServices?: string;
+  subtotalTax?: string;
+  amount?: string;
+  currency?: string;
+  distributorFee?: string;
+  createdDate?: string;
+  createdIp?: string;
+  paymentHtml?: string;
+  paymentLanguage?: string;
+  paymentPostUrl?: string;
+  paymentPostDataUrl?: string;
+  paymentAcceptedUrl?: string;
+  paymentWaitingUrl?: string;
+  paymentRefusedUrl?: string;
+  paymentCanceledUrl?: string;
+  paymentExceptionUrl?: string;
+  ibanFullname?: string;
+  ibanId?: string;
+  ibanBic?: string;
+  ibanTxEndToEndId?: string;
+  ibanTxId?: string;
+  refundAmount?: string;
+  totalRows?: number;
+  forwardUrl?: string;
+  payinDate?: string;
+  mandateId?: number;
+  creditorName?: string;
+  creditorAddressLine?: string;
+  creditorCountry?: string;
+  creditorIban?: string;
+  creditorBIC?: string;
+  virtualIbanId?: number;
+  virtualIbanReference?: string;
+}

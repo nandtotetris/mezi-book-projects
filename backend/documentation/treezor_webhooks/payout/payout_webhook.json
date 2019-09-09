@@ -1,0 +1,36 @@
+{
+  "webhook": "payout.create",
+  "webhook_id": "5793498",
+  "object": "payout",
+  "object_id": "12345",
+  "object_payload": {
+      "payouts": [{
+          "payoutId": "12345",
+          "payoutTag": "some-tag",
+          "payoutStatus": "CANCELED",
+          "payoutTypeId": "2",
+          "payoutType": "Direct Debit",
+          "walletId": "258024",
+          "bankaccountId": "58324",
+          "beneficiaryId": "33587",
+          "uniqueMandateReference": null,
+          "label": "Prélèvement SEAP PAUL DUPONT",
+          "payoutDate": "2018-01-10",
+          "amount": "100.00",
+          "currency": "EUR",
+          "partnerFee": "0",
+          "createdDate": "2018-01-01 11:00:00",
+          "modifiedDate": "0000-00-00 00:00:00",
+          "walletEventName": "Wallet-Client",
+          "walletAlias": "test-wallet",
+          "userLastname": "",
+          "userFirstname": "",
+          "userId": "98765",
+          "bankaccountIBAN": "ENCRYPTED IBAN",
+          "codeStatus": "160001",
+          "informationStatus": "",
+          "supportingFileLink": ""
+      }]
+  },
+  "object_payload_signature": "ox99VA+eQXj93O9U0wpWyrgLJTkxGtehv1vFbft3qRg="
+}

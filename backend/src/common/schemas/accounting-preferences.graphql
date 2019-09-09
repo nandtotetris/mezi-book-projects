@@ -1,0 +1,49 @@
+scalar Date
+
+type AccountingPreference {
+  id: ID
+  key: String
+  value: String
+  description: String
+  type: AccountingPreferenceType
+  order: Int
+  enabled: Boolean
+  company: Company
+  createdAt: Date
+  updatedAt: Date
+}
+
+type AccountingPreferences {
+  total: Int
+  rows: [AccountingPreference]
+}
+
+enum AccountingPreferenceType {
+  LEDGER_BANK
+  LEDGER_PURCHASE
+  LEDGER_SALES
+  LEDGER_MISC
+  VAT_ACCOUNT
+  VENDOR_ACCOUNT
+  PURCHASE_ACCOUNT
+  BANK_ACCOUNT
+  BANK_ACCOUNT_TREEZOR
+}
+
+input AccountingPreferenceInput {
+  id: ID
+  key: String!
+  value: String!
+  description: String
+  type: AccountingPreferenceType!
+  order: Int
+  enabled: Boolean
+}
+
+type Query {
+  accountingPreferences(types: [AccountingPreferenceType], default: Boolean): AccountingPreferences
+}
+
+type Mutation {
+  createOrUpdateAccountingPreferences(input: [AccountingPreferenceInput!]!): AccountingPreferences
+}

@@ -1,0 +1,37 @@
+scalar Date
+
+type Partner {
+  id: ID
+  name: String
+  companyInitiator: Company
+  companyPartner: Company
+  createdAt: Date
+  updatedAt: Date
+}
+
+type Partners {
+  total: Int
+  rows: [Partner]
+}
+
+enum PartnerOrder {
+  createdAt_ASC
+  createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+}
+
+input PartnerInput {
+  name: String
+  companyInitiatorId: Int!
+  companyPartnerId: Int!
+}
+
+type Query {
+  partners(orderBy: PartnerOrder, limit: Int, offset: Int): Companies
+  partner(id: ID): Company
+}
+
+type Mutation {
+  createPartner(input: CompanyInput!): Company
+}

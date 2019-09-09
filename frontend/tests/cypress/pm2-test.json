@@ -1,0 +1,12 @@
+{
+  "name": "libeoweb-test",
+  "script": "./tests/cypress/server.js",
+  "nodeArgs": ["--harmony"],
+  "log_date_format" : "YYYY-MM-DD HH:mm Z",
+  "exec_mode": "fork",
+  "wait_ready" : true,
+  "env": {
+    "NODE_ENV": "test",
+    "PORT": "3000"
+  }
+}

@@ -1,0 +1,45 @@
+scalar Date
+
+type Contact {
+  id: ID
+  firstname: String
+  lastname: String
+  user: User
+  company: Company
+  emails: Emails
+  createdAt: Date
+  updatedAt: Date
+}
+
+type Contacts {
+  total: Int
+  rows: [Contact]
+}
+
+enum ContactOrder {
+  firstname_ASC
+  firstname_DESC
+  lastname_ASC
+  lastname_DESC
+  createdAt_ASC
+  createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+}
+
+input ContactInput {
+  firstname: String!
+  lastname: String!
+  companyId: ID
+  emails: [ContactEmailInput]
+}
+
+input ContactEmailInput {
+  id: ID
+  email: String!
+}
+
+type Mutation {
+  createContact(input: ContactInput): Contact
+  updateContact(id: ID!, input: ContactInput!): Contact
+}

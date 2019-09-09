@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="7px" height="11px" viewBox="0 0 7 11" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.5 (67469) - http://www.bohemiancoding.com/sketch -->
+    <defs>
+        <path d="M15.6413044,12.5 C15.6413044,12.7032609 15.5673913,12.8880435 15.4195652,13.0358696 L10.6152174,17.6554348 C10.4673913,17.7847826 10.2826087,17.8586957 10.0978261,17.8586957 C9.8945652,17.8586957 9.70978259,17.7847826 9.5619565,17.6369566 C9.28478259,17.3413044 9.28478259,16.8793479 9.58043477,16.5836957 L13.8304348,12.5 L9.58043477,8.41630432 C9.28478259,8.13913041 9.28478259,7.65869562 9.5619565,7.36304345 C9.83913042,7.06739127 10.3195652,7.06739127 10.6152174,7.34456519 L15.4195652,11.9641304 C15.5673913,12.1119565 15.6413044,12.2967391 15.6413044,12.5 Z" id="chevron-right"></path>
+    </defs>
+    <g id="Switch-Account" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="09_Switch-Account" transform="translate(-1309.000000, -138.000000)">
+            <g id="Popin_info" transform="translate(1073.000000, 65.000000)">
+                <g id="Modifier" transform="translate(12.000000, 66.000000)">
+                    <g id="Arrows/chevron-right" transform="translate(215.000000, 0.000000)">
+                        <mask id="mask-chevron-right-2" fill="white">
+                            <use xlink:href="#chevron-right"></use>
+                        </mask>
+                        <use id="chevron-right" fill="currentColor" fill-rule="evenodd" xlink:href="#chevron-right"></use>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

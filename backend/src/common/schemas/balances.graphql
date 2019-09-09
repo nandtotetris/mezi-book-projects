@@ -1,0 +1,13 @@
+type Balance {
+  walletId: Int
+  currentBalance: Float
+  authorizations: Float
+  authorizedBalance: Float
+  currency: String
+  calculationDate: String
+}
+
+type Query {
+  balance: Balance
+  checkBalance(invoiceId: ID!, paymentAt: Date): Boolean
+}

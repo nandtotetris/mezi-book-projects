@@ -1,0 +1,21 @@
+{
+  "baseUrl": "http://localhost:3000",
+  "fileServerFolder": "./tests/cypress",
+  "fixturesFolder": "./tests/cypress/fixtures",
+  "integrationFolder": "./tests/cypress/integration",
+  "pluginsFile": "./tests/cypress/plugins/index.js",
+  "screenshotsFolder": "./cypress/screenshots",
+  "supportFile": "./tests/cypress/support/index.js",
+  "videosFolder": "./cypress/videos",
+  "video": false,
+  "env": {
+  },
+  "reporter": "junit",
+  "reporterOptions": {
+    "mochaFile": "cypress/test/cypress.[hash].xml",
+    "rootSuiteTitle": "Cypress root suite",
+    "testsuitesTitle": "Cypress"
+  },
+  "projectId": "frontend",
+  "chromeWebSecurity": false
+}

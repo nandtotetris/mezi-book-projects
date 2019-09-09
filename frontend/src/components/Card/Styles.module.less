@@ -1,0 +1,233 @@
+body .card-item.ant-card {
+  background: #FFFFFF;
+  border: 1px solid #EAEAEA;
+  word-break: break-word;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  font-weight: @font-semi-bold;
+  font-size: 11px;
+  color: @light-color;
+  letter-spacing: 0;
+  text-align: left;
+
+  .card-children {
+    width: 100%;
+    height: 100%;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  &.ant-card.center .card-children {
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
+
+  &.condensed-card {
+
+    .card-children {
+      flex-direction: row;
+    }
+
+    .ant-card-body {
+      padding: 13px;
+      flex-direction: row;
+    }
+
+    .condensed-card-left {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      align-items: flex-start;
+      align-self: flex-end;
+
+      .condensed-card-title {
+        font-weight: @font-bold;
+        font-size: 40px;
+        line-height: 45px;
+        color: #0D1B2A;
+        letter-spacing: 0;
+      }
+
+      .condensed-card-description {
+        font-weight: @font-bold;
+        font-size: 11px;
+        line-height: 11px;
+        color: #9B9B9B;
+        letter-spacing: 0;
+        text-transform: uppercase;
+      }
+    }
+
+    .condensed-card-right {
+      display: flex;
+      width: 63px;
+      height: 63px;
+      background: @primary-color;
+      justify-content: center;
+      align-items: center;
+
+      &.red {
+        background: @light-red;
+      }
+
+      &.green {
+        background: @light-green;
+      }
+
+      svg {
+        min-width: 33px;
+        min-height: 33px;
+        color: white;
+      }
+    }
+  }
+
+  .card-edit {
+    display: none;
+    width: 25px;
+    height: 25px;
+    padding: 5px;
+    top: 28px;
+    left: 75%;
+    transform: translate(-50%, 0);
+    position: absolute;
+    cursor: pointer;
+
+    svg {
+      color: @lighter-color;
+    }
+  }
+
+  .card-close {
+    width: 25px;
+    height: 25px;
+    padding: 5px;
+    top: 21px;
+    right: 10px;
+    text-align: right;
+    transform: translate(-50%, 0);
+    position: absolute;
+    cursor: pointer;
+
+    svg {
+      color: @lighter-color;
+    }
+  }
+
+  .card-remove {
+    display: none;
+    width: 25px;
+    height: 25px;
+    padding: 5px;
+    position: absolute;
+    top: 28px;
+    left: 25%;
+    transform: translate(-50%, 0);
+    cursor: pointer;
+
+    svg {
+      color: @light-red;
+    }
+  }
+
+  &:hover {
+    .card-remove,
+    .card-edit {
+      display: block;
+    }
+  }
+
+  &.shadow {
+    box-shadow: 0 10px 50px 0 rgba(0,116,249,0.10);
+  }
+
+  &.primary {
+    background: rgba(0,116,249,0.03);
+    border: 1px solid rgba(0,116,249,0.10);
+    box-shadow: 0 1px 10px 0 rgba(0,116,249,0.10);
+
+    .card-close svg {
+      color: @primary-color;
+    }
+  }
+
+  .ant-card-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    flex: 1;
+  }
+
+  .ant-avatar {
+    background: transparent;
+  }
+
+  .card-avatar.ant-avatar {
+    border-radius: 14px;
+    color: white;
+    margin-bottom: 10px;
+    background-color: #0053FA;
+
+    .ant-avatar-string {
+      transform: translateX(-50%) !important;
+      text-transform: uppercase;
+      font-weight: 700;
+      font-size: 10px;
+      color: #FFFFFF;
+      letter-spacing: 2px;
+      background: transparent;
+    }
+  }
+
+  .card-item {
+    .space {
+      margin-top: 10px;
+    }
+  }
+
+  .card-title {
+    width: 100%;
+    font-weight: 600;
+    font-size: 16px;
+    color: #0D1B2A;
+    letter-spacing: 0;
+    text-align: center;
+    line-height: 19px;
+    margin-bottom: 24px;
+
+    &.left {
+      width: 100%;
+      text-align-last: left;
+    }
+
+    &.right {
+      width: 100%;
+      text-align-last: left;
+    }
+  }
+
+  .card-row-title {
+    font-weight: 600;
+    font-size: 10px;
+    color: #989CA8;
+    letter-spacing: 0;
+    text-align: center;
+    line-height: 11px;
+    margin: 3px 0 15px;
+    text-transform: uppercase;
+  }
+
+  .card-row-item {
+    font-weight: 500;
+    font-size: 14px;
+    color: #0D1B2A;
+    letter-spacing: 0;
+    text-align: center;
+    line-height: 21px;
+    margin-bottom: 5px;
+  }
+}

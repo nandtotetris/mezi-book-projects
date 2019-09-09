@@ -1,0 +1,21 @@
+type Export {
+  id: ID
+  company: Company
+  fileLink: String
+  enabled: Boolean
+  createdAt: Date
+  updatedAt: Date
+}
+
+type Exports {
+  total: Int
+  rows: [Export]
+}
+
+type Mutation {
+  export: String
+}
+
+type Query {
+  exports(limit: Int, offset: Int): Exports
+}

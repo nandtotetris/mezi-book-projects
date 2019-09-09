@@ -1,0 +1,25 @@
+type Transactions {
+  total: Int
+  rows: [Transaction]
+}
+
+type Transaction {
+  transactionId: Int
+  walletDebitId: Int
+  walletCreditId: Int
+  transactionType: String
+  foreignId: Int
+  name: String
+  description: String
+  valueDate: String
+  executionDate: String
+  amount: String
+  walletDebitBalance: String
+  walletCreditBalance: String
+  currency: String
+  createdDate: String
+}
+
+type Query {
+  transactions(limit: Int, page: Int): Transactions
+}

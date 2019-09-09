@@ -1,0 +1,322 @@
+[
+  {
+    "entity" : "INVOICE",
+    "params" : "{\"status\":\"SCANNED\",\"oldStatus\":\"SCANNING\"}",
+    "entity_id" : "6abe54c2-11e3-4b9b-a37d-68d1aa70e737",
+    "id" : "020a1291-9a67-4aca-848c-7eff213c252e",
+    "event" : "UPDATE_STATUS",
+    "created_at" : "2019-04-08 14:27:19.761084",
+    "user_id" : "fa085838-5286-4ebd-a964-81e7928b353c",
+    "updated_at" : "2019-04-08 14:27:19.761084"
+  },
+  {
+    "entity" : "INVOICE",
+    "params" : "{\"status\":\"SCANNED\",\"oldStatus\":\"SCANNING\"}",
+    "entity_id" : "f9e831f6-8ad7-4735-a0c4-e7e57780611c",
+    "id" : "09527626-4170-4bd2-a0bb-ba86d477f891",
+    "event" : "UPDATE_STATUS",
+    "created_at" : "2019-04-08 14:27:19.909559",
+    "user_id" : "fa085838-5286-4ebd-a964-81e7928b353c",
+    "updated_at" : "2019-04-08 14:27:19.909559"
+  },
+  {
+    "entity" : "INVOICE",
+    "params" : "{\"status\":\"TO_PAY\",\"oldStatus\":\"SCANNED\"}",
+    "entity_id" : "2fd0003c-2488-4908-878f-5f59bd4fc4be",
+    "id" : "120087e5-f1dc-4daa-a4fd-c797e477317a",
+    "event" : "UPDATE_STATUS",
+    "created_at" : "2019-04-08 14:50:43.034764",
+    "user_id" : "fa085838-5286-4ebd-a964-81e7928b353c",
+    "updated_at" : "2019-04-08 14:50:43.034764"
+  },
+  {
+    "entity" : "INVOICE",
+    "params" : "{\"status\":\"SCANNING\",\"oldStatus\":\"IMPORTED\"}",
+    "entity_id" : "daec2cec-a7b9-4fe0-9887-2afe9b57baa2",
+    "id" : "21c5bb9f-a83d-4ae2-98ec-13b6424a3afa",
+    "event" : "UPDATE_STATUS",
+    "created_at" : "2019-04-08 14:44:19.549389",
+    "user_id" : "fa085838-5286-4ebd-a964-81e7928b353c",
+    "updated_at" : "2019-04-08 14:44:19.549389"
+  },
+  {
+    "entity" : "INVOICE",
+    "params" : "{\"status\":\"TO_PAY\",\"oldStatus\":\"SCANNED\"}",
+    "entity_id" : "daec2cec-a7b9-4fe0-9887-2afe9b57baa2",
+    "id" : "23fb2901-8b3f-4873-8f01-388045e33fac",
+    "event" : "UPDATE_STATUS",
+    "created_at" : "2019-04-08 14:45:36.16451",
+    "user_id" : "fa085838-5286-4ebd-a964-81e7928b353c",
+    "updated_at" : "2019-04-08 14:45:36.16451"
+  },
+  {
+    "entity" : "INVOICE",
+    "params" : "{\"status\":\"SCANNED\",\"oldStatus\":\"TO_PAY\"}",
+    "entity_id" : "2fd0003c-2488-4908-878f-5f59bd4fc4be",
+    "id" : "2a134d2a-19e1-489e-9a4e-6df2217f4c6e",
+    "event" : "UPDATE_STATUS",
+    "created_at" : "2019-04-08 14:52:09.752536",
+    "user_id" : "fa085838-5286-4ebd-a964-81e7928b353c",
+    "updated_at" : "2019-04-08 14:52:09.752536"
+  },
+  {
+    "entity" : "INVOICE",
+    "params" : "{\"status\":\"SCANNED\",\"oldStatus\":\"TO_PAY\"}",
+    "entity_id" : "6abe54c2-11e3-4b9b-a37d-68d1aa70e737",
+    "id" : "3848fe90-b1c0-4abc-826f-fdf5f45fef89",
+    "event" : "UPDATE_STATUS",
+    "created_at" : "2019-04-08 14:51:14.748369",
+    "user_id" : "fa085838-5286-4ebd-a964-81e7928b353c",
+    "updated_at" : "2019-04-08 14:51:14.748369"
+  },
+  {
+    "entity" : "INVOICE",
+    "params" : "{\"status\":\"SCANNING\",\"oldStatus\":\"IMPORTED\"}",
+    "entity_id" : "6abe54c2-11e3-4b9b-a37d-68d1aa70e737",
+    "id" : "3864e86b-c1c6-4d9e-9b32-d9102f7e6f67",
+    "event" : "UPDATE_STATUS",
+    "created_at" : "2019-04-08 14:27:17.760074",
+    "user_id" : "fa085838-5286-4ebd-a964-81e7928b353c",
+    "updated_at" : "2019-04-08 14:27:17.760074"
+  },
+  {
+    "entity" : "INVOICE",
+    "params" : "{\"status\":\"SCANNED\",\"oldStatus\":\"TO_PAY\"}",
+    "entity_id" : "2fd0003c-2488-4908-878f-5f59bd4fc4be",
+    "id" : "4a75b3f2-43fc-46f5-8307-473ce09402a6",
+    "event" : "UPDATE_STATUS",
+    "created_at" : "2019-04-08 14:50:52.227234",
+    "user_id" : "fa085838-5286-4ebd-a964-81e7928b353c",
+    "updated_at" : "2019-04-08 14:50:52.227234"
+  },
+  {
+    "entity" : "INVOICE",
+    "params" : "{\"status\":\"TO_PAY\",\"oldStatus\":\"SCANNED\"}",
+    "entity_id" : "2fd0003c-2488-4908-878f-5f59bd4fc4be",
+    "id" : "5aec69ac-3bc7-4e95-9ed2-01aee9aea26e",
+    "event" : "UPDATE_STATUS",
+    "created_at" : "2019-04-08 14:51:03.615937",
+    "user_id" : "fa085838-5286-4ebd-a964-81e7928b353c",
+    "updated_at" : "2019-04-08 14:51:03.615937"
+  },
+  {
+    "entity" : "INVOICE",
+    "params" : "{\"status\":\"TO_PAY\",\"oldStatus\":\"SCANNED\"}",
+    "entity_id" : "2fd0003c-2488-4908-878f-5f59bd4fc4be",
+    "id" : "6b771b05-6cf2-4a88-9097-9b4ae01c6a0d",
+    "event" : "UPDATE_STATUS",
+    "created_at" : "2019-04-08 14:37:06.659701",
+    "user_id" : "fa085838-5286-4ebd-a964-81e7928b353c",
+    "updated_at" : "2019-04-08 14:37:06.659701"
+  },
+  {
+    "entity" : "INVOICE",
+    "params" : "{\"status\":\"SCANNED\",\"oldStatus\":\"SCANNING\"}",
+    "entity_id" : "daec2cec-a7b9-4fe0-9887-2afe9b57baa2",
+    "id" : "6b90d9f5-0bb5-471b-9049-1d7a3ddee7f7",
+    "event" : "UPDATE_STATUS",
+    "created_at" : "2019-04-08 14:44:21.445427",
+    "user_id" : "fa085838-5286-4ebd-a964-81e7928b353c",
+    "updated_at" : "2019-04-08 14:44:21.445427"
+  },
+  {
+    "entity" : "INVOICE",
+    "params" : "{\"status\":\"IMPORTED\",\"oldStatus\":\"IMPORTING\"}",
+    "entity_id" : "2fd0003c-2488-4908-878f-5f59bd4fc4be",
+    "id" : "6e71d4e5-e6bf-43e4-8ef6-efe70d18f00c",
+    "event" : "UPDATE_STATUS",
+    "created_at" : "2019-04-08 14:27:17.438084",
+    "user_id" : "fa085838-5286-4ebd-a964-81e7928b353c",
+    "updated_at" : "2019-04-08 14:27:17.438084"
+  },
+  {
+    "entity" : "INVOICE",
+    "params" : "{\"status\":\"SCANNED\",\"oldStatus\":\"SCANNING\"}",
+    "entity_id" : "2fd0003c-2488-4908-878f-5f59bd4fc4be",
+    "id" : "755b26f3-477e-4ec5-854d-57ca3c3f4090",
+    "event" : "UPDATE_STATUS",
+    "created_at" : "2019-04-08 14:27:19.384436",
+    "user_id" : "fa085838-5286-4ebd-a964-81e7928b353c",
+    "updated_at" : "2019-04-08 14:27:19.384436"
+  },
+  {
+    "entity" : "INVOICE",
+    "params" : "{\"status\":\"TO_PAY\",\"oldStatus\":\"SCANNED\"}",
+    "entity_id" : "f9e831f6-8ad7-4735-a0c4-e7e57780611c",
+    "id" : "7f1cd707-777e-45b5-ab46-5bd226770ccf",
+    "event" : "UPDATE_STATUS",
+    "created_at" : "2019-04-08 14:51:54.655796",
+    "user_id" : "fa085838-5286-4ebd-a964-81e7928b353c",
+    "updated_at" : "2019-04-08 14:51:54.655796"
+  },
+  {
+    "entity" : "INVOICE",
+    "params" : "{\"status\":\"SCANNED\",\"oldStatus\":\"TO_PAY\"}",
+    "entity_id" : "2fd0003c-2488-4908-878f-5f59bd4fc4be",
+    "id" : "8799719f-4414-46f9-a649-6ffabe04fee7",
+    "event" : "UPDATE_STATUS",
+    "created_at" : "2019-04-08 14:47:11.403476",
+    "user_id" : "fa085838-5286-4ebd-a964-81e7928b353c",
+    "updated_at" : "2019-04-08 14:47:11.403476"
+  },
+  {
+    "entity" : "INVOICE",
+    "params" : "{\"status\":\"TO_PAY\",\"oldStatus\":\"SCANNED\"}",
+    "entity_id" : "f9e831f6-8ad7-4735-a0c4-e7e57780611c",
+    "id" : "8bbb5042-2565-4e10-8432-7e3cfbad3fa2",
+    "event" : "UPDATE_STATUS",
+    "created_at" : "2019-04-08 14:43:58.586152",
+    "user_id" : "fa085838-5286-4ebd-a964-81e7928b353c",
+    "updated_at" : "2019-04-08 14:43:58.586152"
+  },
+  {
+    "entity" : "INVOICE",
+    "params" : "{\"status\":\"TO_PAY\",\"oldStatus\":\"SCANNED\"}",
+    "entity_id" : "6abe54c2-11e3-4b9b-a37d-68d1aa70e737",
+    "id" : "901a4397-516c-409d-9e68-301f3cdc9aa1",
+    "event" : "UPDATE_STATUS",
+    "created_at" : "2019-04-08 14:51:24.930927",
+    "user_id" : "fa085838-5286-4ebd-a964-81e7928b353c",
+    "updated_at" : "2019-04-08 14:51:24.930927"
+  },
+  {
+    "entity" : "INVOICE",
+    "params" : "{\"status\":\"SCANNED\",\"oldStatus\":\"SCANNING\"}",
+    "entity_id" : "ac91e19c-7fee-4bb6-82d8-3bae0456e71a",
+    "id" : "9e46a33f-179a-425d-a843-f1b218487c3b",
+    "event" : "UPDATE_STATUS",
+    "created_at" : "2019-04-08 14:44:21.763759",
+    "user_id" : "fa085838-5286-4ebd-a964-81e7928b353c",
+    "updated_at" : "2019-04-08 14:44:21.763759"
+  },
+  {
+    "entity" : "INVOICE",
+    "params" : "{\"status\":\"IMPORTED\",\"oldStatus\":\"IMPORTING\"}",
+    "entity_id" : "daec2cec-a7b9-4fe0-9887-2afe9b57baa2",
+    "id" : "a97e0252-37e4-487f-90d7-f10ac7f6c3c4",
+    "event" : "UPDATE_STATUS",
+    "created_at" : "2019-04-08 14:44:19.533464",
+    "user_id" : "fa085838-5286-4ebd-a964-81e7928b353c",
+    "updated_at" : "2019-04-08 14:44:19.533464"
+  },
+  {
+    "entity" : "INVOICE",
+    "params" : "{\"status\":\"TO_PAY\",\"oldStatus\":\"SCANNED\"}",
+    "entity_id" : "ac91e19c-7fee-4bb6-82d8-3bae0456e71a",
+    "id" : "abd5c4fd-b35a-470f-bec6-e3e4654d3fe4",
+    "event" : "UPDATE_STATUS",
+    "created_at" : "2019-04-08 14:46:25.312986",
+    "user_id" : "fa085838-5286-4ebd-a964-81e7928b353c",
+    "updated_at" : "2019-04-08 14:46:25.312986"
+  },
+  {
+    "entity" : "INVOICE",
+    "params" : "{\"status\":\"IMPORTED\",\"oldStatus\":\"IMPORTING\"}",
+    "entity_id" : "6abe54c2-11e3-4b9b-a37d-68d1aa70e737",
+    "id" : "b96bcf6d-9a47-429b-b9dc-cb3825c3ff4f",
+    "event" : "UPDATE_STATUS",
+    "created_at" : "2019-04-08 14:27:17.742584",
+    "user_id" : "fa085838-5286-4ebd-a964-81e7928b353c",
+    "updated_at" : "2019-04-08 14:27:17.742584"
+  },
+  {
+    "entity" : "INVOICE",
+    "params" : "{\"status\":\"SCANNING\",\"oldStatus\":\"IMPORTED\"}",
+    "entity_id" : "ac91e19c-7fee-4bb6-82d8-3bae0456e71a",
+    "id" : "bbaba90b-e717-4b00-ac9f-0f00b004cb3a",
+    "event" : "UPDATE_STATUS",
+    "created_at" : "2019-04-08 14:44:19.504668",
+    "user_id" : "fa085838-5286-4ebd-a964-81e7928b353c",
+    "updated_at" : "2019-04-08 14:44:19.504668"
+  },
+  {
+    "entity" : "INVOICE",
+    "params" : "{\"status\":\"TO_PAY\",\"oldStatus\":\"SCANNED\"}",
+    "entity_id" : "2fd0003c-2488-4908-878f-5f59bd4fc4be",
+    "id" : "cb0b2a78-9bd1-4199-8c9e-599979d0096f",
+    "event" : "UPDATE_STATUS",
+    "created_at" : "2019-04-08 14:52:16.836884",
+    "user_id" : "fa085838-5286-4ebd-a964-81e7928b353c",
+    "updated_at" : "2019-04-08 14:52:16.836884"
+  },
+  {
+    "entity" : "INVOICE",
+    "params" : "{\"status\":\"SCANNING\",\"oldStatus\":\"IMPORTED\"}",
+    "entity_id" : "2fd0003c-2488-4908-878f-5f59bd4fc4be",
+    "id" : "cd9d9561-0c28-4221-a39c-2c648c010d30",
+    "event" : "UPDATE_STATUS",
+    "created_at" : "2019-04-08 14:27:17.457017",
+    "user_id" : "fa085838-5286-4ebd-a964-81e7928b353c",
+    "updated_at" : "2019-04-08 14:27:17.457017"
+  },
+  {
+    "entity" : "INVOICE",
+    "params" : "{\"status\":\"IMPORTED\",\"oldStatus\":\"IMPORTING\"}",
+    "entity_id" : "f9e831f6-8ad7-4735-a0c4-e7e57780611c",
+    "id" : "d801bb17-c3f4-40cb-9028-7cd124bcd374",
+    "event" : "UPDATE_STATUS",
+    "created_at" : "2019-04-08 14:27:17.78853",
+    "user_id" : "fa085838-5286-4ebd-a964-81e7928b353c",
+    "updated_at" : "2019-04-08 14:27:17.78853"
+  },
+  {
+    "entity" : "INVOICE",
+    "params" : "{\"status\":\"SCANNED\",\"oldStatus\":\"TO_PAY\"}",
+    "entity_id" : "f9e831f6-8ad7-4735-a0c4-e7e57780611c",
+    "id" : "d93eb42f-23e5-42b3-b27e-8af1d9e0ead9",
+    "event" : "UPDATE_STATUS",
+    "created_at" : "2019-04-08 14:51:47.164202",
+    "user_id" : "fa085838-5286-4ebd-a964-81e7928b353c",
+    "updated_at" : "2019-04-08 14:51:47.164202"
+  },
+  {
+    "entity" : "INVOICE",
+    "params" : "{\"status\":\"IMPORTED\",\"oldStatus\":\"IMPORTING\"}",
+    "entity_id" : "ac91e19c-7fee-4bb6-82d8-3bae0456e71a",
+    "id" : "e8777b0a-b1fa-47ae-8a83-4803d339afd9",
+    "event" : "UPDATE_STATUS",
+    "created_at" : "2019-04-08 14:44:19.498194",
+    "user_id" : "fa085838-5286-4ebd-a964-81e7928b353c",
+    "updated_at" : "2019-04-08 14:44:19.498194"
+  },
+  {
+    "entity" : "INVOICE",
+    "params" : "{\"status\":\"SCANNING\",\"oldStatus\":\"IMPORTED\"}",
+    "entity_id" : "f9e831f6-8ad7-4735-a0c4-e7e57780611c",
+    "id" : "ec6abfc0-109b-4619-ac86-1bbec500963f",
+    "event" : "UPDATE_STATUS",
+    "created_at" : "2019-04-08 14:27:17.806489",
+    "user_id" : "fa085838-5286-4ebd-a964-81e7928b353c",
+    "updated_at" : "2019-04-08 14:27:17.806489"
+  },
+  {
+    "entity" : "INVOICE",
+    "params" : "{\"status\":\"SCANNED\",\"oldStatus\":\"TO_PAY\"}",
+    "entity_id" : "2fd0003c-2488-4908-878f-5f59bd4fc4be",
+    "id" : "ecc0c8e3-9ed2-4e8d-acdd-85057005b2a6",
+    "event" : "UPDATE_STATUS",
+    "created_at" : "2019-04-08 14:36:23.375735",
+    "user_id" : "fa085838-5286-4ebd-a964-81e7928b353c",
+    "updated_at" : "2019-04-08 14:36:23.375735"
+  },
+  {
+    "entity" : "INVOICE",
+    "params" : "{\"status\":\"TO_PAY\",\"oldStatus\":\"SCANNED\"}",
+    "entity_id" : "6abe54c2-11e3-4b9b-a37d-68d1aa70e737",
+    "id" : "f2cd302d-5204-4d67-b4f8-9a70b7e2d881",
+    "event" : "UPDATE_STATUS",
+    "created_at" : "2019-04-08 14:40:13.658424",
+    "user_id" : "fa085838-5286-4ebd-a964-81e7928b353c",
+    "updated_at" : "2019-04-08 14:40:13.658424"
+  },
+  {
+    "entity" : "INVOICE",
+    "params" : "{\"status\":\"TO_PAY\",\"oldStatus\":\"SCANNED\"}",
+    "entity_id" : "2fd0003c-2488-4908-878f-5f59bd4fc4be",
+    "id" : "f9e98fd4-993a-4808-b4a6-98ab12ff96e6",
+    "event" : "UPDATE_STATUS",
+    "created_at" : "2019-04-08 14:29:36.258773",
+    "user_id" : "fa085838-5286-4ebd-a964-81e7928b353c",
+    "updated_at" : "2019-04-08 14:29:36.258773"
+  }
+]

@@ -1,0 +1,452 @@
+[
+  {
+    "enabled" : true,
+    "id" : "0f3139ca-c188-4c00-bc1a-ba1c6c7a7b2a",
+    "order" : 0,
+    "company_id" : null,
+    "key" : "Compte fournisseur",
+    "value" : "401000",
+    "description" : null,
+    "type" : "VENDOR_ACCOUNT"
+  },
+  {
+    "enabled" : true,
+    "id" : "07a225ac-74e0-4a2a-9c31-96391f9d3b0a",
+    "order" : 0,
+    "company_id" : null,
+    "key" : "Sous-traitance",
+    "value" : "611000",
+    "description" : null,
+    "type" : "PURCHASE_ACCOUNT"
+  },
+  {
+    "enabled" : true,
+    "id" : "0d9beb27-c88c-4ed6-97a0-e39f5f24f667",
+    "order" : 0,
+    "company_id" : null,
+    "key" : "Locations",
+    "value" : "613000",
+    "description" : null,
+    "type" : "PURCHASE_ACCOUNT"
+  },
+  {
+    "enabled" : true,
+    "id" : "0ea9254d-68ce-44b2-bfe4-063f322d5146",
+    "order" : 0,
+    "company_id" : null,
+    "key" : "Etudes et prestations de services",
+    "value" : "604000",
+    "description" : null,
+    "type" : "PURCHASE_ACCOUNT"
+  },
+  {
+    "enabled" : true,
+    "id" : "102b4e3d-949b-4d56-9ab1-434417740d7c",
+    "order" : 0,
+    "company_id" : null,
+    "key" : "Publicité \/ Publication \/ Relations publiques",
+    "value" : "623000",
+    "description" : null,
+    "type" : "PURCHASE_ACCOUNT"
+  },
+  {
+    "enabled" : true,
+    "id" : "13db34cd-514f-4c8d-a051-12852b0f0dca",
+    "order" : 0,
+    "company_id" : null,
+    "key" : "Rémunérations des transitaires",
+    "value" : "622400",
+    "description" : null,
+    "type" : "PURCHASE_ACCOUNT"
+  },
+  {
+    "enabled" : true,
+    "id" : "17a77a7b-f380-419b-b36a-1358a6722c62",
+    "order" : 0,
+    "company_id" : null,
+    "key" : "Missions",
+    "value" : "625600",
+    "description" : null,
+    "type" : "PURCHASE_ACCOUNT"
+  },
+  {
+    "enabled" : true,
+    "id" : "1dd9a236-7fa3-4107-aef4-f5bebdaf79a9",
+    "order" : 0,
+    "company_id" : null,
+    "key" : "Réceptions",
+    "value" : "625700",
+    "description" : null,
+    "type" : "PURCHASE_ACCOUNT"
+  },
+  {
+    "enabled" : true,
+    "id" : "2257a852-39d6-4586-a336-450fef9f08ac",
+    "order" : 0,
+    "company_id" : null,
+    "key" : "Foires et expositions",
+    "value" : "623300",
+    "description" : null,
+    "type" : "PURCHASE_ACCOUNT"
+  },
+  {
+    "enabled" : true,
+    "id" : "2e69e849-6452-40de-a31d-f9187e3af252",
+    "order" : 0,
+    "company_id" : null,
+    "key" : "Droits d'auteur et de reproduction",
+    "value" : "651600",
+    "description" : null,
+    "type" : "PURCHASE_ACCOUNT"
+  },
+  {
+    "enabled" : true,
+    "id" : "3343664a-2d55-44a6-b2fb-6e7221a56bad",
+    "order" : 0,
+    "company_id" : null,
+    "key" : "Eau \/ Energie",
+    "value" : "606100",
+    "description" : null,
+    "type" : "PURCHASE_ACCOUNT"
+  },
+  {
+    "enabled" : true,
+    "id" : "3acd3ca8-f6e5-4360-bd3a-e41d0637aaaa",
+    "order" : 0,
+    "company_id" : null,
+    "key" : "Matières premières et fournitures",
+    "value" : "601000",
+    "description" : null,
+    "type" : "PURCHASE_ACCOUNT"
+  },
+  {
+    "enabled" : true,
+    "id" : "3b6dcf1a-ad6b-4451-af05-0e6050dae29e",
+    "order" : 0,
+    "company_id" : null,
+    "key" : "Primes d'assurances",
+    "value" : "616000",
+    "description" : null,
+    "type" : "PURCHASE_ACCOUNT"
+  },
+  {
+    "enabled" : true,
+    "id" : "3c257818-7be8-4662-8307-a41a848efdd5",
+    "order" : 0,
+    "company_id" : null,
+    "key" : "Autres matières et fournitures",
+    "value" : "606800",
+    "description" : null,
+    "type" : "PURCHASE_ACCOUNT"
+  },
+  {
+    "enabled" : true,
+    "id" : "435af059-427b-4c5b-bfac-bc2dabfb92d5",
+    "order" : 0,
+    "company_id" : null,
+    "key" : "Catalogues et imprimés",
+    "value" : "623600",
+    "description" : null,
+    "type" : "PURCHASE_ACCOUNT"
+  },
+  {
+    "enabled" : true,
+    "id" : "5d9c360b-bf28-4d4f-b2e1-f74ca612bf7d",
+    "order" : 0,
+    "company_id" : null,
+    "key" : "Rémunérations d'affacturage",
+    "value" : "622500",
+    "description" : null,
+    "type" : "PURCHASE_ACCOUNT"
+  },
+  {
+    "enabled" : true,
+    "id" : "607afb2e-78ef-4494-a071-eab2d1bcbda0",
+    "order" : 0,
+    "company_id" : null,
+    "key" : "Redevances de crédit-bail",
+    "value" : "612000",
+    "description" : null,
+    "type" : "PURCHASE_ACCOUNT"
+  },
+  {
+    "enabled" : true,
+    "id" : "6f850cc4-9f7e-4468-b960-20c4bb5f9314",
+    "order" : 0,
+    "company_id" : null,
+    "key" : "Honoraires",
+    "value" : "622600",
+    "description" : null,
+    "type" : "PURCHASE_ACCOUNT"
+  },
+  {
+    "enabled" : true,
+    "id" : "6fb05b00-5516-482a-afe8-bfb6c928a3f9",
+    "order" : 0,
+    "company_id" : null,
+    "key" : "Redevances",
+    "value" : "651000",
+    "description" : null,
+    "type" : "PURCHASE_ACCOUNT"
+  },
+  {
+    "enabled" : true,
+    "id" : "755bbad3-1243-400e-b28e-174c8db220fe",
+    "order" : 0,
+    "company_id" : null,
+    "key" : "Divers",
+    "value" : "618000",
+    "description" : null,
+    "type" : "PURCHASE_ACCOUNT"
+  },
+  {
+    "enabled" : true,
+    "id" : "7c520277-2511-441d-872e-330f3f3b544c",
+    "order" : 0,
+    "company_id" : null,
+    "key" : "Fournitures consommables",
+    "value" : "602200",
+    "description" : null,
+    "type" : "PURCHASE_ACCOUNT"
+  },
+  {
+    "enabled" : true,
+    "id" : "7fc43a73-4393-4521-97e3-c2f44cd0c3bf",
+    "order" : 0,
+    "company_id" : null,
+    "key" : "Redevances pour concessions, brevets, licences, marques, procédés, logiciels",
+    "value" : "651100",
+    "description" : null,
+    "type" : "PURCHASE_ACCOUNT"
+  },
+  {
+    "enabled" : true,
+    "id" : "93ff7095-2c51-4c73-b1e0-036d48704740",
+    "order" : 0,
+    "company_id" : null,
+    "key" : "Etudes et recherches",
+    "value" : "617000",
+    "description" : null,
+    "type" : "PURCHASE_ACCOUNT"
+  },
+  {
+    "enabled" : true,
+    "id" : "9b9e13ff-ce87-4eee-9555-411e4647925e",
+    "order" : 0,
+    "company_id" : null,
+    "key" : "Autres droits et valeurs similaires",
+    "value" : "651800",
+    "description" : null,
+    "type" : "PURCHASE_ACCOUNT"
+  },
+  {
+    "enabled" : true,
+    "id" : "9e4ba5bd-6bf8-4a96-ab41-36e645ec173f",
+    "order" : 0,
+    "company_id" : null,
+    "key" : "Entretien et petit équipement",
+    "value" : "606300",
+    "description" : null,
+    "type" : "PURCHASE_ACCOUNT"
+  },
+  {
+    "enabled" : true,
+    "id" : "a18c4b01-eb67-4375-8119-ce333e3acf63",
+    "order" : 0,
+    "company_id" : null,
+    "key" : "Entretien et réparations",
+    "value" : "615000",
+    "description" : null,
+    "type" : "PURCHASE_ACCOUNT"
+  },
+  {
+    "enabled" : true,
+    "id" : "a635b850-403a-43cd-b91c-9f90e389228b",
+    "order" : 0,
+    "company_id" : null,
+    "key" : "Transports de bien",
+    "value" : "624000",
+    "description" : null,
+    "type" : "PURCHASE_ACCOUNT"
+  },
+  {
+    "enabled" : true,
+    "id" : "a70d8289-315c-4caa-a09b-7b673c705790",
+    "order" : 0,
+    "company_id" : null,
+    "key" : "Frais postaux et de télécommunications",
+    "value" : "626000",
+    "description" : null,
+    "type" : "PURCHASE_ACCOUNT"
+  },
+  {
+    "enabled" : true,
+    "id" : "a8627b75-bbf5-4828-8ab1-6c6ce4305dce",
+    "order" : 0,
+    "company_id" : null,
+    "key" : "Marchandises",
+    "value" : "607000",
+    "description" : null,
+    "type" : "PURCHASE_ACCOUNT"
+  },
+  {
+    "enabled" : true,
+    "id" : "ae28c27e-2cec-4a26-a18b-69b1c1852aaf",
+    "order" : 0,
+    "company_id" : null,
+    "key" : "Colloques, séminaires, conférences",
+    "value" : "618500",
+    "description" : null,
+    "type" : "PURCHASE_ACCOUNT"
+  },
+  {
+    "enabled" : true,
+    "id" : "afd154b5-188b-4358-bd33-2d92889683a5",
+    "order" : 0,
+    "company_id" : null,
+    "key" : "Fournitures administratives",
+    "value" : "606400",
+    "description" : null,
+    "type" : "PURCHASE_ACCOUNT"
+  },
+  {
+    "enabled" : true,
+    "id" : "b29b150b-262f-470f-8dc9-da9c59e03db3",
+    "order" : 0,
+    "company_id" : null,
+    "key" : "Emballages",
+    "value" : "602600",
+    "description" : null,
+    "type" : "PURCHASE_ACCOUNT"
+  },
+  {
+    "enabled" : true,
+    "id" : "b689c15d-158d-4627-be4b-8e4adf050ca6",
+    "order" : 0,
+    "company_id" : null,
+    "key" : "Charges locatives \/ copropriété",
+    "value" : "614000",
+    "description" : null,
+    "type" : "PURCHASE_ACCOUNT"
+  },
+  {
+    "enabled" : true,
+    "id" : "b9595dc2-fd7c-47c1-a463-4ad38df6458f",
+    "order" : 0,
+    "company_id" : null,
+    "key" : "Personnel extérieur à l'entreprise",
+    "value" : "621000",
+    "description" : null,
+    "type" : "PURCHASE_ACCOUNT"
+  },
+  {
+    "enabled" : true,
+    "id" : "c0bc96ee-faf2-4ae4-ab8d-7c7804ca27e4",
+    "order" : 0,
+    "company_id" : null,
+    "key" : "Matériel, équipements et travaux",
+    "value" : "605000",
+    "description" : null,
+    "type" : "PURCHASE_ACCOUNT"
+  },
+  {
+    "enabled" : true,
+    "id" : "c52f8519-0c95-4330-b7bf-3b26c2bb62b3",
+    "order" : 0,
+    "company_id" : null,
+    "key" : "Publications",
+    "value" : "623700",
+    "description" : null,
+    "type" : "PURCHASE_ACCOUNT"
+  },
+  {
+    "enabled" : true,
+    "id" : "e2fd54ab-6849-4420-8cf4-11403872c4fd",
+    "order" : 0,
+    "company_id" : null,
+    "key" : "Déplacements, missions et réceptions",
+    "value" : "625000",
+    "description" : null,
+    "type" : "PURCHASE_ACCOUNT"
+  },
+  {
+    "enabled" : true,
+    "id" : "e38f6433-df07-45aa-8d38-fd29463b676b",
+    "order" : 0,
+    "company_id" : null,
+    "key" : "Rémunérations d'intermédiaires et honoraires",
+    "value" : "622000",
+    "description" : null,
+    "type" : "PURCHASE_ACCOUNT"
+  },
+  {
+    "enabled" : true,
+    "id" : "e5503beb-6f51-48e1-b438-efc1107d9e3f",
+    "order" : 0,
+    "company_id" : null,
+    "key" : "Services bancaires",
+    "value" : "627000",
+    "description" : null,
+    "type" : "PURCHASE_ACCOUNT"
+  },
+  {
+    "enabled" : true,
+    "id" : "e559d635-6250-4d83-9985-ae56d17423d0",
+    "order" : 0,
+    "company_id" : null,
+    "key" : "Divers",
+    "value" : "628000",
+    "description" : null,
+    "type" : "PURCHASE_ACCOUNT"
+  },
+  {
+    "enabled" : true,
+    "id" : "ed6ba794-2fbe-453a-950d-15869801ebc3",
+    "order" : 0,
+    "company_id" : null,
+    "key" : "Autres approvisionnements",
+    "value" : "602000",
+    "description" : null,
+    "type" : "PURCHASE_ACCOUNT"
+  },
+  {
+    "enabled" : true,
+    "id" : "edf45c47-6342-4607-80cb-a5e2525f409c",
+    "order" : 0,
+    "company_id" : null,
+    "key" : "Voyages et déplacements",
+    "value" : "625100",
+    "description" : null,
+    "type" : "PURCHASE_ACCOUNT"
+  },
+  {
+    "enabled" : true,
+    "id" : "f3bf3085-5d51-4f37-a59d-bccfa42c63c5",
+    "order" : 0,
+    "company_id" : null,
+    "key" : "Matières consommables",
+    "value" : "602100",
+    "description" : null,
+    "type" : "PURCHASE_ACCOUNT"
+  },
+  {
+    "enabled" : true,
+    "id" : "f614641c-d8a1-4b21-adc0-f1807b083a59",
+    "order" : 0,
+    "company_id" : null,
+    "key" : "Frais de déménagement",
+    "value" : "625500",
+    "description" : null,
+    "type" : "PURCHASE_ACCOUNT"
+  },
+  {
+    "enabled" : true,
+    "id" : "fe9c4935-10c9-4d36-ad4a-df7278820038",
+    "order" : 0,
+    "company_id" : null,
+    "key" : "Matières non stockées et fournitures",
+    "value" : "606000",
+    "description" : null,
+    "type" : "PURCHASE_ACCOUNT"
+  }
+]

@@ -1,0 +1,54 @@
+version: '3'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: config/docker/node/Dockerfile
+    image: registry.gitlab.com/backend/backend/api:${CI_COMMIT_SHA}
+    volumes:
+      - .env:/var/www/html/.env
+      - .env:/var/www/html/backend/.env
+    labels:
+      - "traefik.enable=false"
+    command: sh -c "yarn workspace backend run start"
+  web:
+    build:
+      context: .
+      dockerfile: config/docker/httpd/Dockerfile
+    image: registry.gitlab.com/backend/backend/web:${CI_COMMIT_SHA}
+    environment:
+      DOMAIN: "${DOMAIN}"
+      REACT_APP_API_URL: "${REACT_APP_API_URL}"
+    links:
+      - api
+    depends_on:
+      - api
+    working_dir: /var/www/html
+    volumes:
+      - ./frontend/config.js:/var/www/html/frontend/config.js
+    labels:
+      - "traefik.enable=false"
+  cache:
+    image: registry.gitlab.com/backend/docker-images/varnish:latest
+    links:
+      - web
+    depends_on:
+      - web
+    networks: 
+      - default
+      - gateway
+    volumes:
+      - ./config/docker/varnish/default.vcl:/etc/varnish/default.vcl
+    labels:
+      - "traefik.api.frontend.rule=Host:api.${DOMAIN}"
+      - "traefik.web.frontend.rule=Host:app.${DOMAIN}"
+      - "traefik.docker.network=traefik_net"
+
+volumes:
+  php-data:
+
+networks:
+  gateway:
+    external:
+      name: traefik_net

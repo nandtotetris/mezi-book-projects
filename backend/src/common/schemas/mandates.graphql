@@ -1,0 +1,34 @@
+scalar Date
+
+type Mandate {
+  id: ID
+  bankAccount: BankAccount
+  treezorMandateId: String
+  rum: String
+  filePath: String
+  status: String
+  signatory: User
+  signatoryIp: String
+  validationCode: String
+  signaturedAt: Date
+  createdAt: Date
+  updatedAt: Date
+}
+
+enum MandateStatus {
+  PENDING
+  VALIDATED
+  REFUSED
+  SIGNED
+}
+
+type Query {
+  mandate(id: ID!): Mandate
+}
+
+type Mutation {
+  createMandate(bankAccountId: ID!): Mandate
+  generateCodeMandate(id: ID!): Mandate
+  signedMandate(id: ID!, code: String!): Mandate
+  removeMandate(id: ID!): Mandate
+}

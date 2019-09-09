@@ -1,0 +1,6 @@
+.shadow-wrapper {
+  background: #FFFFFF;
+  border: 1px solid #EAEAEA;
+  box-shadow: 0 5px 30px 0 rgba(13,27,42,0.10);
+  padding: 21px 27px 21px 27px;
+}

@@ -1,0 +1,31 @@
+scalar Date
+
+type User {
+  id: ID
+  firstname: String
+  lastname: String
+  email: String
+  token: String
+  lastLogin: Date
+  lastCguAccept: Date
+  currentCompany: Company
+  companies: Companies
+  createdAt: Date
+  updatedAt: Date
+}
+
+input UserInput {
+  firstname: String!
+  lastname: String!
+  password: String
+}
+
+type Query {
+  me: User
+}
+
+type Mutation {
+  refreshConfirmationTokenUser(email: String!): User
+  activateUser(confirmationToken: String!): Boolean
+  updateUser(input: UserInput!): User
+}
