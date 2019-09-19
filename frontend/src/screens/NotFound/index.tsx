@@ -5,6 +5,8 @@ import HackAssemblerTranslator from 'dismantle/Translator/HackAssemblerTranslato
 import Definitions from 'dismantle/Utilities/Definitions';
 import * as React from 'react';
 import { RouteComponentProps } from 'react-router';
+import JackTokenizer from 'dismantle/Compiler/JackTokenizer';
+import Tokenizr from 'tokenizr';
 
 interface IProps extends RouteComponentProps {}
 
@@ -480,6 +482,30 @@ add
 return
 `;
 
+const SquareMainJack: string = `
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/09/Square/Main.jack
+
+/**
+ * The Main class initializes a new Square Dance game and starts it.
+ */
+class Main {
+
+    /** Initializes a new game and starts it. */    
+    function void main() {
+        var SquareGame game;
+
+        let game = SquareGame.new();
+        do game.run();
+		do game.dispose();
+
+        return;
+    }
+}
+`;
+
 const assemble = () => {
   localStorage.setItem('mezi.asm', 'labelledAssembly');
   const program: number[] = HackAssemblerTranslator.loadProgram(
@@ -523,9 +549,84 @@ const translateVM = () => {
   translator.translate();
 };
 
+const testTokenizr = () => {
+  const parser: Tokenizr = new Tokenizr();
+  const input = `
+    hello there // this is comment
+    "string negn 123"  890
+    and mnamn
+  `;
+  parser.input(input);
+  parser.debug(false);
+  parser.rule(/(?:\/\*(?:[\s\S]*?)\*\/)|(\/\/.*)/, (ctx, match) => {
+    ctx.ignore();
+  });
+  parser.rule(/[ \t\r\n]+/, (ctx, match) => {
+    ctx.ignore();
+  });
+  parser.rule(/"[^\r\n\\"]*"/, (ctx, match) => {
+    ctx.accept('string');
+  });
+  parser.rule(/[0-9]+/, (ctx, match) => {
+    ctx.accept('number');
+  });
+  parser.rule(/[a-zA-Z_][a-zA-Z0-9_]*/, (ctx, match) => {
+    ctx.accept('identifier');
+  });
+  const hasMoreTokens = () => {
+    try {
+      const peekedToken: any = parser.peek(1);
+      return peekedToken !== null;
+    } catch {
+      return false;
+    }
+  };
+  let token: any;
+  while (hasMoreTokens()) {
+    token = parser.token();
+    // tslint:disable-next-line: no-console
+    console.log(token.value);
+  }
+};
+
+const testJackTokenizer = (source: string) => {
+  const tokenizer: JackTokenizer = new JackTokenizer(source);
+  const output: string[] = [];
+  while (tokenizer.hasMoreTokens()) {
+    tokenizer.advance();
+    switch (tokenizer.tokenType()) {
+      case JackTokenizer.TYPE_KEYWORD:
+        output.push(`<keyword>${tokenizer.keyWord()}</keyword>`);
+        break;
+      case JackTokenizer.TYPE_SYMBOL:
+        output.push(`<symbol>${tokenizer.symbol()}</symbol>`);
+        break;
+      case JackTokenizer.TYPE_IDENTIFIER:
+        output.push(`<identifier>${tokenizer.identifier()}</identifier>`);
+        break;
+      case JackTokenizer.TYPE_INT_CONST:
+        output.push(`<integerConstant>${tokenizer.intVal()}</integerConstant>`);
+        break;
+      case JackTokenizer.TYPE_STRING_CONST:
+        output.push(
+          `<stringConstant>${tokenizer.stringVal()}</stringConstant>`,
+        );
+        break;
+      default:
+        break;
+    }
+  }
+  const tokensList: string = output.join('\n');
+  const xmlOutput: string = `<tokens>\n${tokensList}\n<tokens>`;
+  // tslint:disable-next-line: no-console
+  console.log(xmlOutput);
+};
+
 const NotFound: React.FunctionComponent<IProps> = ({ location }) => {
   // assemble();
-  translateVM();
+  // translateVM();
+  // testTokenizr();
+  testJackTokenizer(SquareMainJack);
   return (
     <Layout style={{ flex: 1, width: '100%', height: '100%' }}>
       <Layout.Content
