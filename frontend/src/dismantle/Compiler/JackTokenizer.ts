@@ -123,7 +123,7 @@ class JackTokenizer {
 
   /**
    * Returns the identifier which is the current token.
-   * Should be called only when tokenType() is IDENTIFIEsR
+   * Should be called only when tokenType() is IDENTIFIER
    */
   public identifier(): string {
     if (this.currentTokenType === JackTokenizer.TYPE_IDENTIFIER) {

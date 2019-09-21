@@ -1,11 +1,12 @@
 import { Col, Layout, Row } from 'antd';
 import UploadComponent from 'components/Upload/UploadComponent';
+import CompilationEngine from 'dismantle/Compiler/CompilationEngine';
+import JackTokenizer from 'dismantle/Compiler/JackTokenizer';
 import VMTranslator from 'dismantle/MyVMTranslator/VMTranslator';
 import HackAssemblerTranslator from 'dismantle/Translator/HackAssemblerTranslator';
 import Definitions from 'dismantle/Utilities/Definitions';
 import * as React from 'react';
 import { RouteComponentProps } from 'react-router';
-import JackTokenizer from 'dismantle/Compiler/JackTokenizer';
 import Tokenizr from 'tokenizr';
 
 interface IProps extends RouteComponentProps {}
@@ -506,6 +507,314 @@ class Main {
 }
 `;
 
+const SquareJack: string = `
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/09/Square/Square.jack
+
+/**
+ * Implements a graphic square. A graphic square has a screen location
+ * and a size. It also has methods for drawing, erasing, moving on the 
+ * screen, and changing its size.
+ */
+class Square {
+
+    // Location on the screen
+    field int x, y;
+
+    // The size of the square
+    field int size;
+
+    /** Constructs a new square with a given location and size. */
+    constructor Square new(int Ax, int Ay, int Asize) {
+        let x = Ax;
+        let y = Ay;
+        let size = Asize;
+
+        do draw();
+
+        return this;
+    }
+
+    /** Deallocates the object's memory. */
+    method void dispose() {
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    /** Draws the square on the screen. */
+    method void draw() {
+        do Screen.setColor(true);
+        do Screen.drawRectangle(x, y, x + size, y + size);
+        return;
+    }
+
+    /** Erases the square from the screen. */
+    method void erase() {
+        do Screen.setColor(false);
+        do Screen.drawRectangle(x, y, x + size, y + size);
+        return;
+    }
+
+    /** Increments the size by 2 pixels. */
+    method void incSize() {
+        if (((y + size) < 254) & ((x + size) < 510)) {
+            do erase();
+            let size = size + 2;
+            do draw();
+        }
+        return;
+    }
+
+    /** Decrements the size by 2 pixels. */
+    method void decSize() {
+        if (size > 2) {
+            do erase();
+            let size = size - 2;
+            do draw();
+        }
+        return;
+	}
+
+    /** Moves up by 2 pixels. */
+    method void moveUp() {
+        if (y > 1) {
+            do Screen.setColor(false);
+            do Screen.drawRectangle(x, (y + size) - 1, x + size, y + size);
+            let y = y - 2;
+            do Screen.setColor(true);
+            do Screen.drawRectangle(x, y, x + size, y + 1);
+        }
+        return;
+    }
+
+    /** Moves down by 2 pixels. */
+    method void moveDown() {
+        if ((y + size) < 254) {
+            do Screen.setColor(false);
+            do Screen.drawRectangle(x, y, x + size, y + 1);
+            let y = y + 2;
+            do Screen.setColor(true);
+            do Screen.drawRectangle(x, (y + size) - 1, x + size, y + size);
+        }
+        return;
+    }
+
+    /** Moves left by 2 pixels. */
+    method void moveLeft() {
+        if (x > 1) {
+            do Screen.setColor(false);
+            do Screen.drawRectangle((x + size) - 1, y, x + size, y + size);
+            let x = x - 2;
+            do Screen.setColor(true);
+            do Screen.drawRectangle(x, y, x + 1, y + size);
+        }
+        return;
+    }
+
+    /** Moves right by 2 pixels. */
+    method void moveRight() {
+        if ((x + size) < 510) {
+            do Screen.setColor(false);
+            do Screen.drawRectangle(x, y, x + 1, y + size);
+            let x = x + 2;
+            do Screen.setColor(true);
+            do Screen.drawRectangle((x + size) - 1, y, x + size, y + size);
+        }
+        return;
+    }
+}
+`;
+
+const SquareGameJack: string = `
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/09/Square/SquareGame.jack
+
+/**
+ * Implements the Square Dance game.
+ * In this game you can move a black square around the screen and
+ * change its size during the movement.
+ * In the beginning, the square is located at the top-left corner
+ * of the screen. The arrow keys are used to move the square.
+ * The 'z' & 'x' keys are used to decrement and increment the size.
+ * The 'q' key is used to quit the game.
+ */
+class SquareGame {
+
+    // The square
+    field Square square;
+
+    // The square's movement direction
+    field int direction; // 0=none,1=up,2=down,3=left,4=right
+
+    /** Constructs a new Square Game. */
+    constructor SquareGame new() {
+        let square = Square.new(0, 0, 30);
+        let direction = 0;
+
+        return this;
+    }
+
+    /** Deallocates the object's memory. */
+    method void dispose() {
+        do square.dispose();
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    /** Starts the game. Handles inputs from the user that control
+     *  the square's movement, direction and size. */
+    method void run() {
+        var char key;
+        var boolean exit;
+
+        let exit = false;
+
+        while (~exit) {
+            // waits for a key to be pressed.
+            while (key = 0) {
+                let key = Keyboard.keyPressed();
+                do moveSquare();
+            }
+
+            if (key = 81) {
+                let exit = true;
+            }
+            if (key = 90) {
+                do square.decSize();
+            }
+            if (key = 88) {
+                do square.incSize();
+            }
+            if (key = 131) {
+                let direction = 1;
+            }
+            if (key = 133) {
+                let direction = 2;
+            }
+            if (key = 130) {
+                let direction = 3;
+            }
+            if (key = 132) {
+                let direction = 4;
+            }
+
+            // waits for the key to be released.
+            while (~(key = 0)) {
+                let key = Keyboard.keyPressed();
+                do moveSquare();
+            }
+        }
+            
+        return;
+	}
+
+    /** Moves the square by 2 pixels in the current direction. */
+    method void moveSquare() {
+        if (direction = 1) {
+            do square.moveUp();
+        }
+        if (direction = 2) {
+            do square.moveDown();
+        }
+        if (direction = 3) {
+            do square.moveLeft();
+        }
+        if (direction = 4) {
+            do square.moveRight();
+        }
+
+        do Sys.wait(5); // Delays the next movement.
+        return;
+    }
+}
+`;
+
+const SquareGameJackk: string = `
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/09/Square/SquareGame.jack
+
+/**
+ * Implements the Square Dance game.
+ * In this game you can move a black square around the screen and
+ * change its size during the movement.
+ * In the beginning, the square is located at the top-left corner
+ * of the screen. The arrow keys are used to move the square.
+ * The 'z' & 'x' keys are used to decrement and increment the size.
+ * The 'q' key is used to quit the game.
+ */
+class SquareGame {
+
+    // The square
+    field Square square;
+
+    // The square's movement direction
+    field int direction; // 0=none,1=up,2=down,3=left,4=right
+
+    /** Constructs a new Square Game. */
+    constructor SquareGame new() {
+    }
+
+    /** Deallocates the object's memory. */
+    method void dispose() {
+    }
+
+    /** Starts the game. Handles inputs from the user that control
+     *  the square's movement, direction and size. */
+    method void run() {
+
+	}
+
+    /** Moves the square by 2 pixels in the current direction. */
+    method void moveSquare() {
+    }
+}
+`;
+
+const ArrayTestMainJack: string = `
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/10/ArrayTest/Main.jack
+
+/** Computes the average of a sequence of integers. */
+class Main {
+    function void main() {
+        var Array a;
+        var int length;
+		var int i, sum;
+	
+		let length = Keyboard.readInt("HOW MANY NUMBERS? ");
+		let a = Array.new(length);
+		let i = 0;
+	
+		while (i < length) {
+	  	  	let a[i] = Keyboard.readInt("ENTER THE NEXT NUMBER: ");
+	  	 	let i = i + 1;
+		}
+	
+		let i = 0;
+		let sum = 0;
+	
+		while (i < length) {
+		    let sum = sum + a[i];
+	 	   	let i = i + 1;
+		}
+	
+		do Output.printString("THE AVERAGE IS: ");
+		do Output.printInt(sum / length);
+		do Output.println();
+	
+		return;
+    }
+}
+`;
+
 const assemble = () => {
   localStorage.setItem('mezi.asm', 'labelledAssembly');
   const program: number[] = HackAssemblerTranslator.loadProgram(
@@ -599,7 +908,17 @@ const testJackTokenizer = (source: string) => {
         output.push(`<keyword>${tokenizer.keyWord()}</keyword>`);
         break;
       case JackTokenizer.TYPE_SYMBOL:
-        output.push(`<symbol>${tokenizer.symbol()}</symbol>`);
+        let symbol: string = tokenizer.symbol();
+        const escapedSymbols: any = {
+          '"': '&quot;',
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+        };
+        if (escapedSymbols[symbol] !== undefined) {
+          symbol = escapedSymbols[symbol];
+        }
+        output.push(`<symbol>${symbol}</symbol>`);
         break;
       case JackTokenizer.TYPE_IDENTIFIER:
         output.push(`<identifier>${tokenizer.identifier()}</identifier>`);
@@ -617,16 +936,23 @@ const testJackTokenizer = (source: string) => {
     }
   }
   const tokensList: string = output.join('\n');
-  const xmlOutput: string = `<tokens>\n${tokensList}\n<tokens>`;
+  const xmlOutput: string = `<tokens>\n${tokensList}\n</tokens>`;
   // tslint:disable-next-line: no-console
   console.log(xmlOutput);
+};
+
+const testCompilationEngine = (source: string) => {
+  const engine: CompilationEngine = new CompilationEngine(source, '');
+  // tslint:disable-next-line: no-console
+  console.log(engine.getXmlOutput());
 };
 
 const NotFound: React.FunctionComponent<IProps> = ({ location }) => {
   // assemble();
   // translateVM();
   // testTokenizr();
-  testJackTokenizer(SquareMainJack);
+  // testJackTokenizer(ArrayTestMainJack);
+  testCompilationEngine(SquareGameJackk);
   return (
     <Layout style={{ flex: 1, width: '100%', height: '100%' }}>
       <Layout.Content
