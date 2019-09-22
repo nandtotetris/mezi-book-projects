@@ -733,49 +733,6 @@ class SquareGame {
 }
 `;
 
-const SquareGameJackk: string = `
-// This file is part of www.nand2tetris.org
-// and the book "The Elements of Computing Systems"
-// by Nisan and Schocken, MIT Press.
-// File name: projects/09/Square/SquareGame.jack
-
-/**
- * Implements the Square Dance game.
- * In this game you can move a black square around the screen and
- * change its size during the movement.
- * In the beginning, the square is located at the top-left corner
- * of the screen. The arrow keys are used to move the square.
- * The 'z' & 'x' keys are used to decrement and increment the size.
- * The 'q' key is used to quit the game.
- */
-class SquareGame {
-
-    // The square
-    field Square square;
-
-    // The square's movement direction
-    field int direction; // 0=none,1=up,2=down,3=left,4=right
-
-    /** Constructs a new Square Game. */
-    constructor SquareGame new() {
-    }
-
-    /** Deallocates the object's memory. */
-    method void dispose() {
-    }
-
-    /** Starts the game. Handles inputs from the user that control
-     *  the square's movement, direction and size. */
-    method void run() {
-
-	}
-
-    /** Moves the square by 2 pixels in the current direction. */
-    method void moveSquare() {
-    }
-}
-`;
-
 const ArrayTestMainJack: string = `
 // This file is part of www.nand2tetris.org
 // and the book "The Elements of Computing Systems"
@@ -811,6 +768,55 @@ class Main {
 		do Output.println();
 	
 		return;
+    }
+}
+`;
+
+
+const SquareGameJackk: string = `
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/09/Square/SquareGame.jack
+
+/**
+ * Implements the Square Dance game.
+ * In this game you can move a black square around the screen and
+ * change its size during the movement.
+ * In the beginning, the square is located at the top-left corner
+ * of the screen. The arrow keys are used to move the square.
+ * The 'z' & 'x' keys are used to decrement and increment the size.
+ * The 'q' key is used to quit the game.
+ */
+class SquareGame {
+
+    // The square
+    field Square square;
+
+    // The square's movement direction
+    field int direction; // 0=none,1=up,2=down,3=left,4=right
+
+    /** Constructs a new Square Game. */
+    constructor SquareGame new() {
+      let mezi[whatever] = nati;
+      do
+      while
+    }
+
+    /** Deallocates the object's memory. */
+    method void dispose(int age, string name, Square square) {
+      while
+    }
+
+    /** Starts the game. Handles inputs from the user that control
+     *  the square's movement, direction and size. */
+    method void run() {
+      do
+	}
+
+    /** Moves the square by 2 pixels in the current direction. */
+    method void moveSquare() {
+      if
     }
 }
 `;
