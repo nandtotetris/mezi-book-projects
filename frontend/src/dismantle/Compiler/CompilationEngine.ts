@@ -144,9 +144,9 @@ class CompilationEngine {
    */
   public compileParameterList() {
     this.currentMethod.push('compileParameterList');
+    this.output.push('<parameterList>');
     this.tokenizer.advance();
     if (!this.isSymbol()) {
-      this.output.push('<parameterList>');
       do {
         // ========> type <======
         if (this.isKeyword()) {
@@ -166,8 +166,8 @@ class CompilationEngine {
         this.pushSymbol({ advance: false });
         this.tokenizer.advance();
       } while (true);
-      this.output.push('</parameterList>');
     }
+    this.output.push('</parameterList>');
     this.currentMethod.pop();
   }
 
@@ -228,7 +228,10 @@ class CompilationEngine {
       } else {
         break;
       }
-      this.tokenizer.advance();
+      // compileIf does advance itself
+      if (keyword !== 'if') {
+        this.tokenizer.advance();
+      }
     } while (true);
     this.output.push('</statements>');
     this.currentMethod.pop();
@@ -242,7 +245,7 @@ class CompilationEngine {
     this.currentMethod.push('compileLet');
     this.output.push('<letStatement>');
     // =======> let <=========
-    this.pushKeyword({ keyword: 'let', advance: false });
+    this.pushKeyword({ advance: false });
     // =======> varName <=========
     this.pushIdentifier();
     // next has to be a symbol, either [ or =
@@ -253,7 +256,8 @@ class CompilationEngine {
     if (symbol === '[') {
       this.pushSymbol({ symbol: '[', advance: false });
       // expression
-      this.pushIdentifier();
+      this.tokenizer.advance();
+      this.compileExpression();
       // ]
       this.pushSymbol({ symbol: ']' });
       // advance for =
@@ -264,7 +268,8 @@ class CompilationEngine {
     // ============> = <=========
     this.pushSymbol({ symbol: '=', advance: false });
     // ============> expression <=========
-    this.pushIdentifier();
+    this.tokenizer.advance();
+    this.compileExpression();
     // ============> ; <=========
     this.pushSymbol({ symbol: ';' });
     this.output.push('</letStatement>');
@@ -272,13 +277,145 @@ class CompilationEngine {
   }
 
   /**
+   * Compiles expression
+   * term (op term)*
+   */
+  public compileExpression() {
+    this.currentMethod.push('compileExpression');
+    this.output.push('<expression>');
+    this.compileTerm();
+    do {
+      this.tokenizer.advance();
+      if (this.isOperand()) {
+        this.pushSymbol({ advance: false });
+        this.tokenizer.advance();
+        this.compileTerm();
+      }
+    } while (true);
+    this.output.push('</expression>');
+    this.currentMethod.pop();
+  }
+
+  /**
+   * Compiles a term. This routine is faced with a slight
+   * difficulty when trying to decide between some of the
+   * alternating parsing rules. Specifically, if the current
+   * token is an identifier, the routine must distinguish
+   * between a variable, an array entry, and a subroutine
+   * call. A single look-ahead token, which may be one of
+   * '[', '(' or '.' suffices to distinguish between the
+   * three possibilities. Any other token is not part of
+   * this term and should not be advanced over.
+   * ---------------------
+   * integrConstant | stringConstant | keywordConstant |
+   * varName | varName '[' expression ']' | subroutineCall |
+   * '(' expression ')' | unaryOp term
+   */
+  public compileTerm() {
+    this.currentMethod.push('compileTerm');
+    this.output.push('<term>');
+    if (this.isIntegerConstant()) {
+      this.output.push(
+        `<integerConstant>${this.tokenizer.intVal()}</integerConstant>`,
+      );
+    } else if (this.isStringConstant()) {
+      this.output.push(
+        `<stringConstant>${this.tokenizer.intVal()}</stringConstant>`,
+      );
+    } else if (this.isKeywordConstant()) {
+      this.pushKeyword({ advance: false });
+    } else if (this.isSymbol()) {
+      if (this.tokenizer.symbol() === '(') {
+        this.pushSymbol({ advance: false });
+        this.compileExpression();
+        this.pushSymbol({ symbol: ')' });
+      } else if (this.isUnaryOp()) {
+        this.pushSymbol({ advance: false });
+        this.compileTerm();
+      } else {
+        throw Error(
+          `In compileTerm: Unexpected symbol: ${this.tokenizer.symbol()}`,
+        );
+      }
+    } else if (this.isIdentifier()) {
+      this.pushIdentifier(false);
+      this.tokenizer.advance();
+      if (this.isSymbol()) {
+        const symbol: string = this.tokenizer.symbol();
+        if (symbol === '[') {
+          // array expression
+        } else if (symbol === '(' || symbol === '.') {
+          // subroutine call
+        } else {
+          // unknown
+        }
+      }
+    } else {
+      throw Error(`In compileTerm: Unknown term: ${this.getWord()}`);
+    }
+    this.output.push('</term>');
+    this.currentMethod.pop();
+  }
+
+  /**
    * Compiles a do statement
    * 'do' subroutineCall ';'
+   *  ---------- subroutineCall -----
+   * subroutineName'(' expressionList? ')' |
+   * ( className | varName )'.'subroutineName'(' expressionList? ')'
    */
   public compileDo() {
     this.currentMethod.push('compileDo');
     this.output.push('<doStatement>');
+    // =======> do <=============
+    this.pushKeyword({ advance: false });
+    // =======> subroutineCall <=============
+    // =======> subroutineName | className
+    // | varName <=============
+    this.pushIdentifier();
+    this.tokenizer.advance();
+    this.reportTypeError(JackTokenizer.TYPE_SYMBOL);
+    const symbol: string = this.tokenizer.symbol();
+    if (symbol === '.') {
+      // ========> . <=======
+      this.pushSymbol({ symbol: '.', advance: false });
+      // ========> subroutineName <=======
+      this.pushIdentifier();
+      this.tokenizer.advance();
+    }
+    // ========> ( <=======
+    this.pushSymbol({ symbol: '(', advance: false });
+    this.tokenizer.advance();
+    // ========> expressionList <=======
+    this.compileExpressionList();
+    // ========> ) <=======
+    this.pushSymbol({ symbol: ')', advance: false });
+    // =======> ; <=============
+    this.pushSymbol({ symbol: ';' });
     this.output.push('</doStatement>');
+    this.currentMethod.pop();
+  }
+
+  /**
+   * Compiles a possibly empty list of expressions
+   * (expression (',' expression)*)?
+   */
+  public compileExpressionList() {
+    this.currentMethod.push('compileExpressionList');
+    this.output.push('<expressionList>');
+    if (this.isIdentifier()) {
+      do {
+        this.compileExpression();
+        this.tokenizer.advance();
+        this.reportTypeError(JackTokenizer.TYPE_SYMBOL);
+        if (this.tokenizer.symbol() === ')') {
+          break;
+        }
+        this.pushSymbol({ symbol: ',', advance: false });
+        this.tokenizer.advance();
+      } while (true);
+    }
+    this.output.push('</expressionList>');
     this.currentMethod.pop();
   }
 
@@ -290,6 +427,38 @@ class CompilationEngine {
   public compileIf() {
     this.currentMethod.push('compileIf');
     this.output.push('<ifStatement>');
+    // =========> if <==========
+    this.pushKeyword({ advance: false });
+    // =========> ( <==========
+    this.pushSymbol({ symbol: '(' });
+    // =========> expression <==========
+    this.tokenizer.advance();
+    this.compileExpression();
+    // =========> ) <==========
+    this.pushSymbol({ symbol: ')' });
+    // =========> { <==========
+    this.pushSymbol({ symbol: '{' });
+    // =========> statements <==========
+    // advance to the first keyword
+    this.tokenizer.advance();
+    this.compileStatements();
+    // =========> { <==========
+    this.pushSymbol({ symbol: '}', advance: false });
+    // =========> else <==========
+    this.tokenizer.advance();
+    if (this.isKeyword() && this.tokenizer.keyWord() === 'else') {
+      this.pushKeyword({ advance: false });
+      // =========> { <==========
+      this.pushSymbol({ symbol: '{' });
+      // =========> statements <==========
+      // advance to the first keyword
+      this.tokenizer.advance();
+      this.compileStatements();
+      // =========> { <==========
+      this.pushSymbol({ symbol: '}', advance: false });
+      // advance one step
+      this.tokenizer.advance();
+    }
     this.output.push('</ifStatement>');
     this.currentMethod.pop();
   }
@@ -301,6 +470,23 @@ class CompilationEngine {
   public compileWhile() {
     this.currentMethod.push('compileWhile');
     this.output.push('<whileStatement>');
+    // =========> while <==========
+    this.pushKeyword({ advance: false });
+    // =========> ( <==========
+    this.pushSymbol({ symbol: '(' });
+    // =========> expression <==========
+    this.tokenizer.advance();
+    this.compileExpression();
+    // =========> ) <==========
+    this.pushSymbol({ symbol: ')' });
+    // =========> { <==========
+    this.pushSymbol({ symbol: '{' });
+    // =========> statements <==========
+    // advance to the first keyword
+    this.tokenizer.advance();
+    this.compileStatements();
+    // =========> { <==========
+    this.pushSymbol({ symbol: '}', advance: false });
     this.output.push('</whileStatement>');
     this.currentMethod.pop();
   }
@@ -313,14 +499,15 @@ class CompilationEngine {
     this.currentMethod.push('compileReturn');
     this.output.push('<returnStatement>');
     // =========> return <==========
-    this.pushKeyword({ keyword: 'return', advance: false });
+    this.pushKeyword({ advance: false });
     this.tokenizer.advance();
     // =========> expression? <==========
     if (!this.isSymbol()) {
-      this.pushIdentifier(false);
+      this.compileExpression();
+      this.tokenizer.advance();
     }
     // =========> ; <==========
-    this.pushSymbol({ symbol: ';' });
+    this.pushSymbol({ symbol: ';', advance: false });
     this.output.push('</returnStatement>');
     this.currentMethod.pop();
   }
@@ -352,6 +539,24 @@ class CompilationEngine {
     this.pushSymbol({ symbol: '}', advance: false });
     this.output.push('</subroutineBody>');
     this.currentMethod.pop();
+  }
+
+  private isOperand(): boolean {
+    const ops: string[] = ['+', '-', '/', '*', '%', '&', '|', '<', '>', '='];
+    const symbol: string = this.tokenizer.symbol();
+    return ops.indexOf(symbol) !== -1;
+  }
+
+  private isUnaryOp(): boolean {
+    const ops: string[] = ['~', '-'];
+    const symbol: string = this.tokenizer.symbol();
+    return ops.indexOf(symbol) !== -1;
+  }
+
+  private isKeywordConstant(): boolean {
+    const constants: string[] = ['this', 'null', 'true', 'false'];
+    const keyword: string = this.tokenizer.keyWord();
+    return constants.indexOf(keyword) !== -1;
   }
 
   private getCurrentMethod(): string {
@@ -405,6 +610,26 @@ class CompilationEngine {
         `In method: ${this.getCurrentMethod()}, Expected symbol in: ${expecteds}, but found word: ${word}`,
       );
     }
+  }
+
+  private pushIntegerConstant({ advance = true }: { advance?: boolean }) {
+    if (advance) {
+      this.tokenizer.advance();
+    }
+    this.reportTypeError(JackTokenizer.TYPE_INT_CONST);
+    this.output.push(
+      `<integerConstant>${this.tokenizer.intVal()}</integerConstant>`,
+    );
+  }
+
+  private pushStringConstant({ advance = true }: { advance?: boolean }) {
+    if (advance) {
+      this.tokenizer.advance();
+    }
+    this.reportTypeError(JackTokenizer.TYPE_STRING_CONST);
+    this.output.push(
+      `<stringConstant>${this.tokenizer.intVal()}</stringConstant>`,
+    );
   }
 
   private pushSymbol({
@@ -503,6 +728,14 @@ class CompilationEngine {
 
   private isIdentifier(): boolean {
     return this.tokenizer.tokenType() === JackTokenizer.TYPE_IDENTIFIER;
+  }
+
+  private isIntegerConstant(): boolean {
+    return this.tokenizer.tokenType() === JackTokenizer.TYPE_INT_CONST;
+  }
+
+  private isStringConstant(): boolean {
+    return this.tokenizer.tokenType() === JackTokenizer.TYPE_STRING_CONST;
   }
 }
 
