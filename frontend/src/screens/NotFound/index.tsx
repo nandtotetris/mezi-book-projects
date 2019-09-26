@@ -16,113 +16,126 @@ const onFileChange = (content: string) => {
   console.log(`Content is: ${content}`);
 };
 
-const SquareGameExpLessJack = `
+const SquareJack = `
 // This file is part of www.nand2tetris.org
 // and the book "The Elements of Computing Systems"
 // by Nisan and Schocken, MIT Press.
-// File name: projects/10/ExpressionlessSquare/SquareGame.jack
-
-// Expressionless version of Square.jack.
+// File name: projects/09/Square/Square.jack
 
 /**
- * The SquareDance class implements the Square Dance game.
- * In this game you can move a black square around the screen and
- * change its size during the movement.
- * In the beggining, the square is located at the top left corner.
- * Use the arrow keys to move the square.
- * Use 'z' & 'x' to decrement & increment the size.
- * Use 'q' to quit.
+ * Implements a graphic square. A graphic square has a screen location
+ * and a size. It also has methods for drawing, erasing, moving on the 
+ * screen, and changing its size.
  */
-class SquareGame {
+class Square {
 
-    // The square
-    field Square square;
+    // Location on the screen
+    field int x, y;
 
-    // The square's movement direction
-    field int direction; // 0=none,1=up,2=down,3=left,4=right
+    // The size of the square
+    field int size;
 
-    // Constructs a new Square Game.
-    constructor SquareGame new() {
-        let square = square;
-        let direction = direction;
+    /** Constructs a new square with a given location and size. */
+    constructor Square new(int Ax, int Ay, int Asize) {
+        let x = Ax;
+        let y = Ay;
+        let size = Asize;
 
-        return square;
+        do draw();
+
+        return this;
     }
 
-    // Deallocates the object's memory.
+    /** Deallocates the object's memory. */
     method void dispose() {
-        do square.dispose();
-        do Memory.deAlloc(square);
+        do Memory.deAlloc(this);
         return;
     }
 
-    // Starts the game. Handles inputs from the user that controls
-    // the square movement direction and size.
-    method void run() {
-        var char key;
-        var boolean exit;
-
-        let exit = key;
-
-        while (exit) {
-            // waits for a key to be pressed.
-            while (key) {
-                let key = key;
-                do moveSquare();
-            }
-
-            if (key) {
-                let exit = exit;
-            }
-            if (key) {
-                do square.decSize();
-            }
-            if (key) {
-                do square.incSize();
-            }
-            if (key) {
-                let direction = exit;
-            }
-            if (key) {
-                let direction = key;
-            }
-            if (key) {
-                let direction = square;
-            }
-            if (key) {
-                let direction = direction;
-            }
-
-            // waits for the key to be released.
-            while (key) {
-                let key = key;
-                do moveSquare();
-            }
-        }
-            
+    /** Draws the square on the screen. */
+    method void draw() {
+        do Screen.setColor(true);
+        do Screen.drawRectangle(x, y, x + size, y + size);
         return;
     }
 
-    // Moves the square by 2 in the current direction.
-    method void moveSquare() {
-        if (direction) {
-            do square.moveUp();
-        }
-        if (direction) {
-            do square.moveDown();
-        }
-        if (direction) {
-            do square.moveLeft();
-        }
-        if (direction) {
-            do square.moveRight();
-        }
+    /** Erases the square from the screen. */
+    method void erase() {
+        do Screen.setColor(false);
+        do Screen.drawRectangle(x, y, x + size, y + size);
+        return;
+    }
 
-        do Sys.wait(direction); // Delays the next movement.
+    /** Increments the size by 2 pixels. */
+    method void incSize() {
+        if (((y + size) < 254) & ((x + size) < 510)) {
+            do erase();
+            let size = size + 2;
+            do draw();
+        }
+        return;
+    }
+
+    /** Decrements the size by 2 pixels. */
+    method void decSize() {
+        if (size > 2) {
+            do erase();
+            let size = size - 2;
+            do draw();
+        }
+        return;
+	}
+
+    /** Moves up by 2 pixels. */
+    method void moveUp() {
+        if (y > 1) {
+            do Screen.setColor(false);
+            do Screen.drawRectangle(x, (y + size) - 1, x + size, y + size);
+            let y = y - 2;
+            do Screen.setColor(true);
+            do Screen.drawRectangle(x, y, x + size, y + 1);
+        }
+        return;
+    }
+
+    /** Moves down by 2 pixels. */
+    method void moveDown() {
+        if ((y + size) < 254) {
+            do Screen.setColor(false);
+            do Screen.drawRectangle(x, y, x + size, y + 1);
+            let y = y + 2;
+            do Screen.setColor(true);
+            do Screen.drawRectangle(x, (y + size) - 1, x + size, y + size);
+        }
+        return;
+    }
+
+    /** Moves left by 2 pixels. */
+    method void moveLeft() {
+        if (x > 1) {
+            do Screen.setColor(false);
+            do Screen.drawRectangle((x + size) - 1, y, x + size, y + size);
+            let x = x - 2;
+            do Screen.setColor(true);
+            do Screen.drawRectangle(x, y, x + 1, y + size);
+        }
+        return;
+    }
+
+    /** Moves right by 2 pixels. */
+    method void moveRight() {
+        if ((x + size) < 510) {
+            do Screen.setColor(false);
+            do Screen.drawRectangle(x, y, x + 1, y + size);
+            let x = x + 2;
+            do Screen.setColor(true);
+            do Screen.drawRectangle((x + size) - 1, y, x + size, y + size);
+        }
         return;
     }
 }
 `;
+
 const assemble = () => {
   localStorage.setItem('mezi.asm', 'labelledAssembly');
   const program: number[] = HackAssemblerTranslator.loadProgram(
@@ -260,7 +273,7 @@ const NotFound: React.FunctionComponent<IProps> = ({ location }) => {
   // translateVM();
   // testTokenizr();
   // testJackTokenizer(ArrayTestMainJack);
-  testCompilationEngine(SquareGameExpLessJack);
+  testCompilationEngine(SquareJack);
   return (
     <Layout style={{ flex: 1, width: '100%', height: '100%' }}>
       <Layout.Content
