@@ -1,6 +1,51 @@
 import Hashtable from 'dismantle/Common/Hashtable';
 import Tokenizr from 'tokenizr';
 
+export const KW_CLASS_STR = 'class';
+export const KW_CONSTRUCTOR_STR = 'constructor';
+export const KW_FUNCTION_STR = 'function';
+export const KW_METHOD_STR = 'method';
+export const KW_FIELD_STR = 'field';
+export const KW_STATIC_STR = 'static';
+export const KW_VAR_STR = 'var';
+export const KW_INT_STR = 'int';
+export const KW_CHAR_STR = 'char';
+export const KW_BOOLEAN_STR = 'boolean';
+export const KW_VOID_STR = 'void';
+export const KW_TRUE_STR = 'true';
+export const KW_FALSE_STR = 'false';
+export const KW_NULL_STR = 'null';
+export const KW_THIS_STR = 'this';
+export const KW_LET_STR = 'let';
+export const KW_DO_STR = 'do';
+export const KW_IF_STR = 'if';
+export const KW_ELSE_STR = 'else';
+export const KW_WHILE_STR = 'while';
+export const KW_RETURN_STR = 'return';
+
+export const SYM_CURLY_OPEN_STR = '{';
+export const SYM_CURLY_CLOSE_STR = '}';
+export const SYM_PARENTH_OPEN_STR = '(';
+export const SYM_PARENTH_CLOSE_STR = ')';
+export const SYM_SQUARE_OPEN_STR = '[';
+export const SYM_SQUARE_CLOSE_STR = ']';
+export const SYM_EQUAL_STR = '=';
+export const SYM_PLUS_STR = '+';
+export const SYM_MINUS_STR = '-';
+export const SYM_DIVIDE_STR = '/';
+export const SYM_REMAINDER_STR = '%';
+export const SYM_MULTIPLY_STR = '*';
+export const SYM_GREATER_STR = '>';
+export const SYM_LESS_STR = '<';
+export const SYM_AND_STR = '&';
+export const SYM_OR_STR = '|';
+export const SYM_INVERT_STR = '~';
+export const SYM_SINGLE_QUOTE_STR = "'";
+export const SYM_DOUBLE_QUOTE_STR = '"';
+export const SYM_COMMA_STR = ',';
+export const SYM_SEMICOLON_STR = ';';
+export const SYM_DOT_STR = '.';
+
 class JackTokenizer {
   // Token types
   static readonly TYPE_WORD: number = 0;
@@ -66,6 +111,16 @@ class JackTokenizer {
     } catch {
       return false;
     }
+  }
+
+  /**
+   * Peeks into the next vlaue of the parser
+   */
+  public peek(): any {
+    if (this.hasMoreTokens()) {
+      return this.parser.peek(0).value;
+    }
+    return undefined;
   }
 
   /**
@@ -223,27 +278,27 @@ class JackTokenizer {
   }
 
   private initKeywords() {
-    this.keywords.put('class', JackTokenizer.KW_CLASS);
-    this.keywords.put('constructor', JackTokenizer.KW_CONSTRUCTOR);
-    this.keywords.put('function', JackTokenizer.KW_FUNCTION);
-    this.keywords.put('method', JackTokenizer.KW_METHOD);
-    this.keywords.put('field', JackTokenizer.KW_FIELD);
-    this.keywords.put('static', JackTokenizer.KW_STATIC);
-    this.keywords.put('var', JackTokenizer.KW_VAR);
-    this.keywords.put('int', JackTokenizer.KW_INT);
-    this.keywords.put('char', JackTokenizer.KW_CHAR);
-    this.keywords.put('boolean', JackTokenizer.KW_BOOLEAN);
-    this.keywords.put('void', JackTokenizer.KW_VOID);
-    this.keywords.put('true', JackTokenizer.KW_TRUE);
-    this.keywords.put('false', JackTokenizer.KW_FALSE);
-    this.keywords.put('null', JackTokenizer.KW_NULL);
-    this.keywords.put('this', JackTokenizer.KW_THIS);
-    this.keywords.put('let', JackTokenizer.KW_LET);
-    this.keywords.put('do', JackTokenizer.KW_DO);
-    this.keywords.put('if', JackTokenizer.KW_IF);
-    this.keywords.put('else', JackTokenizer.KW_ELSE);
-    this.keywords.put('while', JackTokenizer.KW_WHILE);
-    this.keywords.put('return', JackTokenizer.KW_RETURN);
+    this.keywords.put(KW_CLASS_STR, JackTokenizer.KW_CLASS);
+    this.keywords.put(KW_CONSTRUCTOR_STR, JackTokenizer.KW_CONSTRUCTOR);
+    this.keywords.put(KW_FUNCTION_STR, JackTokenizer.KW_FUNCTION);
+    this.keywords.put(KW_METHOD_STR, JackTokenizer.KW_METHOD);
+    this.keywords.put(KW_FIELD_STR, JackTokenizer.KW_FIELD);
+    this.keywords.put(KW_STATIC_STR, JackTokenizer.KW_STATIC);
+    this.keywords.put(KW_VAR_STR, JackTokenizer.KW_VAR);
+    this.keywords.put(KW_INT_STR, JackTokenizer.KW_INT);
+    this.keywords.put(KW_CHAR_STR, JackTokenizer.KW_CHAR);
+    this.keywords.put(KW_BOOLEAN_STR, JackTokenizer.KW_BOOLEAN);
+    this.keywords.put(KW_VOID_STR, JackTokenizer.KW_VOID);
+    this.keywords.put(KW_TRUE_STR, JackTokenizer.KW_TRUE);
+    this.keywords.put(KW_FALSE_STR, JackTokenizer.KW_FALSE);
+    this.keywords.put(KW_NULL_STR, JackTokenizer.KW_NULL);
+    this.keywords.put(KW_THIS_STR, JackTokenizer.KW_THIS);
+    this.keywords.put(KW_LET_STR, JackTokenizer.KW_LET);
+    this.keywords.put(KW_DO_STR, JackTokenizer.KW_DO);
+    this.keywords.put(KW_IF_STR, JackTokenizer.KW_IF);
+    this.keywords.put(KW_ELSE_STR, JackTokenizer.KW_ELSE);
+    this.keywords.put(KW_WHILE_STR, JackTokenizer.KW_WHILE);
+    this.keywords.put(KW_RETURN_STR, JackTokenizer.KW_RETURN);
   }
 
   /**

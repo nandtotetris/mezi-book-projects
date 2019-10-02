@@ -75,3 +75,16 @@ WHILE IMPLEMENTING THE VM TRANSLATOR
 ===>>> make sure sp is incremented after every push operation, and that it is decremented
 after every pop operation, (it is also decremented before accessing top of the stack value,
 but decrement not the SP, but simply use the decremented value).
+
+====================================
+COMPILING II, CODE GENERATION
+------------------------------------
+>>> The tokenizer, and the compilation engine, worked on one jack class at a time. This is going to continue in the code generation step (still going to process a single class at a time). It is the vm translator that later assembles all the separate vm files together.
+>>> I am assuming I will need one symbol table instance per jack class. The symbol table is simply going to help me track the variables (their characterstics, and state info). 
+>>> How is identifier resolution to be made when an identifier of the same name is found in nested scopes. As far as I am concerned now, all I need is two table scopes, the current subroutine table scope, and the current class table scope. If an extera table scope is necessary, it shall be seen (I shall find out later when stuck).
+
+>>> identifier Info:
+  = category: comes either from the symbol table (when not currently being defined) or from inspecting the preceding keyword of the current token (when being defined for the first time, it shall be deducted from the context, eg: is it varDec, letStatement, paramDec .... ?).
+  = Is it being defined? YES (if part of the var statement, or if it is undefined following a symbol table look up), NO otherwise.
+  = Is it one of the four? (this can be inferred from the surrounding context, or from a symbol table lookup; subroutine and class names are for instance not in the symbol table)
+  = Running index: this is found from the symbol table ....
