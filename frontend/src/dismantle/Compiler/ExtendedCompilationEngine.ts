@@ -1,3 +1,4 @@
+import GenericStack from 'dismantle/Common/GenericStack';
 import JackTokenizer, {
   KW_BOOLEAN_STR,
   KW_CHAR_STR,
@@ -47,6 +48,8 @@ import SymbolTable, {
   kindStrToCode,
   SUBROUTINE_STR,
 } from 'dismantle/Compiler/SymbolTable';
+import VMWriter from 'dismantle/Compiler/VMWriter';
+import HVMInstructionSet from 'dismantle/VirtualMachine/HVMInstructionSet';
 import Tokenizr from 'tokenizr';
 
 class ExtendedCompilationEngine {
@@ -54,6 +57,16 @@ class ExtendedCompilationEngine {
   private output: string[] = [];
   private currentMethod: string[] = [];
   private symbolTable: SymbolTable;
+  private vmWriter: VMWriter;
+  private xmlMode: boolean = false;
+  private labelCount: number = 0;
+
+  // the name of the class being compiled currently
+  private className: string = '';
+  // name of current subroutine being compiled
+  private subroutineName: string = '';
+  // number of arguments when calling the current subroutine
+  private numArguments: number = 0;
 
   /**
    * Creates a new compilation engine with the given input
@@ -62,9 +75,10 @@ class ExtendedCompilationEngine {
    * @param input
    * @param output
    */
-  constructor(input: string, output: string) {
+  constructor(input: string, output: string = 'output') {
     this.tokenizer = new JackTokenizer(input);
     this.symbolTable = new SymbolTable();
+    this.vmWriter = new VMWriter();
     this.compileClass();
   }
 
@@ -73,14 +87,17 @@ class ExtendedCompilationEngine {
    */
   public compileClass() {
     this.currentMethod.push('compileClass');
-    this.output.push('<class>');
+    this.pushTag('<class>');
     // ========> class <===========
     this.pushKeyword({ keyword: KW_CLASS_STR });
     // ========> className <==========
+    this.tokenizer.advance();
     this.pushIdentifier({
+      advance: false,
       isClassOrSubroutineDec: true,
       type: 'class_declaration',
     });
+    this.className = this.tokenizer.identifier();
     // ========> { <==========
     this.pushSymbol({ symbol: SYM_CURLY_OPEN_STR });
     // classVarDec, subRoutineDec, or }
@@ -122,7 +139,7 @@ class ExtendedCompilationEngine {
     // ==========> } <==========
     this.pushSymbol({ symbol: SYM_CURLY_CLOSE_STR, advance: false });
     // </class>
-    this.output.push('</class>');
+    this.pushTag('</class>');
     this.currentMethod.pop();
   }
 
@@ -132,7 +149,7 @@ class ExtendedCompilationEngine {
    */
   public compileClassVarDec() {
     this.currentMethod.push('compileClassVarDec');
-    this.output.push('<classVarDec>');
+    this.pushTag('<classVarDec>');
     // =======> static | field <=========
     this.pushKeyword({
       advance: false,
@@ -169,7 +186,7 @@ class ExtendedCompilationEngine {
     // advance over the current classVarDec
     this.tokenizer.advance();
     // </classVarDec>
-    this.output.push('</classVarDec>');
+    this.pushTag('</classVarDec>');
     this.currentMethod.pop();
   }
 
@@ -181,7 +198,7 @@ class ExtendedCompilationEngine {
    */
   public compileSubroutine() {
     this.currentMethod.push('compileSubroutine');
-    this.output.push('<subroutineDec>');
+    this.pushTag('<subroutineDec>');
     // reset subroutine symbol table
     this.symbolTable.startSubroutine();
     // ==========> constructor | function | method <========
@@ -202,10 +219,13 @@ class ExtendedCompilationEngine {
       });
     }
     // =======> subroutineName <========
+    this.tokenizer.advance();
     this.pushIdentifier({
+      advance: false,
       isClassOrSubroutineDec: true,
       type: 'subroutine_declaration',
     });
+    this.subroutineName = this.tokenizer.identifier();
     // =======> ( <========
     this.pushSymbol({ symbol: SYM_PARENTH_OPEN_STR });
     // =======> parameterList <========
@@ -218,7 +238,7 @@ class ExtendedCompilationEngine {
     // this method should advance just over the subroutine
     this.compileSubroutineBody();
     // </subroutineDec>
-    this.output.push('</subroutineDec>');
+    this.pushTag('</subroutineDec>');
     this.currentMethod.pop();
   }
 
@@ -228,7 +248,7 @@ class ExtendedCompilationEngine {
    */
   public compileParameterList() {
     this.currentMethod.push('compileParameterList');
-    this.output.push('<parameterList>');
+    this.pushTag('<parameterList>');
     // parameter list can not start with a symbol, if symbol
     // we are dealing with an empty parameter list, and we have
     // already advanced over it
@@ -267,7 +287,7 @@ class ExtendedCompilationEngine {
         this.tokenizer.advance();
       }
     }
-    this.output.push('</parameterList>');
+    this.pushTag('</parameterList>');
     this.currentMethod.pop();
   }
 
@@ -278,7 +298,7 @@ class ExtendedCompilationEngine {
   public compileVarDec() {
     this.currentMethod.push('compileVarDec');
     // <varDec>
-    this.output.push('<varDec>');
+    this.pushTag('<varDec>');
     // ======> var <========
     this.pushKeyword({ advance: false, keyword: KW_VAR_STR });
     // ======> type <=======
@@ -309,7 +329,7 @@ class ExtendedCompilationEngine {
     // advance over the current varDec
     this.tokenizer.advance();
     // </varDec>
-    this.output.push('</varDec>');
+    this.pushTag('</varDec>');
     this.currentMethod.pop();
   }
 
@@ -318,7 +338,7 @@ class ExtendedCompilationEngine {
    */
   public compileStatements() {
     this.currentMethod.push('compileStatements');
-    this.output.push('<statements>');
+    this.pushTag('<statements>');
     let keyword: string;
     while (true) {
       // statements stop upon discovery of a symbol, possibly }
@@ -340,7 +360,7 @@ class ExtendedCompilationEngine {
         break;
       }
     }
-    this.output.push('</statements>');
+    this.pushTag('</statements>');
     this.currentMethod.pop();
   }
 
@@ -350,19 +370,24 @@ class ExtendedCompilationEngine {
    */
   public compileLet() {
     this.currentMethod.push('compileLet');
-    this.output.push('<letStatement>');
+    this.pushTag('<letStatement>');
     // =======> let <=========
     this.pushKeyword({ advance: false });
     // =======> varName <=========
+    this.tokenizer.advance();
     this.pushIdentifier({
+      advance: false,
       isDefined: true,
     });
+    const variable = this.tokenizer.identifier();
+    let isArray: boolean = false;
     // next has to be a symbol, either [ or =
     this.tokenizer.advance();
     // =======> ('[' expression ']')? <=========
     this.reportTypeError(JackTokenizer.TYPE_SYMBOL);
     const symbol: string = this.tokenizer.symbol();
     if (symbol === SYM_SQUARE_OPEN_STR) {
+      isArray = true;
       this.pushSymbol({ symbol: SYM_SQUARE_OPEN_STR, advance: false });
       // expression
       this.tokenizer.advance();
@@ -381,9 +406,13 @@ class ExtendedCompilationEngine {
     this.compileExpression();
     // ============> ; <=========
     this.pushSymbol({ symbol: SYM_SEMICOLON_STR, advance: false });
+    // transfer result to variable
+    if (!isArray) {
+      this.popIntoVariable(variable);
+    }
     // advance over this statement
     this.tokenizer.advance();
-    this.output.push('</letStatement>');
+    this.pushTag('</letStatement>');
     this.currentMethod.pop();
   }
 
@@ -393,22 +422,25 @@ class ExtendedCompilationEngine {
    */
   public compileExpression() {
     this.currentMethod.push('compileExpression');
-    this.output.push('<expression>');
+    this.pushTag('<expression>');
     // ============> term <=========
     this.compileTerm();
     // ============> (op term)* <=========
     while (true) {
-      if (this.isOperand()) {
+      if (this.isOperator()) {
         // op
         this.pushSymbol({ advance: false });
+        const operator = this.tokenizer.symbol();
         // term
         this.tokenizer.advance();
         this.compileTerm();
+        // output 'op'
+        this.pushOperator(operator);
       } else {
         break;
       }
     }
-    this.output.push('</expression>');
+    this.pushTag('</expression>');
     this.currentMethod.pop();
   }
 
@@ -429,11 +461,16 @@ class ExtendedCompilationEngine {
    */
   public compileTerm() {
     this.currentMethod.push('compileTerm');
-    this.output.push('<term>');
+    this.pushTag('<term>');
     let advance: boolean = true;
     if (this.isIntegerConstant()) {
       // ============> integerConstant <=========
       this.pushIntegerConstant({ advance: false });
+      // if expression is a number n: output 'push n'
+      this.vmWriter.writePush(
+        HVMInstructionSet.CONST_SEGMENT_CODE,
+        this.tokenizer.intVal(),
+      );
     } else if (this.isStringConstant()) {
       // ============> stringConstant <=========
       this.pushStringConstant({ advance: false });
@@ -450,8 +487,11 @@ class ExtendedCompilationEngine {
       } else if (this.isUnaryOp()) {
         // ============> unaryOp term <=========
         this.pushSymbol({ advance: false });
+        const operator = this.tokenizer.symbol();
         this.tokenizer.advance();
         this.compileTerm();
+        // output op
+        this.pushOperator(operator);
         advance = false;
       } else {
         throw Error(
@@ -483,6 +523,8 @@ class ExtendedCompilationEngine {
           advance: false,
           isDefined: true,
         });
+        // push variable to stack
+        this.pushFromVariable(this.tokenizer.identifier());
       }
     } else {
       throw Error(`In compileTerm: Unknown term: ${this.getWord()}`);
@@ -490,7 +532,7 @@ class ExtendedCompilationEngine {
     if (advance) {
       this.tokenizer.advance();
     }
-    this.output.push('</term>');
+    this.pushTag('</term>');
     this.currentMethod.pop();
   }
 
@@ -503,7 +545,7 @@ class ExtendedCompilationEngine {
    */
   public compileDo() {
     this.currentMethod.push('compileDo');
-    this.output.push('<doStatement>');
+    this.pushTag('<doStatement>');
     // =======> do <=============
     this.pushKeyword({ advance: false });
     // =======> subroutineCall <=============
@@ -513,7 +555,7 @@ class ExtendedCompilationEngine {
     this.pushSymbol({ symbol: SYM_SEMICOLON_STR, advance: false });
     // advance over this statement
     this.tokenizer.advance();
-    this.output.push('</doStatement>');
+    this.pushTag('</doStatement>');
     this.currentMethod.pop();
   }
 
@@ -523,11 +565,12 @@ class ExtendedCompilationEngine {
    */
   public compileExpressionList() {
     this.currentMethod.push('compileExpressionList');
-    this.output.push('<expressionList>');
+    this.pushTag('<expressionList>');
     // if not starting with an identifier, we are dealing
     // with an empty expression list
     if (this.getWord() !== SYM_PARENTH_CLOSE_STR) {
       while (true) {
+        this.numArguments++;
         this.compileExpression();
         this.reportTypeError(JackTokenizer.TYPE_SYMBOL);
         if (this.tokenizer.symbol() === SYM_PARENTH_CLOSE_STR) {
@@ -537,7 +580,7 @@ class ExtendedCompilationEngine {
         this.tokenizer.advance();
       }
     }
-    this.output.push('</expressionList>');
+    this.pushTag('</expressionList>');
     this.currentMethod.pop();
   }
 
@@ -548,7 +591,7 @@ class ExtendedCompilationEngine {
    */
   public compileIf() {
     this.currentMethod.push('compileIf');
-    this.output.push('<ifStatement>');
+    this.pushTag('<ifStatement>');
     // =========> if <==========
     this.pushKeyword({ advance: false });
     // =========> ( <==========
@@ -556,6 +599,12 @@ class ExtendedCompilationEngine {
     // =========> expression <==========
     this.tokenizer.advance();
     this.compileExpression();
+    // not
+    this.vmWriter.writeArithmetic(HVMInstructionSet.NOT_CODE);
+    this.labelCount++;
+    // if-goto L1
+    const L1 = `label-${this.labelCount}`;
+    this.vmWriter.writeIf(L1);
     // =========> ) <==========
     this.pushSymbol({ symbol: SYM_PARENTH_CLOSE_STR, advance: false });
     // =========> { <==========
@@ -564,6 +613,12 @@ class ExtendedCompilationEngine {
     // advance to the first keyword
     this.tokenizer.advance();
     this.compileStatements();
+    // goto L2
+    this.labelCount++;
+    const L2 = `label-${this.labelCount}`;
+    this.vmWriter.writeGoto(L2);
+    // label L1
+    this.vmWriter.writeLabel(L1);
     // =========> { <==========
     this.pushSymbol({ symbol: SYM_CURLY_CLOSE_STR, advance: false });
     // =========> else <==========
@@ -581,7 +636,9 @@ class ExtendedCompilationEngine {
       // advance one step
       this.tokenizer.advance();
     }
-    this.output.push('</ifStatement>');
+    // label L2
+    this.vmWriter.writeLabel(L2);
+    this.pushTag('</ifStatement>');
     this.currentMethod.pop();
   }
 
@@ -591,7 +648,11 @@ class ExtendedCompilationEngine {
    */
   public compileWhile() {
     this.currentMethod.push('compileWhile');
-    this.output.push('<whileStatement>');
+    this.pushTag('<whileStatement>');
+    // label L1
+    this.labelCount++;
+    const L1 = `label-${this.labelCount}`;
+    this.vmWriter.writeLabel(L1);
     // =========> while <==========
     this.pushKeyword({ advance: false });
     // =========> ( <==========
@@ -601,6 +662,12 @@ class ExtendedCompilationEngine {
     this.compileExpression();
     // =========> ) <==========
     this.pushSymbol({ symbol: SYM_PARENTH_CLOSE_STR, advance: false });
+    // not
+    this.vmWriter.writeArithmetic(HVMInstructionSet.NOT_CODE);
+    // if-goto L2
+    this.labelCount++;
+    const L2 = `label-${this.labelCount}`;
+    this.vmWriter.writeIf(L2);
     // =========> { <==========
     this.pushSymbol({ symbol: SYM_CURLY_OPEN_STR });
     // =========> statements <==========
@@ -611,7 +678,11 @@ class ExtendedCompilationEngine {
     this.pushSymbol({ symbol: SYM_CURLY_CLOSE_STR, advance: false });
     // advance over this statement
     this.tokenizer.advance();
-    this.output.push('</whileStatement>');
+    // goto L1
+    this.vmWriter.writeGoto(L1);
+    // label L2
+    this.vmWriter.writeLabel(L2);
+    this.pushTag('</whileStatement>');
     this.currentMethod.pop();
   }
 
@@ -621,7 +692,7 @@ class ExtendedCompilationEngine {
    */
   public compileReturn() {
     this.currentMethod.push('compileReturn');
-    this.output.push('<returnStatement>');
+    this.pushTag('<returnStatement>');
     // =========> return <==========
     this.pushKeyword({ advance: false });
     // =========> expression? <==========
@@ -633,12 +704,22 @@ class ExtendedCompilationEngine {
     this.pushSymbol({ symbol: SYM_SEMICOLON_STR, advance: false });
     // advance over current statement
     this.tokenizer.advance();
-    this.output.push('</returnStatement>');
+    // write VM return command
+    this.vmWriter.writeReturn();
+    this.pushTag('</returnStatement>');
     this.currentMethod.pop();
   }
 
-  public getXmlOutput(): string {
-    return this.output.join('\n');
+  /**
+   * Not part of the official api, but gets the string
+   * representation of the output
+   */
+  public getOutput(): string {
+    if (this.xmlMode) {
+      return this.output.join('\n');
+    } else {
+      return this.vmWriter.getOutput();
+    }
   }
 
   /**
@@ -646,6 +727,8 @@ class ExtendedCompilationEngine {
    * ( className | varName )'.'subroutineName'(' expressionList? ')'
    */
   private compileSubroutineCall() {
+    let fullSubroutineName = this.tokenizer.identifier();
+
     // peek into the next value to distinguish between
     // a subroutineName and a className/varName
     const nextWord: string = this.tokenizer.peek();
@@ -667,10 +750,13 @@ class ExtendedCompilationEngine {
       // ========> subroutineName <=======
       // assuming this is a method, since it is preceded with
       // the dot operator
+      this.tokenizer.advance();
       this.pushIdentifier({
+        advance: false,
         isDefined: true,
         type: 'method',
       });
+      fullSubroutineName = `${fullSubroutineName}.${this.tokenizer.identifier()}`;
     } else {
       // ========> subroutineName <=======
       // assuming this is a function, since it lacks a preceding
@@ -685,11 +771,14 @@ class ExtendedCompilationEngine {
     this.pushSymbol({ symbol: SYM_PARENTH_OPEN_STR });
     this.tokenizer.advance();
     // ========> expressionList <=======
+    this.numArguments = 0;
     this.compileExpressionList();
     // ========> ) <=======
     this.pushSymbol({ symbol: SYM_PARENTH_CLOSE_STR, advance: false });
     // advance over the subroutineCall
     this.tokenizer.advance();
+    // write function call through the VMWriter
+    this.vmWriter.writeCall(fullSubroutineName, this.numArguments);
   }
 
   /**
@@ -697,7 +786,7 @@ class ExtendedCompilationEngine {
    */
   private compileSubroutineBody() {
     this.currentMethod.push('compileSubroutineBody');
-    this.output.push('<subroutineBody>');
+    this.pushTag('<subroutineBody>');
     // =========> { <========
     this.pushSymbol({ symbol: SYM_CURLY_OPEN_STR, advance: false });
     // =========> varDec* <========
@@ -709,22 +798,108 @@ class ExtendedCompilationEngine {
       }
       this.compileVarDec();
     } while (true);
+    // write function through the VMWriter, it is written here at the end of
+    // the varDec* so number of local variables can be known
+    const numLocalVars = this.symbolTable.varCount(IDENTIFIER_KIND.VAR);
+    const fullFunctionName = `${this.className}.${this.subroutineName}`;
+    this.vmWriter.writeFunction(fullFunctionName, numLocalVars);
     // =========> statements <========
     this.compileStatements();
     // =========> } <========
     this.pushSymbol({ symbol: SYM_CURLY_CLOSE_STR, advance: false });
     this.tokenizer.advance();
-    this.output.push('</subroutineBody>');
+    this.pushTag('</subroutineBody>');
     this.currentMethod.pop();
   }
 
-  private isOperand(value?: string): boolean {
+  /**
+   * Push a variable into the stack
+   * @param variable the variable to push on to the stack
+   */
+  private pushFromVariable(variable: string) {
+    const kind = this.symbolTable.kindOf(variable);
+    const segmentCode = this.getSegmentOfKind(kind);
+    const segmentIndex = this.symbolTable.indexOf(variable);
+    this.vmWriter.writePush(segmentCode, segmentIndex);
+  }
+
+  /**
+   * Popos stack top value and stores into address pointed by
+   * variable
+   * @param variable the variable to hold stack top value
+   */
+  private popIntoVariable(variable: string) {
+    const kind = this.symbolTable.kindOf(variable);
+    const segmentCode = this.getSegmentOfKind(kind);
+    const segmentIndex = this.symbolTable.indexOf(variable);
+    this.vmWriter.writePop(segmentCode, segmentIndex);
+  }
+
+  private pushOperator(operator: string) {
+    let operatorCode: number = -1;
+    switch (operator) {
+      case SYM_PLUS_STR:
+        operatorCode = HVMInstructionSet.ADD_CODE;
+        break;
+      case SYM_MINUS_STR:
+        operatorCode = HVMInstructionSet.SUBSTRACT_CODE;
+        break;
+      case SYM_MULTIPLY_STR:
+        this.vmWriter.writeCall('Math.multiply', 2);
+        return;
+      case SYM_DIVIDE_STR:
+        this.vmWriter.writeCall('Math.divide', 2);
+        return;
+      case SYM_AND_STR:
+        operatorCode = HVMInstructionSet.AND_CODE;
+        break;
+      case SYM_OR_STR:
+        operatorCode = HVMInstructionSet.OR_CODE;
+        break;
+      case SYM_MINUS_STR:
+        operatorCode = HVMInstructionSet.NEGATE_CODE;
+        break;
+      case SYM_INVERT_STR:
+        operatorCode = HVMInstructionSet.NOT_CODE;
+        break;
+      case SYM_LESS_STR:
+        operatorCode = HVMInstructionSet.LESS_THAN_CODE;
+        break;
+      case SYM_GREATER_STR:
+        operatorCode = HVMInstructionSet.GREATER_THAN_CODE;
+        break;
+      case SYM_EQUAL_STR:
+        operatorCode = HVMInstructionSet.EQUAL_CODE;
+        break;
+      default:
+        break;
+    }
+    this.vmWriter.writeArithmetic(operatorCode);
+  }
+
+  private getSegmentOfKind(kind: IDENTIFIER_KIND): number {
+    switch (kind) {
+      case IDENTIFIER_KIND.STATIC:
+        return HVMInstructionSet.STATIC_SEGMENT_CODE;
+      case IDENTIFIER_KIND.FIELD:
+        return HVMInstructionSet.THIS_SEGMENT_CODE;
+      case IDENTIFIER_KIND.ARG:
+        return HVMInstructionSet.ARG_SEGMENT_CODE;
+      case IDENTIFIER_KIND.VAR:
+        return HVMInstructionSet.LOCAL_SEGMENT_CODE;
+      default:
+        throw Error(
+          `In method getSegementOfKind, Invalid kind ${kind} for segment selection`,
+        );
+    }
+  }
+
+  private isOperator(value?: string): boolean {
     const ops: string[] = [
       SYM_PLUS_STR,
       SYM_MINUS_STR,
       SYM_DIVIDE_STR,
       SYM_MULTIPLY_STR,
-      SYM_REMAINDER_STR,
       SYM_AND_STR,
       SYM_OR_STR,
       SYM_LESS_STR,
@@ -815,7 +990,7 @@ class ExtendedCompilationEngine {
       this.tokenizer.advance();
     }
     this.reportTypeError(JackTokenizer.TYPE_INT_CONST);
-    this.output.push(
+    this.pushTag(
       `<integerConstant>${this.tokenizer.intVal()}</integerConstant>`,
     );
   }
@@ -827,7 +1002,7 @@ class ExtendedCompilationEngine {
       this.tokenizer.advance();
     }
     this.reportTypeError(JackTokenizer.TYPE_STRING_CONST);
-    this.output.push(
+    this.pushTag(
       `<stringConstant>${this.tokenizer.stringVal()}</stringConstant>`,
     );
   }
@@ -851,17 +1026,20 @@ class ExtendedCompilationEngine {
     if (symbols !== undefined) {
       this.reportSymbolsError(symbols);
     }
-    // const escapedSymbols: any = {
-    //   '"': '&quot;',
-    //   '&': '&amp;',
-    //   '<': '&lt;',
-    //   '>': '&gt;',
-    // };
-    // let value: string = this.tokenizer.symbol();
-    // if (escapedSymbols[value] !== undefined) {
-    //   value = escapedSymbols[value];
-    // }
-    // this.output.push(`<symbol>${value}</symbol>`);
+    if (!this.xmlMode) {
+      return;
+    }
+    const escapedSymbols: any = {
+      '"': '&quot;',
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+    };
+    let value: string = this.tokenizer.symbol();
+    if (escapedSymbols[value] !== undefined) {
+      value = escapedSymbols[value];
+    }
+    this.pushTag(`<symbol>${value}</symbol>`);
   }
 
   private pushKeyword({
@@ -883,7 +1061,7 @@ class ExtendedCompilationEngine {
     if (keywords !== undefined) {
       this.reportKeywordsError(keywords);
     }
-    // this.output.push(`<keyword>${this.tokenizer.keyWord()}</keyword>`);
+    this.pushTag(`<keyword>${this.tokenizer.keyWord()}</keyword>`);
   }
 
   private pushIdentifier(
@@ -910,36 +1088,33 @@ class ExtendedCompilationEngine {
     },
   ) {
     if (advance) {
-      // tslint:disable-next-line: no-console
-      console.log('ADVANCED TO AN IDENTIFIER');
       this.tokenizer.advance();
     }
     this.reportTypeError(JackTokenizer.TYPE_IDENTIFIER);
-    if (isType || isClassOrSubroutineDec) {
-      return;
-    }
     const identifier = this.tokenizer.identifier();
-    kind = kind || IDENTIFIER_KIND.NONE;
-    if (!isDefined) {
-      this.symbolTable.define(identifier, type, kind);
+    if (!this.xmlMode) {
+      if (isType || isClassOrSubroutineDec) {
+        // TODO handle them suitably
+        return;
+      }
+      kind = kind || IDENTIFIER_KIND.NONE;
+      if (!isDefined) {
+        this.symbolTable.define(identifier, type, kind);
+      } else {
+        kind = this.symbolTable.kindOf(identifier);
+        // if type is not found in the symbol table, take whatever
+        // is handed in
+        type = this.symbolTable.typeOf(identifier) || type;
+      }
     } else {
-      kind = this.symbolTable.kindOf(identifier);
-      // if type is not found in the symbol table, take whatever
-      // is handed in
-      type = this.symbolTable.typeOf(identifier) || type;
+      this.pushTag(`<identifier>${identifier}</identifier>`);
     }
-    const isPrimitive: boolean =
-      !!type && [KW_CHAR_STR, KW_INT_STR, KW_BOOLEAN_STR].indexOf(type) !== -1;
-    const runningIndex = this.symbolTable.indexOf(identifier);
-    // this.output.push(`<identifier>${identifier}</identifier>`);
-    this.output.push('<identifier>');
-    this.output.push(`<name>${identifier}</name>`);
-    this.output.push(`<isDefined>${isDefined}</isDefined>`);
-    this.output.push(`<isPrimitive>${isPrimitive}</isPrimitive>`);
-    this.output.push(`<kind>${kindCodeToStr(kind)}</kind>`);
-    this.output.push(`<type>${type}</type>`);
-    this.output.push(`<index>${runningIndex}</index>`);
-    this.output.push('</identifier>');
+  }
+
+  private pushTag(tag: string) {
+    if (this.xmlMode) {
+      this.output.push(tag);
+    }
   }
 
   private translateType(type: number): string {

@@ -2,6 +2,7 @@ import { Col, Layout, Row } from 'antd';
 import UploadComponent from 'components/Upload/UploadComponent';
 import CompilationEngine from 'dismantle/Compiler/CompilationEngine';
 import ExtendedCompilationEngine from 'dismantle/Compiler/ExtendedCompilationEngine';
+import JackCompiler, { ISource } from 'dismantle/Compiler/JackCompiler';
 import JackTokenizer from 'dismantle/Compiler/JackTokenizer';
 import VMTranslator from 'dismantle/MyVMTranslator/VMTranslator';
 import HackAssemblerTranslator from 'dismantle/Translator/HackAssemblerTranslator';
@@ -15,6 +16,121 @@ interface IProps extends RouteComponentProps {}
 const onFileChange = (content: string) => {
   // tslint:disable-next-line: no-console
   console.log(`Content is: ${content}`);
+};
+
+const SevenJack = () => {
+  return `
+  // This file is part of www.nand2tetris.org
+  // and the book "The Elements of Computing Systems"
+  // by Nisan and Schocken, MIT Press.
+  // File name: projects/11/Seven/Main.jack
+  
+  /**
+   * Computes the value of 1 + (2 * 3) and prints the result
+   *  at the top-left of the screen.  
+   */
+  class Main {
+  
+     function void main() {
+         do Output.printInt(1 + (2 * 3));
+         return;
+     }
+  
+  }  
+  `;
+};
+
+const ConvertToBinJack = () => {
+  return `
+  // This file is part of www.nand2tetris.org
+  // and the book "The Elements of Computing Systems"
+  // by Nisan and Schocken, MIT Press.
+  // File name: projects/11/ConvertToBin/Main.jack
+  
+  /**
+   * Unpacks a 16-bit number into its binary representation:
+   * Takes the 16-bit number stored in RAM[8000] and stores its individual 
+   * bits in RAM[8001..8016] (each location will contain 0 or 1).
+   * Before the conversion, RAM[8001]..RAM[8016] are initialized to -1.
+   * 
+   * The program should be tested as follows:
+   * 1) Load the program into the supplied VM Emulator
+   * 2) Put some value in RAM[8000]
+   * 3) Switch to "no animation"
+   * 4) Run the program (give it enough time to run)
+   * 5) Stop the program
+   * 6) Check that RAM[8001]..RAM[8016] contains the correct binary result, and
+   *    that none of these memory locations contain -1.
+   */
+  class Main {
+      
+      /**
+       * Initializes RAM[8001]..RAM[8016] to -1, and converts the value in
+       * RAM[8000] to binary.
+       */
+      function void main() {
+    var int result, value;
+          
+          do Main.fillMemory(8001, 16, -1); // sets RAM[8001]..RAM[8016] to -1
+          let value = Memory.peek(8000);    // reads a value from RAM[8000]
+    do Main.convert(value);           // perform the conversion
+      
+        return;
+      }
+      
+      /** Converts the given decimal value to binary, and puts 
+       *  the resulting bits in RAM[8001]..RAM[8016]. */
+      function void convert(int value) {
+        var int mask, position;
+        var boolean loop;
+        
+        let loop = true;
+   
+        while (loop) {
+            let position = position + 1;
+            let mask = Main.nextMask(mask);
+              do Memory.poke(9000 + position, mask);
+        
+            if (~(position > 16)) {
+        
+                if (~((value & mask) = 0)) {
+                    do Memory.poke(8000 + position, 1);
+                   }
+                else {
+                    do Memory.poke(8000 + position, 0);
+                  }    
+            }
+            else {
+                let loop = false;
+            }
+        }
+        
+        return;
+      }
+   
+      /** Returns the next mask (the mask that should follow the given mask). */
+      function int nextMask(int mask) {
+        if (mask = 0) {
+            return 1;
+        }
+        else {
+        return mask * 2;
+        }
+      }
+      
+      /** Fills 'length' consecutive memory locations with 'value',
+        * starting at 'startAddress'. */
+      function void fillMemory(int startAddress, int length, int value) {
+          while (length > 0) {
+              do Memory.poke(startAddress, value);
+              let length = length - 1;
+              let startAddress = startAddress + 1;
+          }
+          
+          return;
+      }
+  }    
+  `;
 };
 
 const SquareGameJack = () => {
@@ -258,7 +374,12 @@ const testCompilationEngine = (source: string) => {
     '',
   );
   // tslint:disable-next-line: no-console
-  console.log(extendedEngine.getXmlOutput());
+  console.log(extendedEngine.getOutput());
+};
+
+const testJackCompiler = (sources: ISource[]) => {
+  const compiler: JackCompiler = new JackCompiler(sources);
+  compiler.compile();
 };
 
 const NotFound: React.FunctionComponent<IProps> = ({ location }) => {
@@ -266,7 +387,13 @@ const NotFound: React.FunctionComponent<IProps> = ({ location }) => {
   // translateVM();
   // testTokenizr();
   // testJackTokenizer(ArrayTestMainJack);
-  testCompilationEngine(SquareGameJack());
+  // testCompilationEngine(SquareGameJack());
+  testJackCompiler([
+    {
+      code: ConvertToBinJack(),
+      name: 'ConvertToBin.jack',
+    },
+  ]);
   return (
     <Layout style={{ flex: 1, width: '100%', height: '100%' }}>
       <Layout.Content

@@ -5,12 +5,12 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "type": "node",
+      "type": "chrome",
       "request": "attach",
-      "name": "Attach",
-      "port": 9229,
-      "restart": true,
-      "stopOnEntry": false
+      "name": "Attach to Chrome",
+      "port": 9222,
+      "webRoot": "${workspaceFolder}"
     }
+ 
   ]
 }
