@@ -81,6 +81,8 @@ class SymbolTable {
    */
   public startSubroutine() {
     this.subroutineTable = new GenericHashtable<string, IdentifierInfo>();
+    this.argsCount = 0;
+    this.varsCount = 0;
   }
 
   /**
@@ -93,7 +95,6 @@ class SymbolTable {
    * @param kind is the identifier STATIC, FIELD, ARG, or VAR
    */
   public define(name: string, type: any, kind: IDENTIFIER_KIND) {
-    this.incrementVarCount(kind);
     const identiferInfo: IdentifierInfo = {
       index: this.varCount(kind),
       kind,
@@ -104,6 +105,7 @@ class SymbolTable {
     } else {
       this.subroutineTable.put(name, identiferInfo);
     }
+    this.incrementVarCount(kind);
   }
 
   /**

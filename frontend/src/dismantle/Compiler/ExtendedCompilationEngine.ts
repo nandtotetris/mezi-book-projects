@@ -19,6 +19,7 @@ import JackTokenizer, {
   KW_THIS_STR,
   KW_TRUE_STR,
   KW_VAR_STR,
+  KW_VOID_STR,
   KW_WHILE_STR,
   SYM_AND_STR,
   SYM_COMMA_STR,
@@ -206,10 +207,30 @@ class ExtendedCompilationEngine {
       advance: false,
       keywords: [KW_CONSTRUCTOR_STR, KW_FUNCTION_STR, KW_METHOD_STR],
     });
+    const keyword = this.tokenizer.keyWord();
+    // handle object construction
+    if (keyword === KW_CONSTRUCTOR_STR) {
+      const fieldCount = this.symbolTable.varCount(IDENTIFIER_KIND.FIELD);
+      // allocate required number of words
+      this.vmWriter.writePush(HVMInstructionSet.CONST_SEGMENT_CODE, fieldCount);
+      // one argument, Memory.alloc returns the base address
+      this.vmWriter.writeCall('Memory.alloc', 1);
+      // anchor this at the base address
+      this.vmWriter.writePop(HVMInstructionSet.POINTER_SEGMENT_CODE, 0);
+    } else if (keyword === KW_METHOD_STR) {
+      // Associate the this memory segment with the object on which
+      // the method operates
+      this.vmWriter.writePush(HVMInstructionSet.ARG_SEGMENT_CODE, 0);
+      this.vmWriter.writePop(HVMInstructionSet.POINTER_SEGMENT_CODE, 0);
+    }
+    let isVoid = false;
     // ========> void | type <=========
     this.tokenizer.advance();
     if (this.isKeyword()) {
       // void or keyword type
+      if (this.tokenizer.keyWord() === KW_VOID_STR) {
+        isVoid = true;
+      }
       this.pushKeyword({ advance: false });
     } else {
       // user-defined type
@@ -237,6 +258,10 @@ class ExtendedCompilationEngine {
     this.tokenizer.advance();
     // this method should advance just over the subroutine
     this.compileSubroutineBody();
+    // return 0
+    if (isVoid) {
+      this.vmWriter.writePush(HVMInstructionSet.CONST_SEGMENT_CODE, 0);
+    }
     // </subroutineDec>
     this.pushTag('</subroutineDec>');
     this.currentMethod.pop();
@@ -389,11 +414,15 @@ class ExtendedCompilationEngine {
     if (symbol === SYM_SQUARE_OPEN_STR) {
       isArray = true;
       this.pushSymbol({ symbol: SYM_SQUARE_OPEN_STR, advance: false });
+      // push arr
+      this.pushFromVariable(variable);
       // expression
       this.tokenizer.advance();
       this.compileExpression();
       // ]
       this.pushSymbol({ symbol: SYM_SQUARE_CLOSE_STR, advance: false });
+      // add
+      this.pushOperator(SYM_PLUS_STR);
       // advance for =
       this.tokenizer.advance();
     } else if (symbol !== SYM_EQUAL_STR) {
@@ -409,6 +438,15 @@ class ExtendedCompilationEngine {
     // transfer result to variable
     if (!isArray) {
       this.popIntoVariable(variable);
+    } else {
+      // temp 0 = value of expression right
+      this.vmWriter.writePop(HVMInstructionSet.TEMP_SEGMENT_CODE, 0);
+      // pop pointer 1, that = expression
+      this.vmWriter.writePop(HVMInstructionSet.POINTER_SEGMENT_CODE, 1);
+      // push temp 0
+      this.vmWriter.writePush(HVMInstructionSet.TEMP_SEGMENT_CODE, 0);
+      // pop that 0
+      this.vmWriter.writePop(HVMInstructionSet.THAT_SEGMENT_CODE, 0);
     }
     // advance over this statement
     this.tokenizer.advance();
@@ -474,9 +512,35 @@ class ExtendedCompilationEngine {
     } else if (this.isStringConstant()) {
       // ============> stringConstant <=========
       this.pushStringConstant({ advance: false });
+      const value = this.tokenizer.stringVal();
+      // create new string
+      this.vmWriter.writePush(
+        HVMInstructionSet.CONST_SEGMENT_CODE,
+        value.length,
+      );
+      this.vmWriter.writeCall('String.new', 1);
+      // append the chars
+      for (const char of value) {
+        this.vmWriter.writePush(
+          HVMInstructionSet.CONST_SEGMENT_CODE,
+          char.charCodeAt(0),
+        );
+        this.vmWriter.writeCall('String.appendChar', 1);
+      }
     } else if (this.isKeywordConstant()) {
       // ============> keywordConstants <=========
+      const keyword = this.tokenizer.keyWord();
       this.pushKeyword({ advance: false });
+      if (keyword === KW_NULL_STR || keyword === KW_FALSE_STR) {
+        this.vmWriter.writePush(HVMInstructionSet.CONST_SEGMENT_CODE, 0);
+      } else if (keyword === KW_TRUE_STR) {
+        this.vmWriter.writePush(HVMInstructionSet.CONST_SEGMENT_CODE, 1);
+        this.vmWriter.writeArithmetic(HVMInstructionSet.NEGATE_CODE);
+      } else if (keyword === KW_THIS_STR) {
+        this.vmWriter.writePush(HVMInstructionSet.POINTER_SEGMENT_CODE, 0);
+      } else {
+        throw new Error(`Unknown keyword in expression: ${keyword}`);
+      }
     } else if (this.isSymbol()) {
       if (this.tokenizer.symbol() === SYM_PARENTH_OPEN_STR) {
         // ============> (expression) <=========
@@ -491,7 +555,11 @@ class ExtendedCompilationEngine {
         this.tokenizer.advance();
         this.compileTerm();
         // output op
-        this.pushOperator(operator);
+        if (operator === SYM_MINUS_STR) {
+          this.vmWriter.writeArithmetic(HVMInstructionSet.NEGATE_CODE);
+        } else {
+          this.pushOperator(operator);
+        }
         advance = false;
       } else {
         throw Error(
@@ -509,9 +577,17 @@ class ExtendedCompilationEngine {
           isDefined: true,
           type: 'Array',
         });
+        // push arr
+        this.pushFromVariable(this.tokenizer.identifier());
         this.pushSymbol({ symbol: SYM_SQUARE_OPEN_STR });
         this.tokenizer.advance();
         this.compileExpression();
+        // add
+        this.pushOperator(SYM_PLUS_STR);
+        // pop pointer 1
+        this.vmWriter.writePop(HVMInstructionSet.POINTER_SEGMENT_CODE, 1);
+        // push that 0
+        this.vmWriter.writePush(HVMInstructionSet.THAT_SEGMENT_CODE, 0);
         this.pushSymbol({ symbol: SYM_SQUARE_CLOSE_STR, advance: false });
       } else if (word === SYM_PARENTH_OPEN_STR || word === SYM_DOT_STR) {
         // ============> subroutineCall <=========
@@ -555,6 +631,8 @@ class ExtendedCompilationEngine {
     this.pushSymbol({ symbol: SYM_SEMICOLON_STR, advance: false });
     // advance over this statement
     this.tokenizer.advance();
+    // pop the return value;
+    this.vmWriter.writePop(HVMInstructionSet.TEMP_SEGMENT_CODE, 0);
     this.pushTag('</doStatement>');
     this.currentMethod.pop();
   }
@@ -603,7 +681,7 @@ class ExtendedCompilationEngine {
     this.vmWriter.writeArithmetic(HVMInstructionSet.NOT_CODE);
     this.labelCount++;
     // if-goto L1
-    const L1 = `label-${this.labelCount}`;
+    const L1 = `label_${this.labelCount}`;
     this.vmWriter.writeIf(L1);
     // =========> ) <==========
     this.pushSymbol({ symbol: SYM_PARENTH_CLOSE_STR, advance: false });
@@ -615,7 +693,7 @@ class ExtendedCompilationEngine {
     this.compileStatements();
     // goto L2
     this.labelCount++;
-    const L2 = `label-${this.labelCount}`;
+    const L2 = `label_${this.labelCount}`;
     this.vmWriter.writeGoto(L2);
     // label L1
     this.vmWriter.writeLabel(L1);
@@ -651,7 +729,7 @@ class ExtendedCompilationEngine {
     this.pushTag('<whileStatement>');
     // label L1
     this.labelCount++;
-    const L1 = `label-${this.labelCount}`;
+    const L1 = `label_${this.labelCount}`;
     this.vmWriter.writeLabel(L1);
     // =========> while <==========
     this.pushKeyword({ advance: false });
@@ -666,7 +744,7 @@ class ExtendedCompilationEngine {
     this.vmWriter.writeArithmetic(HVMInstructionSet.NOT_CODE);
     // if-goto L2
     this.labelCount++;
-    const L2 = `label-${this.labelCount}`;
+    const L2 = `label_${this.labelCount}`;
     this.vmWriter.writeIf(L2);
     // =========> { <==========
     this.pushSymbol({ symbol: SYM_CURLY_OPEN_STR });
@@ -728,6 +806,8 @@ class ExtendedCompilationEngine {
    */
   private compileSubroutineCall() {
     let fullSubroutineName = this.tokenizer.identifier();
+    let isMethodCall = false;
+    let instanceName = '';
 
     // peek into the next value to distinguish between
     // a subroutineName and a className/varName
@@ -756,6 +836,12 @@ class ExtendedCompilationEngine {
         isDefined: true,
         type: 'method',
       });
+      // distinguish a method call
+      isMethodCall =
+        this.symbolTable.kindOf(fullSubroutineName) === IDENTIFIER_KIND.FIELD;
+      if (isMethodCall) {
+        instanceName = fullSubroutineName;
+      }
       fullSubroutineName = `${fullSubroutineName}.${this.tokenizer.identifier()}`;
     } else {
       // ========> subroutineName <=======
@@ -766,6 +852,9 @@ class ExtendedCompilationEngine {
         isDefined: true,
         type: 'function',
       });
+    }
+    if (isMethodCall) {
+      this.pushFromVariable(instanceName);
     }
     // ========> ( <=======
     this.pushSymbol({ symbol: SYM_PARENTH_OPEN_STR });
@@ -778,6 +867,11 @@ class ExtendedCompilationEngine {
     // advance over the subroutineCall
     this.tokenizer.advance();
     // write function call through the VMWriter
+    if (isMethodCall) {
+      this.vmWriter.writeCall(fullSubroutineName, this.numArguments + 1);
+    } else {
+      this.vmWriter.writeCall(fullSubroutineName, this.numArguments);
+    }
     this.vmWriter.writeCall(fullSubroutineName, this.numArguments);
   }
 
@@ -855,9 +949,6 @@ class ExtendedCompilationEngine {
         break;
       case SYM_OR_STR:
         operatorCode = HVMInstructionSet.OR_CODE;
-        break;
-      case SYM_MINUS_STR:
-        operatorCode = HVMInstructionSet.NEGATE_CODE;
         break;
       case SYM_INVERT_STR:
         operatorCode = HVMInstructionSet.NOT_CODE;
@@ -1094,7 +1185,7 @@ class ExtendedCompilationEngine {
     const identifier = this.tokenizer.identifier();
     if (!this.xmlMode) {
       if (isType || isClassOrSubroutineDec) {
-        // TODO handle them suitably
+        // TODO: handle them suitably
         return;
       }
       kind = kind || IDENTIFIER_KIND.NONE;
