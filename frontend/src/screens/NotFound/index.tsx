@@ -133,6 +133,154 @@ const ConvertToBinJack = () => {
   `;
 };
 
+const SquareMainJack = () => {
+  return `
+  // This file is part of www.nand2tetris.org
+  // and the book "The Elements of Computing Systems"
+  // by Nisan and Schocken, MIT Press.
+  // File name: projects/09/Square/Main.jack
+  
+  /**
+   * The Main class initializes a new Square Dance game and starts it.
+   */
+  class Main {
+  
+      /** Initializes a new game and starts it. */    
+      function void main() {
+          var SquareGame game;
+  
+          let game = SquareGame.new();
+          do game.run();
+    do game.dispose();
+  
+          return;
+      }
+  }    
+  `;
+};
+
+const SquareJack = () => {
+  return `
+  // This file is part of www.nand2tetris.org
+  // and the book "The Elements of Computing Systems"
+  // by Nisan and Schocken, MIT Press.
+  // File name: projects/09/Square/Square.jack
+  
+  /**
+   * Implements a graphic square. A graphic square has a screen location
+   * and a size. It also has methods for drawing, erasing, moving on the 
+   * screen, and changing its size.
+   */
+  class Square {
+  
+      // Location on the screen
+      field int x, y;
+  
+      // The size of the square
+      field int size;
+  
+      /** Constructs a new square with a given location and size. */
+      constructor Square new(int Ax, int Ay, int Asize) {
+          let x = Ax;
+          let y = Ay;
+          let size = Asize;
+  
+          do draw();
+  
+          return this;
+      }
+  
+      /** Deallocates the object's memory. */
+      method void dispose() {
+          do Memory.deAlloc(this);
+          return;
+      }
+  
+      /** Draws the square on the screen. */
+      method void draw() {
+          do Screen.setColor(true);
+          do Screen.drawRectangle(x, y, x + size, y + size);
+          return;
+      }
+  
+      /** Erases the square from the screen. */
+      method void erase() {
+          do Screen.setColor(false);
+          do Screen.drawRectangle(x, y, x + size, y + size);
+          return;
+      }
+  
+      /** Increments the size by 2 pixels. */
+      method void incSize() {
+          if (((y + size) < 254) & ((x + size) < 510)) {
+              do erase();
+              let size = size + 2;
+              do draw();
+          }
+          return;
+      }
+  
+      /** Decrements the size by 2 pixels. */
+      method void decSize() {
+          if (size > 2) {
+              do erase();
+              let size = size - 2;
+              do draw();
+          }
+          return;
+    }
+  
+      /** Moves up by 2 pixels. */
+      method void moveUp() {
+          if (y > 1) {
+              do Screen.setColor(false);
+              do Screen.drawRectangle(x, (y + size) - 1, x + size, y + size);
+              let y = y - 2;
+              do Screen.setColor(true);
+              do Screen.drawRectangle(x, y, x + size, y + 1);
+          }
+          return;
+      }
+  
+      /** Moves down by 2 pixels. */
+      method void moveDown() {
+          if ((y + size) < 254) {
+              do Screen.setColor(false);
+              do Screen.drawRectangle(x, y, x + size, y + 1);
+              let y = y + 2;
+              do Screen.setColor(true);
+              do Screen.drawRectangle(x, (y + size) - 1, x + size, y + size);
+          }
+          return;
+      }
+  
+      /** Moves left by 2 pixels. */
+      method void moveLeft() {
+          if (x > 1) {
+              do Screen.setColor(false);
+              do Screen.drawRectangle((x + size) - 1, y, x + size, y + size);
+              let x = x - 2;
+              do Screen.setColor(true);
+              do Screen.drawRectangle(x, y, x + 1, y + size);
+          }
+          return;
+      }
+  
+      /** Moves right by 2 pixels. */
+      method void moveRight() {
+          if ((x + size) < 510) {
+              do Screen.setColor(false);
+              do Screen.drawRectangle(x, y, x + 1, y + size);
+              let x = x + 2;
+              do Screen.setColor(true);
+              do Screen.drawRectangle((x + size) - 1, y, x + size, y + size);
+          }
+          return;
+      }
+  }  
+  `;
+};
+
 const SquareGameJack = () => {
   return `
   // This file is part of www.nand2tetris.org
@@ -237,7 +385,677 @@ const SquareGameJack = () => {
           do Sys.wait(5); // Delays the next movement.
           return;
       }
-  }
+  }  
+  `;
+};
+
+const AverageJack = () => {
+  return `
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/11/Average/Main.jack
+
+/** Computes the average of a sequence of integers */
+class Main {
+    function void main() {
+        var Array a;
+        var int length;
+	var int i, sum;
+	
+	let length = Keyboard.readInt("How many numbers? ");
+	let a = Array.new(length);
+	let i = 0;
+	
+	while (i < length) {
+	    let a[i] = Keyboard.readInt("Enter the next number: ");
+	    let i = i + 1;
+	}
+	
+	let i = 0;
+	let sum = 0;
+	
+	while (i < length) {
+	    let sum = sum + a[i];
+	    let i = i + 1;
+	}
+	
+	do Output.printString("The average is: ");
+	do Output.printInt(sum / length);
+	do Output.println();
+	
+	return;
+    }
+}
+`;
+};
+
+const BallJack = () => {
+  return `
+  // This file is part of www.nand2tetris.org
+  // and the book "The Elements of Computing Systems"
+  // by Nisan and Schocken, MIT Press.
+  // File name: projects/11/Pong/Ball.jack
+  
+  /**
+   * A graphic ball. Has a screen location and distance of last destination.
+   * Has methods for drawing, erasing and moving on the screen.
+   * The ball's dimensions are 6X6 pixels.
+   */
+  class Ball {
+  
+      // The ball's screen location (in pixels)
+      field int x, y;
+  
+      // Distance of last destination
+      field int lengthx, lengthy;
+  
+      // Used for straight line movement computation
+      field int d, straightD, diagonalD;
+      field boolean invert, positivex, positivey;
+  
+      // wall locations
+      field int leftWall, rightWall, topWall, bottomWall;
+  
+      // last wall that the ball was bounced from
+      field int wall;
+  
+      /** Constructs a new Ball with a given initial location
+       *  and the locations of the walls. */
+      constructor Ball new(int Ax, int Ay, int AleftWall, int ArightWall, int AtopWall, int AbottomWall) {    	
+    let x = Ax;		
+    let y = Ay;
+    let leftWall = AleftWall;
+    let rightWall = ArightWall - 6; // -6 for ball size
+    let topWall = AtopWall; 
+    let bottomWall = AbottomWall - 6; // -6 for ball size
+    let wall = 0;
+        
+          do show();
+  
+          return this;
+      }
+  
+      /** Deallocates the object's memory. */
+      method void dispose() {
+          do Memory.deAlloc(this);
+          return;
+      }
+  
+      /** Draws the ball on the screen. */
+      method void show() {
+          do Screen.setColor(true);
+    do draw();
+          return;
+      }
+  
+      /** Erases the ball from the screen. */
+      method void hide() {
+          do Screen.setColor(false);
+    do draw();
+          return;
+      }
+  
+      /** Draws the ball. */
+      method void draw() {
+    do Screen.drawRectangle(x, y, x + 5, y + 5);
+    return;
+      }
+  
+      /** Returns the left edge of the ball. */
+      method int getLeft() {
+          return x;
+      }
+  
+      /** Returns the right edge of the ball. */
+      method int getRight() {
+          return x + 5;
+      }
+  
+      /** Sets the destination of the ball. */
+      method void setDestination(int destx, int desty) {
+          var int dx, dy, temp;
+  
+    let lengthx = destx - x;
+    let lengthy = desty - y;
+          let dx = Math.abs(lengthx);
+          let dy = Math.abs(lengthy);
+          let invert = (dx < dy);
+  
+          // scan should be on Y-axis
+          if (invert) {
+              let temp = dx; // swap dx, dy
+              let dx = dy;
+              let dy = temp;
+  
+           let positivex = (y < desty);
+              let positivey = (x < destx);
+          }
+          else {
+        let positivex = (x < destx);
+              let positivey = (y < desty);
+          }
+  
+          let d = (2 * dy) - dx;
+          let straightD = 2 * dy;
+          let diagonalD = 2 * (dy - dx);
+  
+    return;
+      }
+  
+      /**
+       * Moves the ball one unit towards its destination.
+       * Returns 0 if the ball has not reached a wall.
+       * If it did, returns a value according to the wall:
+       * 1-left wall, 2-right wall, 3-top wall, 4-bottom wall.
+       */
+      method int move() {
+  
+    do hide();
+  
+          if (d < 0) {
+              let d = d + straightD;
+          }
+          else {
+              let d = d + diagonalD;
+  
+              if (positivey) {
+             if (invert) {
+             let x = x + 4;
+                }
+                  else {
+          let y = y + 4;
+                  }
+              }
+              else {
+             if (invert) {
+             let x = x - 4;
+                }
+                  else {
+          let y = y - 4;
+                  }
+              }
+    }
+  
+          if (positivex) {
+              if (invert) {
+           let y = y + 4;
+            }
+              else {
+            let x = x + 4;
+              }
+    }
+    else {
+              if (invert) {
+            let y = y - 4;
+        }
+              else {
+      let x = x - 4;
+              }
+    }
+  
+    if (~(x > leftWall)) {
+        let wall = 1;    
+        let x = leftWall;
+    }
+          if (~(x < rightWall)) {
+        let wall = 2;    
+        let x = rightWall;
+    }
+          if (~(y > topWall)) {
+              let wall = 3;    
+        let y = topWall;
+          }
+          if (~(y < bottomWall)) {
+              let wall = 4;    
+        let y = bottomWall;
+          }
+  
+    do show();
+  
+    return wall;
+      }
+  
+      /**
+       * Bounces from the current wall: sets the new destination
+       * of the ball according to the ball's angle and the given
+       * bouncing direction (-1/0/1=left/center/right or up/center/down).
+       */
+      method void bounce(int bouncingDirection) {
+    var int newx, newy, divLengthx, divLengthy, factor;
+  
+    // dividing by 10 first since results are too big
+          let divLengthx = lengthx / 10;
+          let divLengthy = lengthy / 10;
+    if (bouncingDirection = 0) {
+        let factor = 10;
+    }
+    else {
+        if (((~(lengthx < 0)) & (bouncingDirection = 1)) | ((lengthx < 0) & (bouncingDirection = (-1)))) {
+            let factor = 20; // bounce direction is in ball direction
+           }
+        else {
+            let factor = 5; // bounce direction is against ball direction
+        }
+    }
+  
+    if (wall = 1) {
+        let newx = 506;
+        let newy = (divLengthy * (-50)) / divLengthx;
+              let newy = y + (newy * factor);
+    }
+    else {
+         if (wall = 2) {
+            let newx = 0;
+            let newy = (divLengthy * 50) / divLengthx;
+                  let newy = y + (newy * factor);
+        }
+        else {
+             if (wall = 3) {
+          let newy = 250;
+          let newx = (divLengthx * (-25)) / divLengthy;
+                let newx = x + (newx * factor);
+      }
+            else { // assumes wall = 4
+          let newy = 0;
+          let newx = (divLengthx * 25) / divLengthy;
+                let newx = x + (newx * factor);
+      }
+        }
+    }
+  
+    do setDestination(newx, newy);
+  
+    return;
+      }
+  }    
+  `;
+};
+
+const BatJack = () => {
+  return `
+  // This file is part of www.nand2tetris.org
+  // and the book "The Elements of Computing Systems"
+  // by Nisan and Schocken, MIT Press.
+  // File name: projects/11/Pong/Bat.jack.
+  
+  /**
+   * A graphic Pong bat. Has a screen location, width and height.
+   * Has methods for drawing, erasing, moving left and right on
+   * the screen and changing the width. 
+   */
+  class Bat {
+  
+      // The screen location
+      field int x, y;
+  
+      // The width and height
+      field int width, height;
+  
+      // The direction of the bat's movement
+      field int direction; // 1 = left, 2 = right
+  
+      /** Constructs a new bat with the given location and width. */
+      constructor Bat new(int Ax, int Ay, int Awidth, int Aheight) {
+    let x = Ax;
+    let y = Ay;
+    let width = Awidth;
+    let height = Aheight;
+    let direction = 2;
+  
+          do show();
+  
+          return this;
+      }
+  
+      /** Deallocates the object's memory. */
+      method void dispose() {
+          do Memory.deAlloc(this);
+          return;
+      }
+  
+      /** Draws the bat on the screen. */
+      method void show() {
+          do Screen.setColor(true);
+    do draw();
+          return;
+      }
+  
+      /** Erases the bat from the screen. */
+      method void hide() {
+          do Screen.setColor(false);
+    do draw();
+          return;
+      }
+  
+      /** Draws the bat. */
+      method void draw() {
+    do Screen.drawRectangle(x, y, x + width, y + height);
+    return;
+      }
+  
+      /** Sets the direction of the bat (0=stop, 1=left, 2=right). */
+      method void setDirection(int Adirection) {
+    let direction = Adirection;
+          return;
+      }
+  
+      /** Returns the left edge of the bat. */
+      method int getLeft() {
+          return x;
+      }
+  
+      /** Returns the right edge of the bat. */
+      method int getRight() {
+          return x + width;
+      }
+  
+      /** Sets the width. */
+      method void setWidth(int Awidth) {
+          do hide();
+    let width = Awidth;
+          do show();
+          return;
+      }
+  
+      /** Moves the bat one step in its direction. */
+      method void move() {
+    if (direction = 1) {
+              let x = x - 4;
+        if (x < 0) {
+      let x = 0;
+            }
+              do Screen.setColor(false);
+              do Screen.drawRectangle((x + width) + 1, y, (x + width) + 4, y + height);
+              do Screen.setColor(true);
+           do Screen.drawRectangle(x, y, x + 3, y + height);
+    } 
+    else {
+              let x = x + 4;
+        if ((x + width) > 511) {
+      let x = 511 - width;
+          }
+              do Screen.setColor(false);
+              do Screen.drawRectangle(x - 4, y, x - 1, y + height);
+              do Screen.setColor(true);
+        do Screen.drawRectangle((x + width) - 3, y, x + width, y + height);
+    }
+  
+          return;
+      }
+  }    
+  `;
+};
+
+const PongMainJack = () => {
+  return `
+  // This file is part of www.nand2tetris.org
+  // and the book "The Elements of Computing Systems"
+  // by Nisan and Schocken, MIT Press.
+  // File name: projects/11/Pong/Main.jack
+  
+  /**
+   * The main class of the Pong game.
+   */
+  class Main {
+  
+      /** Initializes the Pong game and starts it. */
+      function void main() {
+          var PongGame game;
+  
+    do PongGame.newInstance();
+          let game = PongGame.getInstance();
+          do game.run();
+    do game.dispose();
+  
+          return;
+      }
+  }    
+  `;
+};
+
+const PongGameJack = () => {
+  return `
+  // This file is part of www.nand2tetris.org
+  // and the book "The Elements of Computing Systems"
+  // by Nisan and Schocken, MIT Press.
+  // File name: projects/11/Pong/PongGame.jack
+  
+  /**
+   * The Pong game.
+   */
+  class PongGame {
+  
+      // The singlton 
+      static PongGame instance;
+  
+      // The bat
+      field Bat bat;
+  
+      // The ball
+      field Ball ball;
+  
+      // The current wall that the ball is bouncing from.
+      field int wall;
+  
+      // True when the game is over
+      field boolean exit;
+  
+      // The current score.
+      field int score;
+  
+      // The last wall that the ball bounced from.
+      field int lastWall;
+  
+      // The current width of the bat
+      field int batWidth;
+  
+      /** Constructs a new Pong Game. */
+      constructor PongGame new() {
+    do Screen.clearScreen();
+  
+    let batWidth = 50;
+          let bat = Bat.new(230, 229, batWidth, 7);
+  
+          let ball = Ball.new(253, 222, 0, 511, 0, 229);
+    do ball.setDestination(400,0);
+  
+    do Screen.drawRectangle(0, 238, 511, 240);
+    do Output.moveCursor(22,0);
+    do Output.printString("Score: 0");
+    
+    let exit = false;
+    let score = 0;
+    let wall = 0;
+    let lastWall = 0;
+  
+          return this;
+      }
+  
+      /** Deallocates the object's memory. */
+      method void dispose() {
+          do bat.dispose();
+      do ball.dispose();
+          do Memory.deAlloc(this);
+          return;
+      }
+  
+      /** Creates an instance of PongGame and stores it. */
+      function void newInstance() {
+          let instance = PongGame.new();
+          return;
+      }
+      
+      /** Returns the single instance of PongGame. */
+      function PongGame getInstance() {
+          return instance;
+      }
+  
+      /** Starts the game. Handles inputs from the user that control
+       *  the bat's movement direction. */
+      method void run() {
+          var char key;
+  
+          while (~exit) {
+              // waits for a key to be pressed.
+              while ((key = 0) & (~exit)) {
+                  let key = Keyboard.keyPressed();
+                  do bat.move();
+      do moveBall();
+              }
+  
+              if (key = 130) {
+            do bat.setDirection(1);
+              }
+        else {
+            if (key = 132) {
+                 do bat.setDirection(2);
+                  }
+      else {
+                if (key = 140) {
+                          let exit = true;
+          }
+      }
+              }
+  
+              // Waits for the key to be released.
+              while ((~(key = 0)) & (~exit)) {
+                  let key = Keyboard.keyPressed();
+                  do bat.move();
+                  do moveBall();
+              }
+          }
+  
+    if (exit) {
+            do Output.moveCursor(10,27);
+        do Output.printString("Game Over");
+    }
+              
+          return;
+      }
+  
+      /**
+       * Handles ball movement, including bouncing.
+       * If the ball bounces from the wall, finds its new direction.
+       * If the ball bounces from the bat, shrinks the bat's size and
+       * increases the score by one.
+       */
+      method void moveBall() {
+    var int bouncingDirection, batLeft, batRight, ballLeft, ballRight;
+  
+    let wall = ball.move();
+  
+    if ((wall > 0) & (~(wall = lastWall))) {
+        let lastWall = wall;
+        let bouncingDirection = 0;
+        let batLeft = bat.getLeft();
+        let batRight = bat.getRight();
+        let ballLeft = ball.getLeft();
+        let ballRight = ball.getRight();
+    
+        if (wall = 4) {
+      let exit = (batLeft > ballRight) | (batRight < ballLeft);
+            if (~exit) {
+          if (ballRight < (batLeft + 10)) {
+        let bouncingDirection = -1;
+          }
+          else {
+        if (ballLeft > (batRight - 10)) {
+            let bouncingDirection = 1;
+        }
+          }
+  
+          let batWidth = batWidth - 2;
+          do bat.setWidth(batWidth);			
+            let score = score + 1;
+          do Output.moveCursor(22,7);
+          do Output.printInt(score);
+      }
+        }
+  
+          do ball.bounce(bouncingDirection);
+    }
+  
+    return;
+      }
+  }    
+  `;
+};
+
+const ArrayMainJack = () => {
+  return `
+  // This file is part of www.nand2tetris.org
+  // and the book "The Elements of Computing Systems"
+  // by Nisan and Schocken, MIT Press.
+  // File name: projects/11/ComplexArrays/Main.jack
+  
+  /**
+   * Performs several complex Array tests.
+   * For each test, the required result is printed along with the
+   * actual result. In each test, the two results should be equal.
+   */
+  class Main {
+  
+      function void main() {
+          var Array a, b, c;
+          
+          let a = Array.new(10);
+          let b = Array.new(5);
+          let c = Array.new(1);
+          
+          let a[3] = 2;
+          let a[4] = 8;
+          let a[5] = 4;
+          let b[a[3]] = a[3] + 3;  // b[2] = 5
+          let a[b[a[3]]] = a[a[5]] * b[((7 - a[3]) - Main.double(2)) + 1];  // a[5] = 8 * 5 = 40
+          let c[0] = null;
+          let c = c[0];
+          
+          do Output.printString("Test 1 - Required result: 5, Actual result: ");
+          do Output.printInt(b[2]);
+          do Output.println();
+          do Output.printString("Test 2 - Required result: 40, Actual result: ");
+          do Output.printInt(a[5]);
+          do Output.println();
+          do Output.printString("Test 3 - Required result: 0, Actual result: ");
+          do Output.printInt(c);
+          do Output.println();
+          
+          let c = null;
+  
+          if (c = null) {
+              do Main.fill(a, 10);
+              let c = a[3];
+              let c[1] = 33;
+              let c = a[7];
+              let c[1] = 77;
+              let b = a[3];
+              let b[1] = b[1] + c[1];  // b[1] = 33 + 77 = 110;
+          }
+  
+          do Output.printString("Test 4 - Required result: 77, Actual result: ");
+          do Output.printInt(c[1]);
+          do Output.println();
+          do Output.printString("Test 5 - Required result: 110, Actual result: ");
+          do Output.printInt(b[1]);
+          do Output.println();
+          
+          return;
+      }
+      
+      function int double(int a) {
+        return a * 2;
+      }
+      
+      function void fill(Array a, int size) {
+          while (size > 0) {
+              let size = size - 1;
+              let a[size] = Array.new(3);
+          }
+          
+          return;
+      }
+  }    
   `;
 };
 
@@ -390,8 +1208,8 @@ const NotFound: React.FunctionComponent<IProps> = ({ location }) => {
   // testCompilationEngine(SquareGameJack());
   testJackCompiler([
     {
-      code: ConvertToBinJack(),
-      name: 'ConvertToBin.jack',
+      code: SquareMainJack(),
+      name: 'Array.jack',
     },
   ]);
   return (

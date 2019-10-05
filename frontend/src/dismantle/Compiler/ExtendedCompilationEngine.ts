@@ -68,6 +68,9 @@ class ExtendedCompilationEngine {
   private subroutineName: string = '';
   // number of arguments when calling the current subroutine
   private numArguments: number = 0;
+  // is the return type of the current subroutine void?
+  private isVoid: boolean = false;
+  private routineType: string = KW_FUNCTION_STR;
 
   /**
    * Creates a new compilation engine with the given input
@@ -207,29 +210,19 @@ class ExtendedCompilationEngine {
       advance: false,
       keywords: [KW_CONSTRUCTOR_STR, KW_FUNCTION_STR, KW_METHOD_STR],
     });
-    const keyword = this.tokenizer.keyWord();
-    // handle object construction
-    if (keyword === KW_CONSTRUCTOR_STR) {
-      const fieldCount = this.symbolTable.varCount(IDENTIFIER_KIND.FIELD);
-      // allocate required number of words
-      this.vmWriter.writePush(HVMInstructionSet.CONST_SEGMENT_CODE, fieldCount);
-      // one argument, Memory.alloc returns the base address
-      this.vmWriter.writeCall('Memory.alloc', 1);
-      // anchor this at the base address
-      this.vmWriter.writePop(HVMInstructionSet.POINTER_SEGMENT_CODE, 0);
-    } else if (keyword === KW_METHOD_STR) {
-      // Associate the this memory segment with the object on which
-      // the method operates
-      this.vmWriter.writePush(HVMInstructionSet.ARG_SEGMENT_CODE, 0);
-      this.vmWriter.writePop(HVMInstructionSet.POINTER_SEGMENT_CODE, 0);
+    // set routine type
+    this.routineType = this.tokenizer.keyWord();
+    if (this.routineType === KW_METHOD_STR) {
+      this.symbolTable.define(KW_THIS_STR, this.className, IDENTIFIER_KIND.ARG);
     }
-    let isVoid = false;
+    // is it void or not?
+    this.isVoid = false;
     // ========> void | type <=========
     this.tokenizer.advance();
     if (this.isKeyword()) {
       // void or keyword type
       if (this.tokenizer.keyWord() === KW_VOID_STR) {
-        isVoid = true;
+        this.isVoid = true;
       }
       this.pushKeyword({ advance: false });
     } else {
@@ -244,7 +237,7 @@ class ExtendedCompilationEngine {
     this.pushIdentifier({
       advance: false,
       isClassOrSubroutineDec: true,
-      type: 'subroutine_declaration',
+      type: this.routineType,
     });
     this.subroutineName = this.tokenizer.identifier();
     // =======> ( <========
@@ -258,10 +251,6 @@ class ExtendedCompilationEngine {
     this.tokenizer.advance();
     // this method should advance just over the subroutine
     this.compileSubroutineBody();
-    // return 0
-    if (isVoid) {
-      this.vmWriter.writePush(HVMInstructionSet.CONST_SEGMENT_CODE, 0);
-    }
     // </subroutineDec>
     this.pushTag('</subroutineDec>');
     this.currentMethod.pop();
@@ -380,6 +369,10 @@ class ExtendedCompilationEngine {
       } else if (keyword === KW_IF_STR) {
         this.compileIf();
       } else if (keyword === KW_RETURN_STR) {
+        // push 0 in case of void subroutines
+        if (this.isVoid) {
+          this.vmWriter.writePush(HVMInstructionSet.CONST_SEGMENT_CODE, 0);
+        }
         this.compileReturn();
       } else {
         break;
@@ -518,14 +511,17 @@ class ExtendedCompilationEngine {
         HVMInstructionSet.CONST_SEGMENT_CODE,
         value.length,
       );
+      // this will push base address to stack top
       this.vmWriter.writeCall('String.new', 1);
-      // append the chars
+      // append the chars by operating on the string reference
       for (const char of value) {
         this.vmWriter.writePush(
           HVMInstructionSet.CONST_SEGMENT_CODE,
           char.charCodeAt(0),
         );
-        this.vmWriter.writeCall('String.appendChar', 1);
+        // 2 because this is a method call, the base address is the
+        // first argument
+        this.vmWriter.writeCall('String.appendChar', 2);
       }
     } else if (this.isKeywordConstant()) {
       // ============> keywordConstants <=========
@@ -534,8 +530,8 @@ class ExtendedCompilationEngine {
       if (keyword === KW_NULL_STR || keyword === KW_FALSE_STR) {
         this.vmWriter.writePush(HVMInstructionSet.CONST_SEGMENT_CODE, 0);
       } else if (keyword === KW_TRUE_STR) {
-        this.vmWriter.writePush(HVMInstructionSet.CONST_SEGMENT_CODE, 1);
-        this.vmWriter.writeArithmetic(HVMInstructionSet.NEGATE_CODE);
+        this.vmWriter.writePush(HVMInstructionSet.CONST_SEGMENT_CODE, 0);
+        this.vmWriter.writeArithmetic(HVMInstructionSet.NOT_CODE);
       } else if (keyword === KW_THIS_STR) {
         this.vmWriter.writePush(HVMInstructionSet.POINTER_SEGMENT_CODE, 0);
       } else {
@@ -557,8 +553,10 @@ class ExtendedCompilationEngine {
         // output op
         if (operator === SYM_MINUS_STR) {
           this.vmWriter.writeArithmetic(HVMInstructionSet.NEGATE_CODE);
+        } else if (operator === SYM_INVERT_STR) {
+          this.vmWriter.writeArithmetic(HVMInstructionSet.NOT_CODE);
         } else {
-          this.pushOperator(operator);
+          throw new Error(`Unknow unary operator: ${operator}`);
         }
         advance = false;
       } else {
@@ -805,9 +803,10 @@ class ExtendedCompilationEngine {
    * ( className | varName )'.'subroutineName'(' expressionList? ')'
    */
   private compileSubroutineCall() {
-    let fullSubroutineName = this.tokenizer.identifier();
-    let isMethodCall = false;
-    let instanceName = '';
+    const firstIdentifier = this.tokenizer.identifier();
+    let isExternalMethodCall = false;
+    let isInternalMethodCall = false;
+    let subroutineName = firstIdentifier;
 
     // peek into the next value to distinguish between
     // a subroutineName and a className/varName
@@ -834,27 +833,36 @@ class ExtendedCompilationEngine {
       this.pushIdentifier({
         advance: false,
         isDefined: true,
-        type: 'method',
       });
       // distinguish a method call
-      isMethodCall =
-        this.symbolTable.kindOf(fullSubroutineName) === IDENTIFIER_KIND.FIELD;
-      if (isMethodCall) {
-        instanceName = fullSubroutineName;
+      isExternalMethodCall =
+        this.symbolTable.kindOf(firstIdentifier) !== IDENTIFIER_KIND.NONE;
+      if (isExternalMethodCall) {
+        subroutineName = `${this.symbolTable.typeOf(
+          firstIdentifier,
+        )}.${this.tokenizer.identifier()}`;
+      } else {
+        subroutineName = `${firstIdentifier}.${this.tokenizer.identifier()}`;
       }
-      fullSubroutineName = `${fullSubroutineName}.${this.tokenizer.identifier()}`;
     } else {
       // ========> subroutineName <=======
-      // assuming this is a function, since it lacks a preceding
-      // dot operator
+
+      // check if it is a method of the current class, preceded with an implicit this
+      isInternalMethodCall = true;
+      subroutineName = `${this.className}.${firstIdentifier}`;
+
       this.pushIdentifier({
         advance: false,
         isDefined: true,
-        type: 'function',
       });
     }
-    if (isMethodCall) {
-      this.pushFromVariable(instanceName);
+    if (isExternalMethodCall) {
+      // push the address of the object
+      this.pushFromVariable(firstIdentifier);
+    }
+    if (isInternalMethodCall) {
+      // push the this address
+      this.vmWriter.writePush(HVMInstructionSet.POINTER_SEGMENT_CODE, 0);
     }
     // ========> ( <=======
     this.pushSymbol({ symbol: SYM_PARENTH_OPEN_STR });
@@ -866,13 +874,12 @@ class ExtendedCompilationEngine {
     this.pushSymbol({ symbol: SYM_PARENTH_CLOSE_STR, advance: false });
     // advance over the subroutineCall
     this.tokenizer.advance();
-    // write function call through the VMWriter
-    if (isMethodCall) {
-      this.vmWriter.writeCall(fullSubroutineName, this.numArguments + 1);
-    } else {
-      this.vmWriter.writeCall(fullSubroutineName, this.numArguments);
+    // there is additional argument (the this object) for method calls
+    if (isInternalMethodCall || isExternalMethodCall) {
+      this.numArguments++;
     }
-    this.vmWriter.writeCall(fullSubroutineName, this.numArguments);
+    // write function call through the VMWriter
+    this.vmWriter.writeCall(subroutineName, this.numArguments);
   }
 
   /**
@@ -897,6 +904,21 @@ class ExtendedCompilationEngine {
     const numLocalVars = this.symbolTable.varCount(IDENTIFIER_KIND.VAR);
     const fullFunctionName = `${this.className}.${this.subroutineName}`;
     this.vmWriter.writeFunction(fullFunctionName, numLocalVars);
+    // handle object construction
+    if (this.routineType === KW_CONSTRUCTOR_STR) {
+      const fieldCount = this.symbolTable.varCount(IDENTIFIER_KIND.FIELD);
+      // allocate required number of words
+      this.vmWriter.writePush(HVMInstructionSet.CONST_SEGMENT_CODE, fieldCount);
+      // one argument, Memory.alloc returns the base address
+      this.vmWriter.writeCall('Memory.alloc', 1);
+      // anchor this at the base address
+      this.vmWriter.writePop(HVMInstructionSet.POINTER_SEGMENT_CODE, 0);
+    } else if (this.routineType === KW_METHOD_STR) {
+      // Associate the this memory segment with the object on which
+      // the method operates
+      this.vmWriter.writePush(HVMInstructionSet.ARG_SEGMENT_CODE, 0);
+      this.vmWriter.writePop(HVMInstructionSet.POINTER_SEGMENT_CODE, 0);
+    }
     // =========> statements <========
     this.compileStatements();
     // =========> } <========
@@ -1185,10 +1207,8 @@ class ExtendedCompilationEngine {
     const identifier = this.tokenizer.identifier();
     if (!this.xmlMode) {
       if (isType || isClassOrSubroutineDec) {
-        // TODO: handle them suitably
         return;
       }
-      kind = kind || IDENTIFIER_KIND.NONE;
       if (!isDefined) {
         this.symbolTable.define(identifier, type, kind);
       } else {
