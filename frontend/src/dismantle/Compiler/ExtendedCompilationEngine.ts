@@ -51,7 +51,6 @@ import SymbolTable, {
 } from 'dismantle/Compiler/SymbolTable';
 import VMWriter from 'dismantle/Compiler/VMWriter';
 import HVMInstructionSet from 'dismantle/VirtualMachine/HVMInstructionSet';
-import Tokenizr from 'tokenizr';
 
 class ExtendedCompilationEngine {
   private tokenizer: JackTokenizer;
@@ -60,14 +59,16 @@ class ExtendedCompilationEngine {
   private symbolTable: SymbolTable;
   private vmWriter: VMWriter;
   private xmlMode: boolean = false;
-  private labelCount: number = 0;
+
+  private whileLabelCount: number = -1;
+  private ifLabelCount: number = -1;
 
   // the name of the class being compiled currently
   private className: string = '';
   // name of current subroutine being compiled
   private subroutineName: string = '';
-  // number of arguments when calling the current subroutine
-  private numArguments: number = 0;
+  // stores at the top the number of arguments when calling the most recent subroutine
+  private numArgumentsStack: number[] = [];
   // is the return type of the current subroutine void?
   private isVoid: boolean = false;
   private routineType: string = KW_FUNCTION_STR;
@@ -205,6 +206,8 @@ class ExtendedCompilationEngine {
     this.pushTag('<subroutineDec>');
     // reset subroutine symbol table
     this.symbolTable.startSubroutine();
+    this.whileLabelCount = -1;
+    this.ifLabelCount = -1;
     // ==========> constructor | function | method <========
     this.pushKeyword({
       advance: false,
@@ -407,11 +410,11 @@ class ExtendedCompilationEngine {
     if (symbol === SYM_SQUARE_OPEN_STR) {
       isArray = true;
       this.pushSymbol({ symbol: SYM_SQUARE_OPEN_STR, advance: false });
-      // push arr
-      this.pushFromVariable(variable);
-      // expression
+      // push expression
       this.tokenizer.advance();
       this.compileExpression();
+      // push arr
+      this.pushFromVariable(variable);
       // ]
       this.pushSymbol({ symbol: SYM_SQUARE_CLOSE_STR, advance: false });
       // add
@@ -576,10 +579,11 @@ class ExtendedCompilationEngine {
           type: 'Array',
         });
         // push arr
-        this.pushFromVariable(this.tokenizer.identifier());
+        const arrayName = this.tokenizer.identifier();
         this.pushSymbol({ symbol: SYM_SQUARE_OPEN_STR });
         this.tokenizer.advance();
         this.compileExpression();
+        this.pushFromVariable(arrayName);
         // add
         this.pushOperator(SYM_PLUS_STR);
         // pop pointer 1
@@ -644,9 +648,10 @@ class ExtendedCompilationEngine {
     this.pushTag('<expressionList>');
     // if not starting with an identifier, we are dealing
     // with an empty expression list
+    let numArguments = 0;
     if (this.getWord() !== SYM_PARENTH_CLOSE_STR) {
       while (true) {
-        this.numArguments++;
+        numArguments++;
         this.compileExpression();
         this.reportTypeError(JackTokenizer.TYPE_SYMBOL);
         if (this.tokenizer.symbol() === SYM_PARENTH_CLOSE_STR) {
@@ -656,6 +661,7 @@ class ExtendedCompilationEngine {
         this.tokenizer.advance();
       }
     }
+    this.numArgumentsStack.push(numArguments);
     this.pushTag('</expressionList>');
     this.currentMethod.pop();
   }
@@ -675,35 +681,40 @@ class ExtendedCompilationEngine {
     // =========> expression <==========
     this.tokenizer.advance();
     this.compileExpression();
-    // not
-    this.vmWriter.writeArithmetic(HVMInstructionSet.NOT_CODE);
-    this.labelCount++;
-    // if-goto L1
-    const L1 = `label_${this.labelCount}`;
-    this.vmWriter.writeIf(L1);
+    // increment if label count
+    this.ifLabelCount++;
+    const labelCountStr = `${this.ifLabelCount}`;
+    // if-goto IF_TRUE
+    const labelTrue = `IF_TRUE${labelCountStr}`;
+    this.vmWriter.writeIf(labelTrue);
+    // goto IF_FALSE
+    const labelFalse = `IF_FALSE${labelCountStr}`;
+    this.vmWriter.writeGoto(labelFalse);
     // =========> ) <==========
     this.pushSymbol({ symbol: SYM_PARENTH_CLOSE_STR, advance: false });
     // =========> { <==========
     this.pushSymbol({ symbol: SYM_CURLY_OPEN_STR });
     // =========> statements <==========
+    // IF_TRUE, execute statements
+    this.vmWriter.writeLabel(labelTrue);
     // advance to the first keyword
     this.tokenizer.advance();
     this.compileStatements();
-    // goto L2
-    this.labelCount++;
-    const L2 = `label_${this.labelCount}`;
-    this.vmWriter.writeGoto(L2);
-    // label L1
-    this.vmWriter.writeLabel(L1);
     // =========> { <==========
     this.pushSymbol({ symbol: SYM_CURLY_CLOSE_STR, advance: false });
     // =========> else <==========
     this.tokenizer.advance();
+
     if (this.isKeyword() && this.tokenizer.keyWord() === KW_ELSE_STR) {
       this.pushKeyword({ advance: false });
       // =========> { <==========
       this.pushSymbol({ symbol: SYM_CURLY_OPEN_STR });
       // =========> statements <==========
+      // after statements, go to END
+      const labelEnd = `IF_END${labelCountStr}`;
+      this.vmWriter.writeGoto(labelEnd);
+      // IF_FALSE
+      this.vmWriter.writeLabel(labelFalse);
       // advance to the first keyword
       this.tokenizer.advance();
       this.compileStatements();
@@ -711,9 +722,12 @@ class ExtendedCompilationEngine {
       this.pushSymbol({ symbol: SYM_CURLY_CLOSE_STR, advance: false });
       // advance one step
       this.tokenizer.advance();
+      // END
+      this.vmWriter.writeLabel(labelEnd);
+    } else {
+      // IF_FALSE
+      this.vmWriter.writeLabel(labelFalse);
     }
-    // label L2
-    this.vmWriter.writeLabel(L2);
     this.pushTag('</ifStatement>');
     this.currentMethod.pop();
   }
@@ -725,10 +739,10 @@ class ExtendedCompilationEngine {
   public compileWhile() {
     this.currentMethod.push('compileWhile');
     this.pushTag('<whileStatement>');
-    // label L1
-    this.labelCount++;
-    const L1 = `label_${this.labelCount}`;
-    this.vmWriter.writeLabel(L1);
+    this.whileLabelCount++;
+    // WHILE_EXP
+    const labelExp = `WHILE_EXP${this.whileLabelCount}`;
+    this.vmWriter.writeLabel(labelExp);
     // =========> while <==========
     this.pushKeyword({ advance: false });
     // =========> ( <==========
@@ -740,10 +754,9 @@ class ExtendedCompilationEngine {
     this.pushSymbol({ symbol: SYM_PARENTH_CLOSE_STR, advance: false });
     // not
     this.vmWriter.writeArithmetic(HVMInstructionSet.NOT_CODE);
-    // if-goto L2
-    this.labelCount++;
-    const L2 = `label_${this.labelCount}`;
-    this.vmWriter.writeIf(L2);
+    // if-goto label END
+    const labelEnd = `WHILE_END${this.whileLabelCount}`;
+    this.vmWriter.writeIf(labelEnd);
     // =========> { <==========
     this.pushSymbol({ symbol: SYM_CURLY_OPEN_STR });
     // =========> statements <==========
@@ -754,10 +767,10 @@ class ExtendedCompilationEngine {
     this.pushSymbol({ symbol: SYM_CURLY_CLOSE_STR, advance: false });
     // advance over this statement
     this.tokenizer.advance();
-    // goto L1
-    this.vmWriter.writeGoto(L1);
-    // label L2
-    this.vmWriter.writeLabel(L2);
+    // goto WHILE_EXP
+    this.vmWriter.writeGoto(labelExp);
+    // END
+    this.vmWriter.writeLabel(labelEnd);
     this.pushTag('</whileStatement>');
     this.currentMethod.pop();
   }
@@ -773,7 +786,7 @@ class ExtendedCompilationEngine {
     this.pushKeyword({ advance: false });
     // =========> expression? <==========
     this.tokenizer.advance();
-    if (!this.isSymbol()) {
+    if (this.getWord() !== SYM_SEMICOLON_STR) {
       this.compileExpression();
     }
     // =========> ; <==========
@@ -868,18 +881,18 @@ class ExtendedCompilationEngine {
     this.pushSymbol({ symbol: SYM_PARENTH_OPEN_STR });
     this.tokenizer.advance();
     // ========> expressionList <=======
-    this.numArguments = 0;
     this.compileExpressionList();
     // ========> ) <=======
     this.pushSymbol({ symbol: SYM_PARENTH_CLOSE_STR, advance: false });
     // advance over the subroutineCall
     this.tokenizer.advance();
+    let numArguments = this.numArgumentsStack.pop() || 0;
     // there is additional argument (the this object) for method calls
     if (isInternalMethodCall || isExternalMethodCall) {
-      this.numArguments++;
+      numArguments++;
     }
     // write function call through the VMWriter
-    this.vmWriter.writeCall(subroutineName, this.numArguments);
+    this.vmWriter.writeCall(subroutineName, numArguments);
   }
 
   /**

@@ -2066,6 +2066,11 @@
   resolved "https://registry.yarnpkg.com/@types/tapable/-/tapable-1.0.2.tgz#e13182e1b69871a422d7863e11a4a6f5b814a4bd"
   integrity sha512-42zEJkBpNfMEAvWR5WlwtTH22oDzcMjFsL9gDGExwF8X8WvAiw7Vwop7hPw03QT8TKfec83LwbHj6SvpqM4ELQ==
 
+"@types/tokenizr@^1.5.1":
+  version "1.5.1"
+  resolved "https://registry.yarnpkg.com/@types/tokenizr/-/tokenizr-1.5.1.tgz#63c2fd0e213735cc4fa50aa2876cd8b63cade3ba"
+  integrity sha512-8q17OkvdTTXmKpcW28rJhVmnkj1aCm8KcQnPwZUffFmGcY0/ukCBNqqYTUQ+o5sI3dFUAh772IOLV5wEQ9or2g==
+
 "@types/tough-cookie@*":
   version "2.3.5"
   resolved "https://registry.yarnpkg.com/@types/tough-cookie/-/tough-cookie-2.3.5.tgz#9da44ed75571999b65c37b60c9b2b88db54c585d"
@@ -9284,6 +9289,11 @@ joi@^13.0.0:
     isemail "3.x.x"
     topo "3.x.x"
 
+js-file-download@^0.4.8:
+  version "0.4.8"
+  resolved "https://registry.yarnpkg.com/js-file-download/-/js-file-download-0.4.8.tgz#f91c532acd685d8b16685672010b99473ca7f606"
+  integrity sha512-8xygX/IkjQbr/2nWqJnyc0IWOMvA1R/78HQVyexB22YZDBAEz2MG59s+ieLFKOkDFzyDDk3bezKXEjyGW5HPCw==
+
 js-git@^0.7.8:
   version "0.7.8"
   resolved "https://registry.yarnpkg.com/js-git/-/js-git-0.7.8.tgz#52fa655ab61877d6f1079efc6534b554f31e5444"
@@ -16341,6 +16351,11 @@ toidentifier@1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/toidentifier/-/toidentifier-1.0.0.tgz#7e1be3470f1e77948bc43d94a3c8f4d7752ba553"
   integrity sha512-yaOH/Pk/VEhBWWTlhI+qXxDFXlejDGcQipMlyxda9nthulaxLZUNcUqFxokp0vcYnvteJln5FNQDRrxj3YcbVw==
+
+tokenizr@^1.5.4:
+  version "1.5.4"
+  resolved "https://registry.yarnpkg.com/tokenizr/-/tokenizr-1.5.4.tgz#1774dd5105b2798f175d2952d7ef86cbb7e17cae"
+  integrity sha512-rajluZChTcvTuLwrs5pAM2QhM5vQ9Aj80nXOD0XWqRnJfNa3QFuiCQNZ9ky/O1up4zzZA57TQO6DVDnXDRbPGA==
 
 topo@2.x.x:
   version "2.0.2"

@@ -21,15 +21,14 @@ class JackCompiler {
   /**
    * Compiles jack class files into corresponding/equivalent vm files
    */
-  public compile() {
+  public compile(): ISource[] {
     let compilerEngine: ExtendedCompilationEngine;
+    const results: ISource[] = [];
     for (const source of this.soruces) {
-      // tslint:disable-next-line: no-console
-      console.log(`=========== ${source.name} ===========`);
       compilerEngine = new ExtendedCompilationEngine(source.code);
-      // tslint:disable-next-line: no-console
-      console.log(compilerEngine.getOutput());
+      results.push({ name: source.name, code: compilerEngine.getOutput() });
     }
+    return results;
   }
 }
 export default JackCompiler;
