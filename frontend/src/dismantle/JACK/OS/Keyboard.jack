@@ -1,0 +1,116 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/12/Keyboard.jack
+
+/**
+ * A library for handling user input from the keyboard.
+ */
+class Keyboard {
+
+    static int KEYBOARD;
+    static int LINE_LENGTH;
+    static char CURSOR;
+    static char NO_CHAR;
+
+    /** Initializes the keyboard. */
+    function void init() {
+        let KEYBOARD = 24576;    
+        let LINE_LENGTH = 64;
+        let CURSOR = 124;
+        let NO_CHAR = 0;
+        return;
+    } 
+
+    /**
+     * Returns the ASCII code (as char) of the currently pressed key,
+     * or 0 if no key is currently pressed.
+     * Recognizes all ASCII characters, as well as the following extension
+     * of action keys:
+     * New line = 128 = String.newline()
+     * Backspace = 129 = String.backspace()
+     * Left Arrow = 130
+     * Up Arrow = 131
+     * Right Arrow = 132
+     * Down Arrow = 133
+     * Home = 134
+     * End = 135
+     * Page Up = 136
+     * Page Down = 137
+     * Insert = 138
+     * Delete = 139
+     * ESC = 140
+     * F1 - F12 = 141 - 152
+     */
+    function char keyPressed() {
+        return Memory.peek(KEYBOARD);
+    }
+
+    /**								
+     * Reads the next character from the keyboard.
+     * waits until a key is pressed and then released, then echoes
+     * the key to the screen, and returns the value of the pressed key.
+     */
+    function char readChar() {
+        var char currentKey;
+        // display the cursor
+        do Output.printChar(CURSOR);
+        // while no key is pressed on the keyboard, do nothing
+        let currentKey = NO_CHAR;
+        while (~currentKey) {
+            let currentKey = Keyboard.keyPressed();
+        }
+        // while a key is pressed do nothing;
+        while (Keyboard.keyPressed()) {
+        }
+        do Output.backSpace();
+        if (~(currentKey = String.backSpace())) {
+            // print the character and move cursor to the right
+            do Output.printChar(currentKey);
+        }
+        // reset memory
+        do Memory.poke(KEYBOARD, NO_CHAR);
+        return currentKey;
+    }
+
+    /**								
+     * Prints the message on the screen, reads the next line
+     * (until a newline character) from the keyboard, and returns its value.
+     */
+    function String readLine(String message) {
+        var String lineString;
+        var char currentChar;
+        var boolean loop;
+        // print the message
+        do Output.printString(message);
+        // read the input
+        let lineString = String.new(LINE_LENGTH);
+        let loop = true;
+        while (loop) {
+            let currentChar = Keyboard.readChar();
+            if (currentChar = String.newLine()) {
+                let loop = false;
+                do Output.println();
+            } else {
+                if (currentChar = String.backSpace()) {
+                    do Output.backSpace();
+                    do lineString.eraseLastChar();
+                } else {
+                    let lineString = lineString.appendChar(currentChar);
+                }
+            }
+        }    
+        return lineString;
+    }   
+
+    /**								
+     * Prints the message on the screen, reads the next line
+     * (until a newline character) from the keyboard, and returns its
+     * integer value (until the first non numeric character).
+     */
+    function int readInt(String message) {
+        var String input;
+        let input = Keyboard.readLine(message);
+        return input.intValue();
+    }
+}

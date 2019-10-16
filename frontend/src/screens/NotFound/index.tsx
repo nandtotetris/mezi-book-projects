@@ -3,6 +3,8 @@ import UploadComponent from 'components/Upload/UploadComponent';
 import {
   BallJack,
   BatJack,
+  KeyboardMain,
+  OutputMain,
   PongGameJack,
   PongMainJack,
   ScreenMain,
@@ -10,13 +12,14 @@ import {
 import {
   Array,
   JackString,
-  Keyboard,
   Math,
   Memory,
   Output,
   Screen,
   Sys,
 } from 'dismantle/Compiler/os';
+import { OS } from 'dismantle/JACK/OS';
+import { OsTest } from 'dismantle/JACK/OsTest';
 import { testJackCompiler } from 'dismantle/test';
 import * as React from 'react';
 import { RouteComponentProps } from 'react-router';
@@ -44,11 +47,11 @@ const NotFound: React.FunctionComponent<IProps> = ({ location }) => {
       name: 'Memory.vm',
     },
     {
-      code: Keyboard(),
+      code: OS.Keyboard,
       name: 'Keyboard.vm',
     },
     {
-      code: Output(),
+      code: OS.Output,
       name: 'Output.vm',
     },
     {
@@ -74,7 +77,13 @@ const NotFound: React.FunctionComponent<IProps> = ({ location }) => {
     { code: PongGameJack(), name: 'PongGame.vm' },
     { code: PongMainJack(), name: 'Main.vm' },
   ];
-  testJackCompiler(osSources);
+  const TestSource = [{ code: OsTest.KeyboardTest, name: 'Main.vm' }];
+  testJackCompiler([
+    {
+      code: OS.Output,
+      name: 'Output.vm',
+    },
+  ]);
   return (
     <Layout style={{ flex: 1, width: '100%', height: '100%' }}>
       <Layout.Content

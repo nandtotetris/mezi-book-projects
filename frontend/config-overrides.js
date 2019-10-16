@@ -54,6 +54,11 @@ module.exports = function override(config, env) {
     loader: 'handlebars-template-loader',
   });
 
+  config.module.rules.splice(0, 0, {
+    test: /\.jack$/i,
+    use: 'raw-loader',
+  });
+
   // config.plugins.push(new AntDesignThemePlugin(options));
   // Silence mini-css-extract-plugin generating lots of warnings for CSS ordering.
   // We use CSS modules that should not care for the order of CSS imports, so we

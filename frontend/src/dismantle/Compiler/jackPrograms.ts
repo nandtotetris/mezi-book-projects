@@ -1080,3 +1080,239 @@ export const ScreenMain = () => {
     }        
     `;
 };
+
+export const StringMain = () => {
+  return `
+    // This file is part of www.nand2tetris.org
+    // and the book "The Elements of Computing Systems"
+    // by Nisan and Schocken, MIT Press.
+    // File name: projects/12/StringTest/Main.jack
+    
+    /** Test program for the OS String class. */
+    class Main {
+    
+        /** Performs several string manipulations and prints their results. */
+        function void main() {
+            var String s;
+            var String i;
+            
+            let s = String.new(0); // A zero-capacity string should be supported
+            do s.dispose();
+    
+            let s = String.new(6); // capacity 6, make sure length 5 will be printed
+            let s = s.appendChar(97);
+            let s = s.appendChar(98);
+            let s = s.appendChar(99);
+            let s = s.appendChar(100);
+            let s = s.appendChar(101);
+            do Output.printString("new,appendChar: ");
+            do Output.printString(s);                // new, appendChar: abcde
+            do Output.println();
+        
+            let i = String.new(6);
+            do i.setInt(12345);
+            do Output.printString("setInt: ");
+            do Output.printString(i);                // setInt: 12345
+            do Output.println();
+    
+            do i.setInt(-32767);
+            do Output.printString("setInt: ");
+            do Output.printString(i);                // setInt: -32767
+            do Output.println();
+            
+            do Output.printString("length: ");
+            do Output.printInt(s.length());          // length: 5
+            do Output.println();
+            
+            do Output.printString("charAt[2]: ");
+            do Output.printInt(s.charAt(2));         // charAt[2]: 99
+            do Output.println();
+            
+            do s.setCharAt(2, 45);
+            do Output.printString("setCharAt(2,'-'): ");     
+            do Output.printString(s);                // setCharAt(2,'-'): ab-de
+            do Output.println();
+            
+            do s.eraseLastChar();        
+            do Output.printString("eraseLastChar: ");     
+            do Output.printString(s);                // eraseLastChar: ab-d
+            do Output.println();
+            
+            let s = "456";
+            do Output.printString("intValue: ");
+            do Output.printInt(s.intValue());        // intValue: 456
+            do Output.println();
+            
+            let s = "-32123";
+            do Output.printString("intValue: ");
+            do Output.printInt(s.intValue());        // intValue: -32123
+            do Output.println();
+            
+            do Output.printString("backSpace: ");
+            do Output.printInt(String.backSpace());  // backSpace: 129
+            do Output.println();
+            
+            do Output.printString("doubleQuote: ");
+            do Output.printInt(String.doubleQuote());// doubleQuote: 34
+            do Output.println();
+            
+            do Output.printString("newLine: ");
+            do Output.printInt(String.newLine());    // newLine: 128
+            do Output.println();
+            
+            do i.dispose();
+            do s.dispose();
+    
+            return;
+        }
+    
+    }        
+    `;
+};
+
+export const OutputMain = () => {
+  return `
+    // This file is part of www.nand2tetris.org
+    // and the book "The Elements of Computing Systems"
+    // by Nisan and Schocken, MIT Press.
+    // File name: projects/12/OutputTest/Main.jack
+    
+    /** Test program for the OS Output class. */
+    class Main {
+    
+        /** Outputs the entire character set to the screen using all the
+         *  methods of the Output class. */
+        function void main() {
+            var String s;
+        
+            let s = String.new(1);
+            do s.appendChar(String.doubleQuote());
+        
+            do Output.moveCursor(0, 63);
+            do Output.printChar(66);
+            do Output.moveCursor(22, 0);
+            do Output.printChar(67);
+            do Output.moveCursor(22, 63);
+            do Output.printChar(68);
+            do Output.printChar(65);
+            
+            do Output.moveCursor(2, 0);
+            do Output.printString("0123456789");
+            do Output.println();
+            
+            do Output.printString("ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz");
+            do Output.println();
+            
+            do Output.printString("!#$%&'()*+,-./:;<=>?@[\]^_{|}~");
+            do Output.printString(s);
+            do Output.println();
+            
+            do Output.printInt(-12345);
+            do Output.backSpace();
+            do Output.printInt(6789);
+            
+            return;
+        }
+    
+    }        
+    `;
+};
+
+export const KeyboardMain = () => {
+  return `
+    // This file is part of www.nand2tetris.org
+    // and the book "The Elements of Computing Systems"
+    // by Nisan and Schocken, MIT Press.
+    // File name: projects/12/KeyboardTest/Main.jack
+    
+    /** Test program for the OS Keyboard class. */
+    class Main {
+    
+        /** Gets input from the user and verifies its contents. */
+        function void main() {
+            var char c, key;
+            var String s;
+            var int i;
+            var boolean ok;
+        
+            let ok = false;
+            do Output.printString("keyPressed test:");
+            do Output.println();
+            while (~ok) {
+                do Output.printString("Please press the 'Page Down' key");
+                while (key = 0) {
+                    let key = Keyboard.keyPressed();
+                }
+                let c = key;
+                while (~(key = 0)) {
+                    let key = Keyboard.keyPressed();
+                }
+            
+                do Output.println();
+            
+                if (c = 137) {
+                       do Output.printString("ok");
+                do Output.println();
+                let ok = true;
+            }
+        }
+        
+        let ok = false;
+            do Output.printString("readChar test:");
+            do Output.println();
+            do Output.printString("(Verify that the pressed character is echoed to the screen)");
+            do Output.println();
+            while (~ok) {
+                do Output.printString("Please press the number '3': ");
+                let c = Keyboard.readChar();
+            
+                do Output.println();
+            
+                if (c = 51) {
+                do Output.printString("ok");
+                do Output.println();
+                let ok = true;
+            }
+        }
+        
+        let ok = false;
+            do Output.printString("readLine test:");
+            do Output.println();
+            do Output.printString("(Verify echo and usage of 'backspace')");
+            do Output.println();
+            while (~ok) {
+                let s = Keyboard.readLine("Please type 'JACK' and press enter: ");
+    
+            if (s.length() = 4) {
+                if ((s.charAt(0) = 74) & (s.charAt(1) = 65) & (s.charAt(2) = 67) & (s.charAt(3) = 75)) {
+                    do Output.printString("ok");
+                       do Output.println();
+                       let ok = true;
+                   }
+                }
+            }
+    
+        let ok = false;
+            do Output.printString("readInt test:");
+            do Output.println();
+            do Output.printString("(Verify echo and usage of 'backspace')");
+            do Output.println();
+            while (~ok) {
+              let i = Keyboard.readInt("Please type '-32123' and press enter: ");
+    
+            if (i = (-32123)) {
+                do Output.printString("ok");
+                do Output.println();
+                let ok = true;
+            }
+        }
+            
+            do Output.println();
+            do Output.printString("Test completed successfully");
+            
+            return;
+        }
+    
+    }        
+    `;
+};
