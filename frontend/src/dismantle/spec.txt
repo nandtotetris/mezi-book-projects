@@ -1,7 +1,0 @@
-THE IDEAS IN A NUTSHELL
-= software assisted maintanenance (SAM) --> manually (as well as) automatically
-   TAKE ME THROUGH THE PROCESS:
-   >>> You build/design, and interconnect the hardware components of your device using an HDL language. You can import and use components that are available in the component's repositoy. You can also upload your component to this repository. You can modify/edit/update the source code (write in HDL) at any time.
-= on demand machine assembler (ODMA) --> down to actual adrduinos and sensors
-
-
