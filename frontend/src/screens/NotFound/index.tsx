@@ -1,25 +1,8 @@
 import { Col, Layout, Row } from 'antd';
 import UploadComponent from 'components/Upload/UploadComponent';
-import {
-  BallJack,
-  BatJack,
-  KeyboardMain,
-  OutputMain,
-  PongGameJack,
-  PongMainJack,
-  ScreenMain,
-} from 'dismantle/Compiler/jackPrograms';
-import {
-  Array,
-  JackString,
-  Math,
-  Memory,
-  Output,
-  Screen,
-  Sys,
-} from 'dismantle/Compiler/os';
 import { OS } from 'dismantle/JACK/OS';
 import { OsTest } from 'dismantle/JACK/OsTest';
+import { Pong } from 'dismantle/JACK/Sample/pong';
 import { testJackCompiler } from 'dismantle/test';
 import * as React from 'react';
 import { RouteComponentProps } from 'react-router';
@@ -39,11 +22,11 @@ const NotFound: React.FunctionComponent<IProps> = ({ location }) => {
   // testCompilationEngine(SquareGameJack());
   const osSources = [
     {
-      code: Array(),
+      code: OS.Array,
       name: 'Array.vm',
     },
     {
-      code: Memory(),
+      code: OS.Memory,
       name: 'Memory.vm',
     },
     {
@@ -55,35 +38,39 @@ const NotFound: React.FunctionComponent<IProps> = ({ location }) => {
       name: 'Output.vm',
     },
     {
-      code: Screen(),
+      code: OS.Screen,
       name: 'Screen.vm',
     },
     {
-      code: Math(),
+      code: OS.Math,
       name: 'Math.vm',
     },
     {
-      code: JackString(),
+      code: OS.JackString,
       name: 'String.vm',
     },
     {
-      code: Sys(),
+      code: OS.Sys,
       name: 'Sys.vm',
     },
   ];
-  const PongSource = [
-    { code: BallJack(), name: 'Ball.vm' },
-    { code: BatJack(), name: 'Bat.vm' },
-    { code: PongGameJack(), name: 'PongGame.vm' },
-    { code: PongMainJack(), name: 'Main.vm' },
-  ];
-  const TestSource = [{ code: OsTest.KeyboardTest, name: 'Main.vm' }];
-  testJackCompiler([
-    {
-      code: OS.Output,
-      name: 'Output.vm',
-    },
-  ]);
+  const testSource: any = {
+    array: [{ code: OsTest.ArrayTest, name: 'Main.vm' }],
+    keyboard: [{ code: OsTest.KeyboardTest, name: 'Main.vm' }],
+    math: [{ code: OsTest.MathTest, name: 'Main.vm' }],
+    memory: [{ code: OsTest.MemoryTest, name: 'Main.vm' }],
+    output: [{ code: OsTest.OutputTest, name: 'Main.vm' }],
+    pong: [
+      { code: Pong.Ball, name: 'Ball.vm' },
+      { code: Pong.Bat, name: 'Bat.vm' },
+      { code: Pong.PongGame, name: 'PongGame.vm' },
+      { code: Pong.Main, name: 'Main.vm' },
+    ],
+    screen: [{ code: OsTest.ScreenTest, name: 'Main.vm' }],
+    string: [{ code: OsTest.StringTest, name: 'Main.vm' }],
+    sys: [{ code: OsTest.SysTest, name: 'Main.vm' }],
+  };
+  testJackCompiler([...osSources, ...testSource.string]);
   return (
     <Layout style={{ flex: 1, width: '100%', height: '100%' }}>
       <Layout.Content

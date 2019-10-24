@@ -224,7 +224,7 @@ class JackTokenizer {
   // String constant: A sequence of unicode characters not
   // including double quote or new line
   private parseStrings() {
-    this.parser.rule(/"[^\r\n\\"]*"/, (ctx, match) => {
+    this.parser.rule(/".*"/, (ctx, match) => {
       ctx.accept(`${JackTokenizer.TYPE_STRING_CONST}`);
     });
   }

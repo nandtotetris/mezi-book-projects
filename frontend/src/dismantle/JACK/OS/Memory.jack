@@ -1,0 +1,146 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/12/Memory.jack
+
+/**
+ * Memory operations library.
+ */ 
+class Memory {
+
+    static int freeList, LENGTH, NEXT;
+    static boolean hasDefragmented;
+
+    /** Initializes memory parameters. */
+    function void init() {
+        // length is found at index 0
+        let LENGTH = 0;
+        // the next pointer is found at index 0
+        let NEXT = 1;
+        // freeList =  heapBase
+        let freeList = 2048;
+        // freeList.length = heapLength
+        let freeList[LENGTH] = 14335;
+        // freeList.next = null
+        let freeList[NEXT] = null;
+        // no defragmentation done yet
+        let hasDefragmented = false;
+        return;
+    }
+
+    /** Returns the value of the main memory at the given address. */
+    function int peek(int address) {
+        return address[0];
+    }
+
+    /** Sets the value of the main memory at    this address
+     *  to the given value. */
+    function void poke(int address, int value) {
+        let address[0] = value;
+        return;
+    }
+
+    /** finds and allocates from the heap a memory block of the 
+     *  specified size and returns a reference to its base address. */
+    function int alloc(int size) {
+        var int currentSegment, previousSegment, length, block, leftOver;
+        var boolean loop;
+        let loop = true;
+        // search freeList using best-fit or first-fit heuristics to obtain 
+        // a segment with segment.length > size. If no such segment is found, 
+        // return failure (or attempt defragmentation)
+        let previousSegment = freeList;
+        let currentSegment = freeList;
+        while (loop) {
+            let length = currentSegment[LENGTH];
+            if (length > size) {
+                let loop = false;
+            } else {
+                // check if next is null
+                if (currentSegment[NEXT] = null) {
+                    if (hasDefragmented) {
+                        // return error
+                        return Sys.error(1);
+                    } else {
+                        // defragment
+                        do Memory.defragment(size);
+                        // set defragmentation flag
+                        let hasDefragmented = true;
+                        // and then try reallocating
+                        let block = Memory.alloc(size);
+                        // rest the defragmentation flag
+                        let hasDefragmented = false;
+                        return block;
+                    }
+                }
+                // update Previous segment
+                let previousSegment = currentSegment;
+                // update current segment
+                let currentSegment = currentSegment[NEXT];
+
+            }
+        }
+        // update the freeList to reflect the allocation
+        let leftOver = length - (size + 1);
+        if (leftOver < 2) {
+            // no leftover, or practically useless leftOver
+            // at least 3, 2 for headers 1 for data, required
+            let previousSegment[NEXT] = currentSegment[NEXT];
+            return currentSegment;
+        }
+        // update length of remaining block
+        let currentSegment[LENGTH] = length - (size + 1);
+        // get block
+        let block = currentSegment + (length - size);
+        // assign new length
+        let block[-1] = size + 1;
+        return block;
+
+    }
+
+    /** Does defragmentation for a given size **/
+    function void defragment(int size) {
+        var int currentSegment, nextSegment;
+        var boolean loop;
+        let currentSegment = freeList;
+        let loop = true;
+        while (loop) {
+            if (currentSegment[NEXT] = null) {
+                return;
+            }
+            let nextSegment = currentSegment[1];
+
+            if ( (currentSegment[LENGTH] + nextSegment[LENGTH]) > size) {
+                // update the length of the first segment
+                let currentSegment[LENGTH] = currentSegment[LENGTH] + nextSegment[0];
+                // update the pointer of the first segment
+                let currentSegment[NEXT] = nextSegment[NEXT];
+                // exit the loop
+                let loop = false;
+            } 
+            // keep searching, for sufficient adjacents
+            let currentSegment = nextSegment;
+        }
+        return;
+    }
+
+    /** De-allocates the given object and frees its space. */
+    function void deAlloc(int object) {
+        var int segment, temp;
+        // segment = object - 1
+        let segment = object - 1;
+        // segment.length = object[-1]
+        let segment[LENGTH] = object[-1];
+        if (freeList[NEXT] = null) {
+            let freeList[NEXT] = segment;
+            let segment[NEXT] = null;
+        } else {
+            // insert at the second positin in
+            // the linked list
+            let temp = freeList[NEXT];
+            let freeList[NEXT] = segment;
+            let segment[NEXT] = temp;
+        }      
+        return;
+    }    
+}

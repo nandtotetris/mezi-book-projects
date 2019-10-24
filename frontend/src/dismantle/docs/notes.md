@@ -56,3 +56,13 @@ So, from which end would you like to start?  From the component's end or from th
 
 # mapping a swing UI into a react component
 I am just saying, you have to try it. A perfect and direct mapping between a swing application and a react app. Why can't swing components be directly mapped into react components? What is the catch? You should go for it, and stop when you get stuck. But for now, focus on getting the functionality right (by manually calling what would have been invoked following a button's click).
+
+# next step
+- Retrace each chapter's project by way of revision, from the last chapter (the operating system) backward to the earliest of chapters (MUX designs).
+  1. **The Operating System** and the **compiler**
+  *How should they be tested?* 
+  - Compile all the OS jack files using your compiler
+  - Run all the OS tests using your compiled OS
+  - Run all the compiler tests using your compiled OS
+  - The test jack files should also be compiled using your compiler
+- Plan how to integrate all of the projects into a unifing react app. Do integrate, and bring something cool to life.

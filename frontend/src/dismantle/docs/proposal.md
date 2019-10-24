@@ -1,7 +1,7 @@
 # title
 A Computer Visualizer, from OS to NAND gates
 
-# memebers
+# members
 1.	Mezigebu Zework ... ¬¬ATR/0337/08
 2.	Henok Tesfaye     … ATR/2487/08
 3.	Biruk Misganaw   … ATR/2038/08
@@ -73,11 +73,11 @@ The software architecture will consist several layers; including an assembler, a
 
 # Feasibility Study
 - # Economic Feasibility
-- ## Developmental cost 
-The system incurs almost no financial cost for its development. The only purchasable resources that will be needed are a computer and an internet connection. So it can be confidently said that the project has no significant development cost.
+    - # Developmental cost 
+    The system incurs almost no financial cost for its development. The only purchasable resources that will be needed are a computer and an internet connection. So it can be confidently said that the project has no significant development cost.
 
-- ## Operational Cost 
-All that will be required to operate the system is a browser equipped computer. Therefore, the project will introduce no tangible operational cost.
+    - # Operational Cost 
+    All that will be required to operate the system is a browser equipped computer. Therefore, the project will introduce no tangible operational cost.
 
 - # Technical Feasibility 
 The project is technically feasible because all its components are already well known, and precisely defined. The system will not introduce a radically new component (be it a hardware or a software component), it will simply reduce the complexity and increase the control of the already existing components (of the computer systems we use today) by modifying and adapting them in a managed and incremental approach. A software realization of the inspection and simulation of these components is also not something unattainable. There are several simulation and inspection software tools in the market to prove the feasibility of running inspection and simulation on top of an intricate system that is composed of several interconnected models.

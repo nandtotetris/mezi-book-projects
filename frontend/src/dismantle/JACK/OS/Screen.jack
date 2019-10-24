@@ -1,0 +1,259 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/12/Screen.jack
+
+/**
+ * Graphic screen library.
+ */
+class Screen {
+
+    // screen pixel memory mapping starts at address 16384
+    static int SCREEN_BASE;
+    // screen mapping ends at
+    static int SCREEN_LIMIT;
+    // powers of two array to be used as a mask
+    static Array twoToThe;
+    // color
+    static boolean color;
+
+    static int rectOrCircLoc;
+    static boolean isRectOrCirc;
+
+    /** Initializes the Screen. */
+    function void init() {
+        var int i, powOf2;
+        let SCREEN_BASE = 16384;
+        let SCREEN_LIMIT = 24576;
+        let color = true;
+        let rectOrCircLoc = 0;
+        let isRectOrCirc = false;
+        // populate the twoToThe array
+        let i = 0;
+        let powOf2 = 1;
+        let twoToThe = Array.new(16);
+        while (i < 16) {
+            let twoToThe[i] = powOf2;
+            let powOf2 = 2 * powOf2;
+            let i = i + 1;
+        }
+        return;
+    }    
+
+    /** Erases the whole screen. */
+    function void clearScreen() {
+        var int location;
+        let location = SCREEN_BASE;
+        while (location < SCREEN_LIMIT) {
+            do Memory.poke(location, false);
+            let location = location + 1;
+        }
+        return;
+    }
+
+    /** Sets the color to be used in further draw commands
+     *  where white = false, black = true. */
+    function void setColor(boolean b) {
+        let color = b;
+        return;
+    }
+
+    /** Draws the (x, y) pixel. */
+    function void drawPixel(int x, int y) {
+        var int value, memLocation, bitLocation, sixtnQuotientOfRow;
+        if (isRectOrCirc) {
+            let memLocation = rectOrCircLoc;
+        } else {
+            let sixtnQuotientOfRow = x / 16;
+            // mem location = 16384 + r * 32 + c/16
+            let memLocation = SCREEN_BASE + (y * 32) + sixtnQuotientOfRow;            
+        }
+        // get value at memory location
+        let value = Memory.peek(memLocation);
+        // bit location c%16
+        let bitLocation = x & 15;
+        // set the value at bit location        
+        if (color) {
+            // draw black
+            let value = twoToThe[bitLocation] | value;
+        } else {
+            // draw whie
+            let value = (~twoToThe[bitLocation]) & value;
+        }
+        // put value back to memLocation
+        do Memory.poke(memLocation, value);
+        return;
+    }
+
+    /** Draws a line from (x1, y1) to (x2, y2). */
+    function void drawLine(int x1, int y1, int x2, int y2) {
+        var int dx, dy, a, b, i, x, y, adyMinusbdx, temp, lineColor, memLocation, lastValue;
+        var boolean isYMirrored, isXMirrored;
+        let dx = x2 - x1;
+        let dy = y2 - y1;
+        let a = 0;
+        let b = 0;
+        if ((dx = 0) | (dy = 0)) {
+            if (dx = 0) {
+                // draw a vertical line
+                if (y2 < y1) {
+                    // we want to draw bottom to top
+                    let temp = y1;
+                    let y1 = y2;
+                    let y2 = temp;
+                }
+                while (y1 < y2) {
+                    let y1 = y1 + 1;
+                    do Screen.drawPixel(x1, y1);
+                }
+            } else {
+                // draw a horizontal line
+                if (x2 < x1) {
+                    // we want to draw left to right
+                    let temp = x1;
+                    let x1 = x2;
+                    let x2 = temp;
+                }        
+                let x = x1;
+                while (x1 < (x2 + 1)) {
+                    if ((x1 & 15) = 0) {
+                        // we are at a good point man, let's do some trick
+                        if (isRectOrCirc & (x1 > x)) {
+                            let memLocation = rectOrCircLoc + 1;
+                        } else {
+                            let memLocation = SCREEN_BASE + (y1 * 32) + (x1 / 16);
+                        }
+                        while ((x2 - x1) > 15) {
+                            do Memory.poke(memLocation, color);
+                            let x1 = x1 + 16;
+                            let memLocation = memLocation + 1;
+                        }
+                        // the last pixel is not drawn, draw it here
+                        let rectOrCircLoc = memLocation;
+                        do Screen.drawPixel(x1, y1);
+                    } else {
+                        do Screen.drawPixel(x1, y1);
+                    }
+                    let x1 = x1 + 1;
+
+                }                
+            }
+            
+        } else {
+            let adyMinusbdx = 0;
+            // do some mirroring, since the calculations that follow
+            // assume a nice rising slope that runs from left to right
+            if(y2 < y1) {
+                let isYMirrored = true;
+                let y1 = -y1;
+                let y2 = -y2;
+            } else {
+                let isYMirrored = false;
+            }
+            if(x2 < x1) {
+                let isXMirrored = true;
+                let x1 = -x1;
+                let x2 = -x2;
+            } else {
+                let isXMirrored = false;
+            }        
+            // recompute dx and dy
+            let dx = x2 - x1 + 1;
+            let dy = y2 - y1 + 1;    
+            while ((a < dx) & (b < dy)) {
+                do Screen.drawPixel(x, y);
+                if (adyMinusbdx < 0) {
+                    let a = a + 1;
+                    let adyMinusbdx = adyMinusbdx + dy;
+                    let x = x1 + a;
+                    if (isXMirrored) {
+                        let x = -x;
+                    }
+                } else {
+                    let b = b + 1;
+                    let adyMinusbdx = adyMinusbdx - dx;
+                    let y = y1 + b;    
+                    if (isYMirrored) {
+                        let y = -y;
+                    }                      
+                }
+                      
+            }
+        }
+        return;
+    }
+
+    /** Draws a filled rectangle where the top left corner
+     *  is (x1, y1) and the bottom right corner is (x2, y2). */
+    function void drawRectangle(int x1, int y1, int x2, int y2) {
+        var int line, height, y, leftEdgeLocation;
+        let line = 0;
+        let height = y2 - y1;
+        // we are at a good point man, let's do some trick
+        let leftEdgeLocation = SCREEN_BASE + (y1 * 32) + (x1 / 16);  
+        let rectOrCircLoc = leftEdgeLocation;  
+        let isRectOrCirc = true;    
+        while (line < height) {
+            let y = y1 + line;
+            do Screen.drawLine(x1, y, x2, y);
+            let leftEdgeLocation = leftEdgeLocation + 32;
+            let rectOrCircLoc = leftEdgeLocation;
+            let line = line + 1;
+        }
+        let isRectOrCirc = false;
+        return;
+    }
+
+    /** Draws a filled circle of radius r around (cx, cy). */
+    function void drawCircle(int cx, int cy, int r) {
+        // limit radii to be at most 181, to avoid overflow
+        var int x1, x2, y, rSquared, sqrtRsqrdMinDySqrd, dy, leftEdgeLocation, left, right;
+        if (r > 181) {
+            let r = 181;
+        }
+        // the plus one is not to avoid the attempt of drawing a dot
+        // as a line, cases found at the extreme edges of a circle
+        let dy = -r + 1;
+        let rSquared = r * r;
+        // -r + 1 is for the same reason of avoiding extreme edges of the circle
+        let leftEdgeLocation = SCREEN_BASE + ((cy - r + 1) * 32) + (cx / 16);  
+        // lift up the left edge since code adds 32 to elft edge, right at the start of 
+        // the following while loop
+        let leftEdgeLocation = leftEdgeLocation - 32;
+        // the coordinate that is mapped to the left most of current memory location
+        let left = cx - (cx & 15);
+        // the coordiante that is mapped to the right most of current memory location
+        let right = left + 16;
+        let isRectOrCirc = true;            
+        while ((dy > -r) & (dy < r )) {
+            let sqrtRsqrdMinDySqrd = Math.sqrt(rSquared - (dy * dy));
+            let x1 = cx - sqrtRsqrdMinDySqrd;
+            let x2 = cx + sqrtRsqrdMinDySqrd;
+            let y = cy + dy;
+            // move left edge location to one line below
+            let leftEdgeLocation = leftEdgeLocation + 32;
+            // likewise update the tracker location
+            let rectOrCircLoc = leftEdgeLocation;
+            if(dy < 1) {
+                // update left only when drawing the top half of the circle
+                if(x1 < (left + 1)) {
+                    let rectOrCircLoc = rectOrCircLoc - 1;
+                    let left = left - 16;
+                    let right = left + 16;
+                }
+            } else {
+                // update right only when drawing the bottom half of the circle
+                if(x1 > right) {
+                    let rectOrCircLoc = rectOrCircLoc + 1;
+                    let right = right + 16;
+                }     
+            }       
+            // let next left edge value reflect the updated left location
+            let leftEdgeLocation = rectOrCircLoc;               
+            do Screen.drawLine(x1, y, x2, y);
+            let dy = dy + 1;         
+        }     
+        let isRectOrCirc = false;
+        return;
+    }
+}

@@ -564,7 +564,7 @@ class ExtendedCompilationEngine {
         advance = false;
       } else {
         throw Error(
-          `In compileTerm: Unexpected symbol: ${this.tokenizer.symbol()}`,
+          `In compileTerm: Unexpected symbol: ${this.tokenizer.symbol()}, expected: ${this.tokenizer.peek()}`,
         );
       }
     } else if (this.isIdentifier()) {

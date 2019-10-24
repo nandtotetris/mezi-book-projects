@@ -1,0 +1,166 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/12/Math.jack
+
+/**
+ * A basic math library.
+ */
+class Math {
+
+    static int doubleYQ;
+    static Array twoToThe;
+
+    /** Initializes the library. */
+    function void init() {
+        var int i, powOf2;
+
+        let doubleYQ = 0;
+
+        // populate the twoToThe array
+        let i = 0;
+        let powOf2 = 1;
+        let twoToThe = Array.new(16);
+        while (i < 16) {
+            let twoToThe[i] = powOf2;
+            let powOf2 = powOf2 + powOf2;
+            let i = i + 1;
+        }
+        return;
+    }
+
+    /** Returns the absolute value of x. */
+    function int abs(int x) {
+        if (x < 0) {
+            return -x;
+        } else {
+            return x;
+        }
+    }
+
+    /** Returns the product of x and y. */
+    function int multiply(int x, int y) {
+        // where x, y >= 0
+        var int sum, shiftedX, j, n;
+        var boolean loop, isJthBitOne;
+        let sum = 0;
+        let j = 0;
+        let shiftedX = x;
+        let loop = true;
+        let isJthBitOne = false;
+        // number of bits of y, use 16 for now, you 
+        // should use the exact number of bits (if
+        // there is a way to efficiently calculate it)
+        let n = 16;
+        while (loop) {
+            // calculate jth bit of y
+            let isJthBitOne = ((y & twoToThe[j]) = twoToThe[j]);
+            // if jthBit === 1, add shiftedX to sum
+            if (isJthBitOne) {
+                let sum = sum + shiftedX;
+            }
+            // keep shifting x
+            let shiftedX = shiftedX + shiftedX;
+            // iterate for the number of bits n = 16
+            let j = j + 1;            
+            // end of loop
+            if (j = n) {
+                let loop = false;
+            }            
+        }
+        return sum;
+    }
+
+    /** Returns the integer part of x/y. */
+    function int doDivide(int x, int y) {
+        var int quotient, remainder, doubleY;
+        // divisor is larger than dividend, so 0 quotient
+        if (y > x) {
+            let doubleYQ = 0;
+            return 0;
+        }
+        // see if dividend is enough for 2 ys
+        let doubleY = y + y;
+        // detect overflow
+        if (doubleY < 0) {
+            let doubleYQ = 0;
+            return 0;
+        }
+        let quotient = Math.doDivide(x, doubleY);
+        // calculate remainder
+        let remainder = x - doubleYQ;
+        // multiply by 2, since our target divisor is y, and not 2y
+        let quotient = quotient + quotient;
+        if (remainder < y) {
+            // discard the fractional part
+            return quotient;
+        } else {
+            let doubleYQ = y + doubleYQ;
+            // dividend had enough place for one more y
+            return quotient + 1;
+        }
+    }    
+
+    function int divide(int x, int y) {
+        var int quotient;
+        // prevent division by zero
+        if (y = 0) {
+            do Sys.error(0);
+        }
+        // quotient will be positive is their sign bits are identical
+        let quotient = Math.doDivide(Math.abs(x), Math.abs(y));
+        if ((x < 0) = (y < 0)) {
+            return quotient;
+        } else {
+            return -quotient;
+        }
+    }
+
+    /** Returns the integer part of the square root of x. */
+    function int sqrt(int x) {
+        var int j, y, n, yPlusJthPowOf2, yPlusJthPowOf2Squared;
+        var boolean loop;
+        // number of bits of x, use 16 (though it might actually
+        // be less than that)
+        // j = n/2 - 1
+        let n = 16;
+        let j = n / 2 - 1;
+        let loop = true;
+        let y = 0;
+        while (loop) {
+            // (y + 2^j)^2 <= x
+            let yPlusJthPowOf2 = y + twoToThe[j];
+            let yPlusJthPowOf2Squared = yPlusJthPowOf2 * yPlusJthPowOf2;
+            // the first condition checks for overflow
+            if ((yPlusJthPowOf2Squared > 0) & ((yPlusJthPowOf2Squared - x) < 1)) {
+                let y = yPlusJthPowOf2;
+            }
+            // check for the condition
+            if (j = 0) {
+                let loop = false;
+            } 
+            // update j
+            let j = j - 1;              
+            
+        }
+        return y;
+    }
+
+    /** Returns the greater number. */
+    function int max(int a, int b) {
+        if ((a - b) > 0) {
+            return a;
+        } else {
+            return b;
+        }
+    }
+
+    /** Returns the smaller number. */
+    function int min(int a, int b) {
+        if ((a - b) < 0) {
+            return a;
+        } else {
+            return b;
+        }        
+    }
+}
