@@ -8,8 +8,8 @@ class HashSet {
       this.set = new Set();
     }
   }
-  add(key: any) {
-    this.set.add(key);
+  add(key: any): boolean {
+    return !!this.set.add(key);
   }
   clear() {
     this.set.clear();
@@ -26,8 +26,8 @@ class HashSet {
   isEmpty(): boolean {
     return this.set.size !== 0;
   }
-  remove(key: any) {
-    this.set.delete(key);
+  remove(key: any): boolean {
+    return this.set.delete(key);
   }
 }
 

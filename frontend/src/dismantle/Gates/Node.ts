@@ -2,7 +2,7 @@ import { NodeSet } from 'dismantle/Gates/internal';
 /**
  * A node - a wire (or a complete bus) in a circuit.
  */
-class Node {
+export default class Node {
   // the value of the node
   protected value: number;
 
@@ -19,7 +19,7 @@ class Node {
   /**
    * Adds the given node as a listener.
    */
-  addListener(node: Node) {
+  public addListener(node: Node) {
     if (this.listeners === null) {
       this.listeners = new NodeSet();
     }
@@ -29,7 +29,7 @@ class Node {
   /**
    * Removes the given node from being a listener.
    */
-  removeListener(node: Node) {
+  public removeListener(node: Node) {
     if (this.listeners !== null) {
       this.listeners.remove(node);
     }
@@ -38,7 +38,7 @@ class Node {
   /**
    * Returns the value of this node.
    */
-  get(): number {
+  public get(): number {
     return this.value;
   }
 
@@ -46,7 +46,7 @@ class Node {
    * Sets the node's value with the given value.
    * Notifies the listeners on the change by calling their set() method.
    */
-  set(value: number) {
+  public set(value: number) {
     if (this.value !== value) {
       this.value = value;
 
@@ -58,5 +58,3 @@ class Node {
     }
   }
 }
-
-export default Node;

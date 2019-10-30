@@ -1,5 +1,5 @@
 import Vector from 'dismantle/Common/Vector';
-import { GateClass, HDLTokenizer, PinInfo } from 'dismantle/Gates/internal';
+import {BuiltInGateWithGUI, Connection, ConnectionSet, DirtyGateAdapter, Gate, GateClass, HDLTokenizer, PinInfo } from 'dismantle/Gates/internal';
 import Graph from 'dismantle/Utilities/Graph';
 
 export class CompositeGateClass extends GateClass {
@@ -8,6 +8,58 @@ export class CompositeGateClass extends GateClass {
   public static TRUE_NODE_INFO: PinInfo = new PinInfo('true', 16);
   public static FALSE_NODE_INFO: PinInfo = new PinInfo('false', 16);
   public static CLOCK_NODE_INFO: PinInfo = new PinInfo('clk', 1);
+
+  public static getSubBus(pinName: string): Int8Array | null {
+    let result: Int8Array | null = null;
+    const bracketsPos: number = pinName.indexOf('[');
+    if (bracketsPos >= 0) {
+      result = new Int8Array(2);
+      let num: string;
+      const dotsPos: number = pinName.indexOf('..');
+      if (dotsPos >= 0) {
+        num = pinName.substring(bracketsPos + 1, dotsPos);
+        result[0] = Number(num);
+        num = pinName.substring(dotsPos + 2, pinName.indexOf(']'));
+        result[1] = Number(num);
+      } else {
+        num = pinName.substring(bracketsPos + 1, pinName.indexOf(']'));
+        result[0] = Number(num);
+        result[1] = result[0];
+      }
+    }
+    return result;
+  } 
+  private static getSubBusAndCheck(
+    input: HDLTokenizer,
+    pinName: string,
+    busWidth: number,
+  ): Int8Array | null {
+    let result: Int8Array | null = null;
+    try {
+      result = CompositeGateClass.getSubBus(pinName);
+    } catch (ex) {
+        input.HDLError(pinName + ' has an invalid sub bus specification');
+    }
+    if (result != null) {
+      if (result[0] < 0 || result[1] < 0) {
+        input.HDLError(pinName + ': negative bit numbers are illegal');
+      } else {
+        if (result[0] > result[1]) {
+          input.HDLError(
+            pinName + ': left bit number should be lower than the right one',
+          );
+        } else {
+          if (result[1] >= busWidth) {
+            input.HDLError(
+              pinName + ': the specified sub bus is not in the bus range',
+            );
+          }
+        }
+      }
+    }
+    return result;
+  }
+ 
   public internalPinsInfo: Vector;
   private partsList: Vector;
   private partsOrder: Int32Array;
@@ -50,6 +102,161 @@ export class CompositeGateClass extends GateClass {
         outputPinsInfo[i],
       );
     }
+  }
+
+  public getPinInfo(type: number, num: number): PinInfo | null {
+    let result: PinInfo  | null = null;
+    if (type === CompositeGateClass.INTERNAL_PIN_TYPE) {
+      if (num < this.internalPinsInfo.size()) {
+        return this.internalPinsInfo.elementAt(num);
+      }
+    } else {
+      result = super.getPinInfo(type, num);
+    }
+    return result;
+  }
+
+  public newInstance(): Gate {
+    const inputNodes: Node[] = new Array<Node>(this.inputPinsInfo.length);
+    const outputNodes: Node[] = new Array<Node>(this.outputPinsInfo.length);
+    const internalNodes: Node[] = new Array<Node>(this.internalPinsInfo.size());
+    const result: CompositeGate = new CompositeGate();
+    const parts: Gate[] = new Array<Gate>(this.partsList.size());
+    for (let i: number = 0; i < parts.length; i++) {
+      parts[i] = (this.partsList.elementAt(i) as GateClass).newInstance();
+      if (parts[i] instanceof BuiltInGateWithGUI) {
+        (parts[i] as any).setParent(result);
+      }
+    }
+    const sortedParts: Gate[] = new Array<Gate>(parts.length);
+    for (let i: number = 0; i < parts.length; i++) {
+      sortedParts[i] = parts[this.partsOrder[i]];
+    }
+    for (let i: number = 0; i < inputNodes.length; i++) {
+      inputNodes[i] = new Node();
+    }
+    for (let i: number = 0; i < outputNodes.length; i++) {
+      outputNodes[i] = new Node();
+    }
+    const adapter: DirtyGateAdapter = new DirtyGateAdapter(result);
+    for (let i: number = 0; i < this.isInputClocked.length; i++) {
+      if (!this.isInputClocked[i]) {
+        (inputNodes[i] as any).addListener(adapter);
+      }
+    }
+    const internalConnections: ConnectionSet = new ConnectionSet();
+    let partNode: Node;
+    const source: Node;
+    let target: Node;
+    let gateSubBus: Int8Array;
+    let partSubBus: Int8Array;
+    const connectionIter: Iterator<any> = this.connections.iterator();
+    while (connectionIter.next()) {
+      const connection: Connection = connectionIter.next() as any;
+      gateSubBus = connection.getGateSubBus();
+      partSubBus = connection.getPartSubBus();
+      partNode = parts[connection.getPartNumber()].getNode(
+        connection.getPartPinName(),
+      ) as any;
+      switch (connection.getType()) {
+        case Connection.FROM_INPUT:
+          this.connectGateToPart(
+            inputNodes[connection.getGatePinNumber()],
+            gateSubBus,
+            partNode,
+            partSubBus,
+          );
+          break;
+        case Connection.TO_OUTPUT:
+          this.connectGateToPart(
+            partNode,
+            partSubBus,
+            outputNodes[connection.getGatePinNumber()],
+            gateSubBus,
+          );
+          break;
+        case Connection.TO_INTERNAL:
+          target = null;
+          if (partSubBus === null) {
+            target = new Node();
+          } else {
+            target = new SubNode(partSubBus[0], partSubBus[1]);
+          }
+          partNode.addListener(target);
+          internalNodes[connection.getGatePinNumber()] = target;
+          break;
+        case Connection.FROM_INTERNAL:
+        case Connection.FROM_TRUE:
+        case Connection.FROM_FALSE:
+        case Connection.FROM_CLOCK:
+          internalConnections.add(connection);
+          break;
+      }
+    }
+    connectionIter = internalConnections.iterator();
+    let isClockParticipating: boolean = false;
+    while (connectionIter.hasNext()) {
+      let connection: Connection = <Connection>connectionIter.next();
+      partNode = parts[connection.getPartNumber()].getNode(
+        connection.getPartPinName(),
+      );
+      partSubBus = connection.getPartSubBus();
+      gateSubBus = connection.getGateSubBus();
+      source = null;
+      switch (connection.getType()) {
+        case Connection.FROM_INTERNAL:
+          source = internalNodes[connection.getGatePinNumber()];
+          if (partSubBus === null) {
+            source.addListener(partNode);
+          } else {
+            let node: Node = new SubBusListeningAdapter(
+              partNode,
+              partSubBus[0],
+              partSubBus[1],
+            );
+            source.addListener(node);
+          }
+          break;
+        case Connection.FROM_TRUE:
+          let subNode: SubNode = new SubNode(gateSubBus[0], gateSubBus[1]);
+          subNode.set(Gate.TRUE_NODE.get());
+          if (partSubBus === null) {
+            partNode.set(subNode.get());
+          } else {
+            let node: Node = new SubBusListeningAdapter(
+              partNode,
+              partSubBus[0],
+              partSubBus[1],
+            );
+            node.set(subNode.get());
+          }
+          break;
+        case Connection.FROM_FALSE:
+          subNode = new SubNode(gateSubBus[0], gateSubBus[1]);
+          subNode.set(Gate.FALSE_NODE.get());
+          if (partSubBus === null) {
+            partNode.set(subNode.get());
+          } else {
+            let node: Node = new SubBusListeningAdapter(
+              partNode,
+              partSubBus[0],
+              partSubBus[1],
+            );
+            node.set(subNode.get());
+          }
+          break;
+        case Connection.FROM_CLOCK:
+          partNode.set(Gate.CLOCK_NODE.get());
+          Gate.CLOCK_NODE.addListener(partNode);
+          isClockParticipating = true;
+          break;
+      }
+    }
+    if (isClockParticipating) {
+      Gate.CLOCK_NODE.addListener(new DirtyGateAdapter(result));
+    }
+    result.init(inputNodes, outputNodes, internalNodes, sortedParts, this);
+    return result;
   }
   
   private readParts(input: HDLTokenizer): void {
@@ -114,6 +321,7 @@ export class CompositeGateClass extends GateClass {
       }
     }
   }
+
   private readPinNames(
     input: HDLTokenizer,
     partNumber: number,
@@ -159,61 +367,7 @@ export class CompositeGateClass extends GateClass {
       }
     }
   }
-  private static getSubBusAndCheck(
-    input: HDLTokenizer,
-    pinName: string,
-    busWidth: number,
-  ): Int8Array {
-    let result: Int8Array = null;
-    try {
-      result = CompositeGateClass.getSubBus(pinName);
-    } catch ($ex$) {
-      if ($ex$ instanceof Error) {
-        let e: Error = <Error>$ex$;
-        input.HDLError(pinName + ' has an invalid sub bus specification');
-      } else {
-        throw $ex$;
-      }
-    }
-    if (result != null) {
-      if (result[0] < 0 || result[1] < 0) {
-        input.HDLError(pinName + ': negative bit numbers are illegal');
-      } else {
-        if (result[0] > result[1]) {
-          input.HDLError(
-            pinName + ': left bit number should be lower than the right one',
-          );
-        } else {
-          if (result[1] >= busWidth) {
-            input.HDLError(
-              pinName + ': the specified sub bus is not in the bus range',
-            );
-          }
-        }
-      }
-    }
-    return result;
-  }
-  public static getSubBus(pinName: string): Int8Array {
-    let result: Int8Array = null;
-    let bracketsPos: number = pinName.indexOf('[');
-    if (bracketsPos >= 0) {
-      result = new Int8Array(2);
-      let num: string = null;
-      let dotsPos: number = pinName.indexOf('..');
-      if (dotsPos >= 0) {
-        num = pinName.substring(bracketsPos + 1, dotsPos);
-        result[0] = Byte.parseByte(num);
-        num = pinName.substring(dotsPos + 2, pinName.indexOf(']'));
-        result[1] = Byte.parseByte(num);
-      } else {
-        num = pinName.substring(bracketsPos + 1, pinName.indexOf(']'));
-        result[0] = Byte.parseByte(num);
-        result[1] = result[0];
-      }
-    }
-    return result;
-  }
+
   private addConnection(
     input: HDLTokenizer,
     partNumber: number,
@@ -481,156 +635,7 @@ export class CompositeGateClass extends GateClass {
     );
     return !partGateClass.isOutputClocked[partPinNumber];
   }
-  public getPinInfo(type: number, number: number): PinInfo {
-    let result: PinInfo = null;
-    if (type === CompositeGateClass.INTERNAL_PIN_TYPE) {
-      if (number < this.internalPinsInfo.size()) {
-        return <PinInfo>this.internalPinsInfo.elementAt(number);
-      }
-    } else {
-      result = super.getPinInfo(type, number);
-    }
-    return result;
-  }
-  public newInstance(): Gate {
-    let inputNodes: Node[] = new Array<Node>(this.inputPinsInfo.length);
-    let outputNodes: Node[] = new Array<Node>(this.outputPinsInfo.length);
-    let internalNodes: Node[] = new Array<Node>(this.internalPinsInfo.size());
-    let result: CompositeGate = new CompositeGate();
-    let parts: Gate[] = new Array<Gate>(this.partsList.size());
-    for (let i: number = 0; i < parts.length; i++) {
-      parts[i] = (<GateClass>this.partsList.elementAt(i)).newInstance();
-      if (parts[i] instanceof BuiltInGateWithGUI) {
-        (<BuiltInGateWithGUI>parts[i]).setParent(result);
-      }
-    }
-    let sortedParts: Gate[] = new Array<Gate>(parts.length);
-    for (let i: number = 0; i < parts.length; i++) {
-      sortedParts[i] = parts[this.partsOrder[i]];
-    }
-    for (let i: number = 0; i < inputNodes.length; i++) {
-      inputNodes[i] = new Node();
-    }
-    for (let i: number = 0; i < outputNodes.length; i++) {
-      outputNodes[i] = new Node();
-    }
-    let adapter: Node = new DirtyGateAdapter(result);
-    for (let i: number = 0; i < this.isInputClocked.length; i++) {
-      if (!this.isInputClocked[i]) {
-        inputNodes[i].addListener(adapter);
-      }
-    }
-    let internalConnections: ConnectionSet = new ConnectionSet();
-    let partNode: Node, source: Node, target: Node;
-    let gateSubBus: Int8Array, partSubBus: Int8Array;
-    let connectionIter: java.util.Iterator = this.connections.iterator();
-    while (connectionIter.hasNext()) {
-      let connection: Connection = <Connection>connectionIter.next();
-      gateSubBus = connection.getGateSubBus();
-      partSubBus = connection.getPartSubBus();
-      partNode = parts[connection.getPartNumber()].getNode(
-        connection.getPartPinName(),
-      );
-      switch (connection.getType()) {
-        case Connection.FROM_INPUT:
-          this.connectGateToPart(
-            inputNodes[connection.getGatePinNumber()],
-            gateSubBus,
-            partNode,
-            partSubBus,
-          );
-          break;
-        case Connection.TO_OUTPUT:
-          this.connectGateToPart(
-            partNode,
-            partSubBus,
-            outputNodes[connection.getGatePinNumber()],
-            gateSubBus,
-          );
-          break;
-        case Connection.TO_INTERNAL:
-          target = null;
-          if (partSubBus === null) {
-            target = new Node();
-          } else {
-            target = new SubNode(partSubBus[0], partSubBus[1]);
-          }
-          partNode.addListener(target);
-          internalNodes[connection.getGatePinNumber()] = target;
-          break;
-        case Connection.FROM_INTERNAL:
-        case Connection.FROM_TRUE:
-        case Connection.FROM_FALSE:
-        case Connection.FROM_CLOCK:
-          internalConnections.add(connection);
-          break;
-      }
-    }
-    connectionIter = internalConnections.iterator();
-    let isClockParticipating: boolean = false;
-    while (connectionIter.hasNext()) {
-      let connection: Connection = <Connection>connectionIter.next();
-      partNode = parts[connection.getPartNumber()].getNode(
-        connection.getPartPinName(),
-      );
-      partSubBus = connection.getPartSubBus();
-      gateSubBus = connection.getGateSubBus();
-      source = null;
-      switch (connection.getType()) {
-        case Connection.FROM_INTERNAL:
-          source = internalNodes[connection.getGatePinNumber()];
-          if (partSubBus === null) {
-            source.addListener(partNode);
-          } else {
-            let node: Node = new SubBusListeningAdapter(
-              partNode,
-              partSubBus[0],
-              partSubBus[1],
-            );
-            source.addListener(node);
-          }
-          break;
-        case Connection.FROM_TRUE:
-          let subNode: SubNode = new SubNode(gateSubBus[0], gateSubBus[1]);
-          subNode.set(Gate.TRUE_NODE.get());
-          if (partSubBus === null) {
-            partNode.set(subNode.get());
-          } else {
-            let node: Node = new SubBusListeningAdapter(
-              partNode,
-              partSubBus[0],
-              partSubBus[1],
-            );
-            node.set(subNode.get());
-          }
-          break;
-        case Connection.FROM_FALSE:
-          subNode = new SubNode(gateSubBus[0], gateSubBus[1]);
-          subNode.set(Gate.FALSE_NODE.get());
-          if (partSubBus === null) {
-            partNode.set(subNode.get());
-          } else {
-            let node: Node = new SubBusListeningAdapter(
-              partNode,
-              partSubBus[0],
-              partSubBus[1],
-            );
-            node.set(subNode.get());
-          }
-          break;
-        case Connection.FROM_CLOCK:
-          partNode.set(Gate.CLOCK_NODE.get());
-          Gate.CLOCK_NODE.addListener(partNode);
-          isClockParticipating = true;
-          break;
-      }
-    }
-    if (isClockParticipating) {
-      Gate.CLOCK_NODE.addListener(new DirtyGateAdapter(result));
-    }
-    result.init(inputNodes, outputNodes, internalNodes, sortedParts, this);
-    return result;
-  }
+
   private connectGateToPart(
     sourceNode: Node,
     sourceSubBus: Int8Array,
@@ -653,67 +658,5 @@ export class CompositeGateClass extends GateClass {
       source.addListener(subNode);
       subNode.addListener(target);
     }
-  }
-}
-export class Connection {
-  public static FROM_INPUT: number = 1;
-  public static TO_INTERNAL: number = 2;
-  public static FROM_INTERNAL: number = 3;
-  public static TO_OUTPUT: number = 5;
-  public static FROM_TRUE: number = 6;
-  public static FROM_FALSE: number = 7;
-  public static FROM_CLOCK: number = 8;
-  private type: number;
-  private gatePinNumber: number;
-  private partNumber: number;
-  private partPinName: string;
-  private partSubBus: Int8Array;
-  private gateSubBus: Int8Array;
-  constructor(
-    type: number,
-    gatePinNumber: number,
-    partNumber: number,
-    partPinName: string,
-    gateSubBus: Int8Array,
-    partSubBus: Int8Array,
-  ) {
-    this.type = type;
-    this.gatePinNumber = gatePinNumber;
-    this.partNumber = partNumber;
-    this.partPinName = partPinName;
-    this.gateSubBus = gateSubBus;
-    this.partSubBus = partSubBus;
-  }
-  public getType(): number {
-    return this.type;
-  }
-  public getGatePinNumber(): number {
-    return this.gatePinNumber;
-  }
-  public getPartNumber(): number {
-    return this.partNumber;
-  }
-  public getPartPinName(): string {
-    return this.partPinName;
-  }
-  public getGateSubBus(): Int8Array {
-    return this.gateSubBus;
-  }
-  public getPartSubBus(): Int8Array {
-    return this.partSubBus;
-  }
-}
-export class ConnectionSet extends java.util.HashSet {
-  constructor() {
-    super();
-  }
-  public add(connection: Connection): boolean {
-    return super.add(connection);
-  }
-  public remove(connection: Connection): boolean {
-    return super.remove(connection);
-  }
-  public contains(connection: Connection): boolean {
-    return super.contains(connection);
   }
 }

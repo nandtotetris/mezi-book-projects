@@ -2,7 +2,10 @@ import BuiltInGate from 'dismantle/Gates/BuilInGate';
 import BuiltInGateClass from 'dismantle/Gates/BuiltInGateClass';
 import BuiltInGateWithGUI from 'dismantle/Gates/BuiltInGateWithGUI';
 import CompositeGateClass from 'dismantle/Gates/CompositeGateClass';
+import Connection from 'dismantle/Gates/Connection';
+import ConnectionSet from 'dismantle/Gates/ConnectionSet';
 import DirtyGateAdapter from 'dismantle/Gates/DirtyGateAdapter';
+import DirtyGateListener from 'dismantle/Gates/DirtyGateListener';
 import NodeSet from 'dismantle/Gates/NodeSet';
 import Node from 'dismantle/Gates/Node';
 import PinInfo from 'dismantle/Gates/PinInfo';
@@ -20,7 +23,10 @@ export {
   BuiltInGateClass,
   BuiltInGateWithGUI,
   CompositeGateClass,
+  Connection,
+  ConnectionSet,
   DirtyGateAdapter,
+  DirtyGateListener,
   Gate,
   GateErrorEvent,
   GateErrorEventListener,
