@@ -75,6 +75,8 @@ class String {
         if (charArray[0] = HYPHEN) {
             let isNegative = true;
             let i = i + 1;
+        } else {
+            let isNegative = false;
         }
         let loop = true;
         while (loop) {
@@ -96,10 +98,9 @@ class String {
  
         }
         if (isNegative) {
-            return -value;
-        } else {
-            return value;
-        }
+            let value = -value;
+        } 
+        return value;
         
     }
 
@@ -111,7 +112,7 @@ class String {
         if (number < 10) {
             do appendChar(lastChar);
         } else {
-            do setPositiveInt(number / 10);
+            do setPositiveInt(quotient);
             do appendChar(lastChar);
         }
         return;

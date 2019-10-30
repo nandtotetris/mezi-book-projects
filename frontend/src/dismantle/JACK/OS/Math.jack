@@ -40,18 +40,43 @@ class Math {
 
     /** Returns the product of x and y. */
     function int multiply(int x, int y) {
-        // where x, y >= 0
-        var int sum, shiftedX, j, n;
-        var boolean loop, isJthBitOne;
+        var int sum, shiftedX, j, n, numDigits;
+        var boolean loop, isJthBitOne, isNegative;
         let sum = 0;
         let j = 0;
-        let shiftedX = x;
         let loop = true;
         let isJthBitOne = false;
+        let n = 16;
+        // take care of signs
+        if ((x < 0) = (y < 0)) {
+            let isNegative = false;
+        } else {
+            let isNegative = true;
+        }
+        let x = Math.abs(x);
+        let y = Math.abs(y);
+
+        // count number of didgits
+        while (loop) {
+            let j = j + 1;
+            // calculate jth bit of y
+            let isJthBitOne = ((y & twoToThe[j]) = twoToThe[j]);    
+            if (isJthBitOne) {
+               let numDigits = j;
+            }        
+            // end of loop
+            if (j = n) {
+                let loop = false;
+            }               
+        }
+        // reset loop, and j
+        let j = 0;
+        let loop = true;
+        let shiftedX = x;
+
         // number of bits of y, use 16 for now, you 
         // should use the exact number of bits (if
         // there is a way to efficiently calculate it)
-        let n = 16;
         while (loop) {
             // calculate jth bit of y
             let isJthBitOne = ((y & twoToThe[j]) = twoToThe[j]);
@@ -64,10 +89,13 @@ class Math {
             // iterate for the number of bits n = 16
             let j = j + 1;            
             // end of loop
-            if (j = n) {
+            if (j = numDigits) {
                 let loop = false;
             }            
         }
+        if (isNegative) {
+            let sum = -sum;
+        } 
         return sum;
     }
 
@@ -83,8 +111,8 @@ class Math {
         let doubleY = y + y;
         // detect overflow
         if (doubleY < 0) {
-            let doubleYQ = 0;
-            return 0;
+            let doubleYQ = y;
+            return 1;
         }
         let quotient = Math.doDivide(x, doubleY);
         // calculate remainder

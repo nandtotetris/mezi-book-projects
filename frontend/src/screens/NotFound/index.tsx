@@ -54,7 +54,7 @@ const NotFound: React.FunctionComponent<IProps> = ({ location }) => {
       name: 'Sys.vm',
     },
   ];
-  const testSource: any = {
+  const testSources: any = {
     array: [{ code: OsTest.ArrayTest, name: 'Main.vm' }],
     keyboard: [{ code: OsTest.KeyboardTest, name: 'Main.vm' }],
     math: [{ code: OsTest.MathTest, name: 'Main.vm' }],
@@ -70,7 +70,8 @@ const NotFound: React.FunctionComponent<IProps> = ({ location }) => {
     string: [{ code: OsTest.StringTest, name: 'Main.vm' }],
     sys: [{ code: OsTest.SysTest, name: 'Main.vm' }],
   };
-  testJackCompiler([...osSources, ...testSource.string]);
+  // keyboard, screen, and sys not tested yet
+  testJackCompiler([...osSources, ...testSources.string]);
   return (
     <Layout style={{ flex: 1, width: '100%', height: '100%' }}>
       <Layout.Content

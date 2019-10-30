@@ -58,7 +58,7 @@ class Main {
         do Output.printInt(s.intValue());        // intValue: 456
         do Output.println();
         
-        let s = "-32123";
+        let s = "-33";
         do Output.printString("intValue: ");
         do Output.printInt(s.intValue());        // intValue: -32123
         do Output.println();
