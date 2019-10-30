@@ -19,7 +19,7 @@ class Vector {
   elementAt(i: number): any {
     return this.list[i];
   }
-  toArray(array:any[]) {
+  toArray(array: any[]) {
     array.push(this.list);
     return array;
   }

@@ -1,6 +1,8 @@
 import Hashtable from 'dismantle/Common/Hashtable';
 import Vector from 'dismantle/Common/Vector';
 import {
+  BuiltInGateClass,
+  CompositeGateClass,
   Gate,
   GatesManager,
   HDLException,
@@ -33,7 +35,10 @@ abstract class GateClass {
    * according to the directory hierarchy.
    * If the GateClass doesn't exist yet, creates the GateClass by parsing the hdl file.
    */
-  static getGateClass(gateName: string, containsPath: boolean): GateClass {
+  static getGateClass(
+    gateName: string,
+    containsPath: boolean,
+  ): GateClass | null {
     let fileName: string = '';
 
     // find hdl file name according to the gate name.
@@ -55,7 +60,7 @@ abstract class GateClass {
     }
 
     // Try to find the gate in the "cache"
-    let result: GateClass = GateClass.GateClasses.get(fileName);
+    let result: GateClass | null = GateClass.GateClasses.get(fileName);
 
     // gate wasn't found in cache
     if (result == null) {
@@ -134,7 +139,10 @@ abstract class GateClass {
   }
 
   // Loads the HDL from the given input, creates the appropriate GateClass and returns it.
-  private static readHDL(input: HDLTokenizer, gateName: string): GateClass {
+  private static readHDL(
+    input: HDLTokenizer,
+    gateName: string,
+  ): GateClass | null {
     // read CHIP keyword
     input.advance();
     if (
@@ -303,10 +311,11 @@ abstract class GateClass {
    * Returns the PinInfo according to the given pin type and number.
    * If doesn't exist, return null.
    */
-  getPinInfo(typeOrName: string | number, num?: number = 0): PinInfo | null {
+  getPinInfo(typeOrName: string | number, num?: number): PinInfo | null {
     if (typeof typeOrName === 'number') {
       const type: number = typeOrName as number;
       let result: PinInfo | null = null;
+      num = num || 0;
       switch (type) {
         case GateClass.INPUT_PIN_TYPE:
           if (num < this.inputPinsInfo.length) {

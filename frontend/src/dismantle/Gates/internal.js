@@ -1,5 +1,8 @@
 import BuiltInGate from 'dismantle/Gates/BuilInGate';
+import BuiltInGateClass from 'dismantle/Gates/BuiltInGateClass';
 import BuiltInGateWithGUI from 'dismantle/Gates/BuiltInGateWithGUI';
+import CompositeGateClass from 'dismantle/Gates/CompositeGateClass';
+import DirtyGateAdapter from 'dismantle/Gates/DirtyGateAdapter';
 import NodeSet from 'dismantle/Gates/NodeSet';
 import Node from 'dismantle/Gates/Node';
 import PinInfo from 'dismantle/Gates/PinInfo';
@@ -14,7 +17,10 @@ import HDLException from 'dismantle/Gates/HDLException';
 import HDLTokenizer from 'dismantle/Gates/HDLTokenizer';
 export {
   BuiltInGate,
+  BuiltInGateClass,
   BuiltInGateWithGUI,
+  CompositeGateClass,
+  DirtyGateAdapter,
   Gate,
   GateErrorEvent,
   GateErrorEventListener,

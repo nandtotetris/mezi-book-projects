@@ -1,6 +1,7 @@
 import {
   BuiltInGate,
   BuiltInGateWithGUI,
+  DirtyGateAdapter,
   Gate,
   GateClass,
   GatesManager,
@@ -135,7 +136,7 @@ export default class BuiltInGateClass extends GateClass {
 
     // Add a DirtyGateAdapter as a listener to all the non-clocked inputs,
     // so the gate will become dirty when one of its non-clocked input changes.
-    let adapter = new DirtyGateAdapter(result);
+    const adapter = new DirtyGateAdapter(result);
     for (let i = 0; i < this.isInputClocked.length; i++) {
       if (!this.isInputClocked[i]) {
         inputNodes[i].addListener(adapter);
