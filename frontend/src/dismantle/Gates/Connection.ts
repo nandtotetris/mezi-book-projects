@@ -10,16 +10,16 @@ export default class Connection {
   private gatePinNumber: number;
   private partNumber: number;
   private partPinName: string;
-  private partSubBus: Int8Array;
-  private gateSubBus: Int8Array;
+  private partSubBus: Int8Array | null;
+  private gateSubBus: Int8Array | null;
 
   constructor(
     type: number,
     gatePinNumber: number,
     partNumber: number,
     partPinName: string,
-    gateSubBus: Int8Array,
-    partSubBus: Int8Array,
+    gateSubBus: Int8Array | null,
+    partSubBus: Int8Array | null,
   ) {
     this.type = type;
     this.gatePinNumber = gatePinNumber;
@@ -40,10 +40,10 @@ export default class Connection {
   public getPartPinName(): string {
     return this.partPinName;
   }
-  public getGateSubBus(): Int8Array {
+  public getGateSubBus(): Int8Array | null {
     return this.gateSubBus;
   }
-  public getPartSubBus(): Int8Array {
+  public getPartSubBus(): Int8Array | null {
     return this.partSubBus;
   }
 }

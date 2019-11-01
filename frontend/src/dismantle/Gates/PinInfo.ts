@@ -35,7 +35,7 @@ class PinInfo {
    * Marks the given sub bus as initialized.
    * If subBus is null, all the pin is initialized.
    */
-  initialize(subBus: Int8Array) {
+  initialize(subBus: Int8Array | null) {
     let from: number;
     let to: number;
 
@@ -55,7 +55,7 @@ class PinInfo {
    * Checks whether the given sub bus is marked as initialized.
    * If subBus is null, all the pin is checked.
    */
-  isInitialized(subBus: Int8Array): boolean {
+  isInitialized(subBus: Int8Array | null): boolean {
     let found: boolean = false;
     let from: number;
     let to: number;

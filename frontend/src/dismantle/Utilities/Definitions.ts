@@ -1,4 +1,4 @@
-import Hashtable from '../Common/Hashtable';
+import Hashtable from 'dismantle/Common/Hashtable';
 /**
  * Hack definitions and services. Designed as a singleton.
  */

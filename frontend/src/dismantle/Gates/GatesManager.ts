@@ -1,7 +1,6 @@
 import Vector from 'dismantle/Common/Vector';
 import {
   BuiltInGateWithGUI,
-  Gate,
   GateErrorEventListener,
   GatesPanelGUI,
 } from 'dismantle/Gates/internal';

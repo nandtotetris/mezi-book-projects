@@ -1,3 +1,5 @@
+import { Node, SubNode } from 'dismantle/Gates/internal';
+
 export default class SubBusListeningAdapter extends Node {
   private mask: number;
   private shiftLeft: number;
@@ -9,10 +11,12 @@ export default class SubBusListeningAdapter extends Node {
     this.targetNode = targetNode;
   }
   public set(value: number): void {
-    let masked1: number = (this.targetNode.get() & ~this.mask);
-    let masked2: number = (
-      (((value << this.shiftLeft)) & this.mask)
-    );
-    this.targetNode.set((masked1 | masked2));
+    // tslint:disable-next-line: no-bitwise
+    const masked1: number = this.targetNode.get() & ~this.mask;
+    const masked2: number =
+      // tslint:disable-next-line: no-bitwise
+      (value << this.shiftLeft) & this.mask;
+    // tslint:disable-next-line: no-bitwise
+    this.targetNode.set(masked1 | masked2);
   }
 }

@@ -63,7 +63,7 @@ abstract class GateClass {
     let result: GateClass | null = GateClass.GateClasses.get(fileName);
 
     // gate wasn't found in cache
-    if (result == null) {
+    if (result === null) {
       const input: HDLTokenizer = new HDLTokenizer(fileName);
       result = GateClass.readHDL(input, gateName);
       GateClass.GateClasses.put(fileName, result);

@@ -56,7 +56,7 @@ export default class BuiltInGateClass extends GateClass {
 
     // check if clocked keyword exists
     if (input.getTokenType() === HDLTokenizer.TYPE_KEYWORD) {
-      if (input.getKeywordType() != HDLTokenizer.KW_CLOCKED) {
+      if (input.getKeywordType() !== HDLTokenizer.KW_CLOCKED) {
         input.HDLError('Unexpected keyword');
       }
 

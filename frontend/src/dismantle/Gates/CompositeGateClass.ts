@@ -1,6 +1,7 @@
 import Vector from 'dismantle/Common/Vector';
 import {
   BuiltInGateWithGUI,
+  CompositeGate,
   Connection,
   ConnectionSet,
   DirtyGateAdapter,
@@ -134,9 +135,9 @@ export class CompositeGateClass extends GateClass {
     const result: CompositeGate = new CompositeGate();
     const parts: Gate[] = new Array<Gate>(this.partsList.size());
     for (let i: number = 0; i < parts.length; i++) {
-      parts[i] = (this.partsList.elementAt(i) as GateClass).newInstance();
+      parts[i] = this.partsList.elementAt(i).newInstance();
       if (parts[i] instanceof BuiltInGateWithGUI) {
-        (parts[i] as any).setParent(result);
+        ((parts[i] as unknown) as BuiltInGateWithGUI).setParent(result);
       }
     }
     const sortedParts: Gate[] = new Array<Gate>(parts.length);
@@ -152,23 +153,23 @@ export class CompositeGateClass extends GateClass {
     const adapter: DirtyGateAdapter = new DirtyGateAdapter(result);
     for (let i: number = 0; i < this.isInputClocked.length; i++) {
       if (!this.isInputClocked[i]) {
-        (inputNodes[i] as any).addListener(adapter);
+        inputNodes[i].addListener(adapter);
       }
     }
     const internalConnections: ConnectionSet = new ConnectionSet();
     let partNode: Node;
-    const source: Node;
+    let source: Node;
     let target: Node;
-    let gateSubBus: Int8Array;
-    let partSubBus: Int8Array;
-    const connectionIter: Iterator<any> = this.connections.iterator();
+    let gateSubBus: Int8Array | null;
+    let partSubBus: Int8Array | null;
+    let connectionIter: Iterator<Connection> = this.connections.iterator();
     while (connectionIter.next()) {
-      const connection: Connection = connectionIter.next() as any;
+      const connection: Connection = connectionIter.next().value;
       gateSubBus = connection.getGateSubBus();
       partSubBus = connection.getPartSubBus();
       partNode = parts[connection.getPartNumber()].getNode(
         connection.getPartPinName(),
-      ) as any;
+      );
       switch (connection.getType()) {
         case Connection.FROM_INPUT:
           this.connectGateToPart(
@@ -187,7 +188,6 @@ export class CompositeGateClass extends GateClass {
           );
           break;
         case Connection.TO_INTERNAL:
-          target = null;
           if (partSubBus === null) {
             target = new Node();
           } else {
@@ -206,21 +206,20 @@ export class CompositeGateClass extends GateClass {
     }
     connectionIter = internalConnections.iterator();
     let isClockParticipating: boolean = false;
-    while (connectionIter.hasNext()) {
-      let connection: Connection = <Connection>connectionIter.next();
+    while (connectionIter.next()) {
+      const connection: Connection = connectionIter.next().value;
       partNode = parts[connection.getPartNumber()].getNode(
         connection.getPartPinName(),
       );
       partSubBus = connection.getPartSubBus();
       gateSubBus = connection.getGateSubBus();
-      source = null;
       switch (connection.getType()) {
         case Connection.FROM_INTERNAL:
           source = internalNodes[connection.getGatePinNumber()];
           if (partSubBus === null) {
             source.addListener(partNode);
           } else {
-            let node: Node = new SubBusListeningAdapter(
+            const node: Node = new SubBusListeningAdapter(
               partNode,
               partSubBus[0],
               partSubBus[1],
@@ -229,12 +228,15 @@ export class CompositeGateClass extends GateClass {
           }
           break;
         case Connection.FROM_TRUE:
+          if (gateSubBus === null) {
+            throw new Error(`In newInstance, gateSubBus is null`);
+          }
           let subNode: SubNode = new SubNode(gateSubBus[0], gateSubBus[1]);
           subNode.set(Gate.TRUE_NODE.get());
           if (partSubBus === null) {
             partNode.set(subNode.get());
           } else {
-            let node: Node = new SubBusListeningAdapter(
+            const node: Node = new SubBusListeningAdapter(
               partNode,
               partSubBus[0],
               partSubBus[1],
@@ -243,12 +245,15 @@ export class CompositeGateClass extends GateClass {
           }
           break;
         case Connection.FROM_FALSE:
+          if (gateSubBus === null) {
+            throw new Error(`In newInstance, gateSubBus is null`);
+          }
           subNode = new SubNode(gateSubBus[0], gateSubBus[1]);
           subNode.set(Gate.FALSE_NODE.get());
           if (partSubBus === null) {
             partNode.set(subNode.get());
           } else {
-            let node: Node = new SubBusListeningAdapter(
+            const node: Node = new SubBusListeningAdapter(
               partNode,
               partSubBus[0],
               partSubBus[1],
@@ -283,11 +288,17 @@ export class CompositeGateClass extends GateClass {
         if (!(input.getTokenType() === HDLTokenizer.TYPE_IDENTIFIER)) {
           input.HDLError('A GateClass name is expected');
         }
-        let partName: string = input.getIdentifier();
-        let gateClass: GateClass = GateClass.getGateClass(partName, false);
+        const partName: string = input.getIdentifier();
+        const gateClass: GateClass | null = GateClass.getGateClass(
+          partName,
+          false,
+        );
+        if (gateClass === null) {
+          throw new Error(`In readParts, gateClass is null`);
+        }
         this.partsList.addElement(gateClass);
         this.isClocked = this.isClocked || gateClass.isClocked;
-        let partNumber: number = this.partsList.size() - 1;
+        const partNumber: number = this.partsList.size() - 1;
         input.advance();
         if (
           !(
@@ -315,10 +326,10 @@ export class CompositeGateClass extends GateClass {
     if (input.hasMoreTokens()) {
       input.HDLError("Expected end-of-file after '}'");
     }
-    let hasSource: boolean[] = [];
-    let connectionIter: java.util.Iterator = this.connections.iterator();
-    while (connectionIter.hasNext()) {
-      let connection: Connection = <Connection>connectionIter.next();
+    const hasSource: boolean[] = [];
+    const connectionIter: Iterator<Connection> = this.connections.iterator();
+    while (connectionIter.next()) {
+      const connection: Connection = connectionIter.next().value;
       if (connection.getType() === Connection.TO_INTERNAL) {
         hasSource[connection.getGatePinNumber()] = true;
       }
@@ -326,8 +337,7 @@ export class CompositeGateClass extends GateClass {
     for (let i: number = 0; i < hasSource.length; i++) {
       if (!hasSource[i]) {
         input.HDLError(
-          (<PinInfo>this.internalPinsInfo.elementAt(i)).name +
-            ' has no source pin',
+          this.internalPinsInfo.elementAt(i).name + ' has no source pin',
         );
       }
     }
@@ -492,9 +502,6 @@ export class CompositeGateClass extends GateClass {
           ? rightPinInfo.width
           : rightSubBus[1] - rightSubBus[0] + 1;
     }
-    if (rightSubBus === null) {
-      throw new Error(`In addConnection, rightSubBus is null`);
-    }
     if (leftWidth !== rightWidth) {
       input.HDLError(
         leftName +
@@ -559,9 +566,6 @@ export class CompositeGateClass extends GateClass {
         }
         break;
     }
-    if (leftSubBus === null) {
-      throw new Error(`In addConnection, leftSubBus is null`);
-    }
     const connection: Connection = new Connection(
       connectionType,
       rightNumber,
@@ -573,12 +577,12 @@ export class CompositeGateClass extends GateClass {
     this.connections.add(connection);
   }
   private createConnectionsGraph(): Graph {
-    let graph: Graph = new Graph();
-    let connectionIter: java.util.Iterator = this.connections.iterator();
-    while (connectionIter.hasNext()) {
-      let connection: Connection = <Connection>connectionIter.next();
-      let part: number = new number(connection.getPartNumber());
-      let gatePinNumber: number = connection.getGatePinNumber();
+    const graph: Graph = new Graph();
+    const connectionIter: Iterator<Connection> = this.connections.iterator();
+    while (connectionIter.next()) {
+      const connection: Connection = connectionIter.next().value;
+      const part: number = Number(connection.getPartNumber());
+      const gatePinNumber: number = connection.getGatePinNumber();
       switch (connection.getType()) {
         case Connection.TO_INTERNAL:
           if (this.isLegalFromPartEdge(connection, part)) {
@@ -636,44 +640,44 @@ export class CompositeGateClass extends GateClass {
       }
     }
     for (let i: number = 0; i < this.partsList.size(); i++) {
-      graph.addEdge(this.partsList, new number(i));
+      graph.addEdge(this.partsList, Number(i));
     }
-    for (let i: number = 0; i < this.outputPinsInfo.length; i++) {
-      graph.addEdge(this.outputPinsInfo[i], this.outputPinsInfo);
+    for (const outputInfo of this.outputPinsInfo) {
+      graph.addEdge(outputInfo, this.outputPinsInfo);
     }
-    for (let i: number = 0; i < this.inputPinsInfo.length; i++) {
-      graph.addEdge(this.inputPinsInfo, this.inputPinsInfo[i]);
+    for (const inputPinInfo of this.inputPinsInfo) {
+      graph.addEdge(this.inputPinsInfo, inputPinInfo);
     }
     return graph;
   }
+
   private isLegalToPartEdge(connection: Connection, part: number): boolean {
-    let partGateClass: GateClass = <GateClass>(
-      this.partsList.elementAt(part.intValue())
-    );
-    let partPinNumber: number = partGateClass.getPinNumber(
+    const partGateClass: GateClass = this.partsList.elementAt(part);
+    const partPinNumber: number = partGateClass.getPinNumber(
       connection.getPartPinName(),
     );
-    return !partGateClass.isInputClocked[partPinNumber];
+    return !(partGateClass as CompositeGateClass).isInputClocked[partPinNumber];
   }
+
   private isLegalFromPartEdge(connection: Connection, part: number): boolean {
-    let partGateClass: GateClass = <GateClass>(
-      this.partsList.elementAt(part.intValue())
-    );
-    let partPinNumber: number = partGateClass.getPinNumber(
+    const partGateClass: GateClass = this.partsList.elementAt(part);
+    const partPinNumber: number = partGateClass.getPinNumber(
       connection.getPartPinName(),
     );
-    return !partGateClass.isOutputClocked[partPinNumber];
+    return !(partGateClass as CompositeGateClass).isOutputClocked[
+      partPinNumber
+    ];
   }
 
   private connectGateToPart(
     sourceNode: Node,
-    sourceSubBus: Int8Array,
+    sourceSubBus: Int8Array | null,
     targetNode: Node,
-    targetSubBus: Int8Array,
+    targetSubBus: Int8Array | null,
   ): void {
     const source: Node = sourceNode;
     let target: Node = targetNode;
-    if (targetSubBus != null) {
+    if (targetSubBus !== null) {
       target = new SubBusListeningAdapter(
         target,
         targetSubBus[0],

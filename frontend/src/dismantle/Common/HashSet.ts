@@ -1,14 +1,14 @@
-class HashSet {
-  private set: Set<any>;
+class HashSet<T> {
+  private set: Set<T>;
 
-  constructor(iterable?: Iterable<any>) {
+  constructor(iterable?: Iterable<T>) {
     if (iterable !== undefined) {
       this.set = new Set(iterable);
     } else {
       this.set = new Set();
     }
   }
-  add(key: any): boolean {
+  add(key: T): boolean {
     return !!this.set.add(key);
   }
   clear() {
@@ -17,16 +17,16 @@ class HashSet {
   clone() {
     return Object.assign({}, this);
   }
-  contains(key: any) {
+  contains(key: T) {
     return this.set.has(key);
   }
-  iterator(): Iterator<any> {
+  iterator(): Iterator<T> {
     return this.set.values();
   }
   isEmpty(): boolean {
     return this.set.size !== 0;
   }
-  remove(key: any): boolean {
+  remove(key: T): boolean {
     return this.set.delete(key);
   }
 }

@@ -1,7 +1,7 @@
 import HashSet from 'dismantle/Common/HashSet';
 import Connection from 'dismantle/Gates/Connection';
 
-export default class ConnectionSet extends HashSet {
+export default class ConnectionSet extends HashSet<Connection> {
   constructor() {
     super();
   }

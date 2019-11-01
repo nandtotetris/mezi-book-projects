@@ -17,7 +17,7 @@ class HashMap<K, V> {
   containsKey(key: K) {
     return this.map.has(key);
   }
-  keySet(): HashSet {
+  keySet(): HashSet<K> {
     return new HashSet(this.map.keys());
   }
 }

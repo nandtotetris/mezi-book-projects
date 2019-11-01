@@ -1,6 +1,7 @@
 import BuiltInGate from 'dismantle/Gates/BuilInGate';
 import BuiltInGateClass from 'dismantle/Gates/BuiltInGateClass';
 import BuiltInGateWithGUI from 'dismantle/Gates/BuiltInGateWithGUI';
+import CompositeGate from 'dismantle/Gate/CompositeGate';
 import CompositeGateClass from 'dismantle/Gates/CompositeGateClass';
 import Connection from 'dismantle/Gates/Connection';
 import ConnectionSet from 'dismantle/Gates/ConnectionSet';
@@ -25,6 +26,7 @@ export {
   BuiltInGateClass,
   BuiltInGateWithGUI,
   CompositeGateClass,
+  CompositeGate,
   Connection,
   ConnectionSet,
   DirtyGateAdapter,

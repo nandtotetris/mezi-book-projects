@@ -28,7 +28,7 @@ class SubNode extends Node {
    * Constructs a new SubNode with the given low & high sub-bus indice.
    */
   constructor(low: number, high: number) {
-    super(low);
+    super();
     this.mask = SubNode.getMask(low, high);
     this.shiftRight = low;
   }
