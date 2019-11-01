@@ -90,7 +90,7 @@ export class CompositeGateClass extends GateClass {
     this.isInputClocked = [];
     this.isOutputClocked = [];
     this.readParts(input);
-    const graph: Graph = this.createConnectionsGraph();
+    const graph: Graph<any> = this.createConnectionsGraph();
     const topologicalOrder: any[] = graph.topologicalSort(this.partsList);
     if (graph.hasCircle()) {
       throw new Error('This chip has a circle in its parts connections');
@@ -576,8 +576,8 @@ export class CompositeGateClass extends GateClass {
     );
     this.connections.add(connection);
   }
-  private createConnectionsGraph(): Graph {
-    const graph: Graph = new Graph();
+  private createConnectionsGraph(): Graph<any> {
+    const graph: Graph<any> = new Graph();
     const connectionIter: Iterator<Connection> = this.connections.iterator();
     while (connectionIter.next()) {
       const connection: Connection = connectionIter.next().value;
