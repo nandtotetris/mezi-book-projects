@@ -18,6 +18,8 @@ import GateException from 'dismantle/Gates/GateException';
 import GatesManager from 'dismantle/Gates/GatesManager';
 import HDLException from 'dismantle/Gates/HDLException';
 import HDLTokenizer from 'dismantle/Gates/HDLTokenizer';
+import SubNode from 'dismantle/Gates/SubNode';
+import SubBusListeningAdapter from 'dismantle/Gates/SubBusListeningAdapter';
 export {
   BuiltInGate,
   BuiltInGateClass,
@@ -39,4 +41,6 @@ export {
   NodeSet,
   Node,
   PinInfo,
+  SubNode,
+  SubBusListeningAdapter,
 };

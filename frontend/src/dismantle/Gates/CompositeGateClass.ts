@@ -1,9 +1,20 @@
 import Vector from 'dismantle/Common/Vector';
-import {BuiltInGateWithGUI, Connection, ConnectionSet, DirtyGateAdapter, Gate, GateClass, HDLTokenizer, PinInfo } from 'dismantle/Gates/internal';
+import {
+  BuiltInGateWithGUI,
+  Connection,
+  ConnectionSet,
+  DirtyGateAdapter,
+  Gate,
+  GateClass,
+  HDLTokenizer,
+  Node,
+  PinInfo,
+  SubBusListeningAdapter,
+  SubNode,
+} from 'dismantle/Gates/internal';
 import Graph from 'dismantle/Utilities/Graph';
 
 export class CompositeGateClass extends GateClass {
-
   public static INTERNAL_PIN_TYPE: number = 3;
   public static TRUE_NODE_INFO: PinInfo = new PinInfo('true', 16);
   public static FALSE_NODE_INFO: PinInfo = new PinInfo('false', 16);
@@ -28,7 +39,7 @@ export class CompositeGateClass extends GateClass {
       }
     }
     return result;
-  } 
+  }
   private static getSubBusAndCheck(
     input: HDLTokenizer,
     pinName: string,
@@ -38,7 +49,7 @@ export class CompositeGateClass extends GateClass {
     try {
       result = CompositeGateClass.getSubBus(pinName);
     } catch (ex) {
-        input.HDLError(pinName + ' has an invalid sub bus specification');
+      input.HDLError(pinName + ' has an invalid sub bus specification');
     }
     if (result != null) {
       if (result[0] < 0 || result[1] < 0) {
@@ -59,7 +70,7 @@ export class CompositeGateClass extends GateClass {
     }
     return result;
   }
- 
+
   public internalPinsInfo: Vector;
   private partsList: Vector;
   private partsOrder: Int32Array;
@@ -105,7 +116,7 @@ export class CompositeGateClass extends GateClass {
   }
 
   public getPinInfo(type: number, num: number): PinInfo | null {
-    let result: PinInfo  | null = null;
+    let result: PinInfo | null = null;
     if (type === CompositeGateClass.INTERNAL_PIN_TYPE) {
       if (num < this.internalPinsInfo.size()) {
         return this.internalPinsInfo.elementAt(num);
@@ -258,7 +269,7 @@ export class CompositeGateClass extends GateClass {
     result.init(inputNodes, outputNodes, internalNodes, sortedParts, this);
     return result;
   }
-  
+
   private readParts(input: HDLTokenizer): void {
     let endOfParts: boolean = false;
     while (input.hasMoreTokens() && !endOfParts) {
@@ -333,7 +344,7 @@ export class CompositeGateClass extends GateClass {
       if (!(input.getTokenType() === HDLTokenizer.TYPE_IDENTIFIER)) {
         input.HDLError('A pin name is expected');
       }
-      let leftName: string = input.getIdentifier();
+      const leftName: string = input.getIdentifier();
       input.advance();
       if (
         !(
@@ -347,7 +358,7 @@ export class CompositeGateClass extends GateClass {
       if (!(input.getTokenType() === HDLTokenizer.TYPE_IDENTIFIER)) {
         input.HDLError('A pin name is expected');
       }
-      let rightName: string = input.getIdentifier();
+      const rightName: string = input.getIdentifier();
       this.addConnection(input, partNumber, partName, leftName, rightName);
       input.advance();
       if (
@@ -375,49 +386,58 @@ export class CompositeGateClass extends GateClass {
     fullLeftName: string,
     fullRightName: string,
   ): void {
-    let partGateClass: GateClass = <GateClass>(
-      this.partsList.elementAt(partNumber)
-    );
-    let leftName: string, rightName: string;
+    const partGateClass: GateClass = this.partsList.elementAt(partNumber);
+    let leftName: string;
+    let rightName: string;
     let connectionType: number = 0;
     let bracketsPos: number = fullLeftName.indexOf('[');
     leftName =
       bracketsPos >= 0 ? fullLeftName.substring(0, bracketsPos) : fullLeftName;
-    let leftType: number = partGateClass.getPinType(leftName);
+    const leftType: number = partGateClass.getPinType(leftName);
     if (leftType === GateClass.UNKNOWN_PIN_TYPE) {
       input.HDLError(leftName + ' is not a pin in ' + partName);
     }
-    let leftNumber: number = partGateClass.getPinNumber(leftName);
-    let leftPinInfo: PinInfo = partGateClass.getPinInfo(leftType, leftNumber);
-    let leftSubBus: Int8Array = CompositeGateClass.getSubBusAndCheck(
-      input,
-      fullLeftName,
-      leftPinInfo.width,
+    const leftNumber: number = partGateClass.getPinNumber(leftName);
+    const leftPinInfo: PinInfo | null = partGateClass.getPinInfo(
+      leftType,
+      leftNumber,
     );
-    let leftWidth: number =
-      leftSubBus === null
-        ? leftPinInfo.width
-        : leftSubBus[1] - leftSubBus[0] + 1;
+    let leftWidth;
+    let leftSubBus: Int8Array | null;
+    if (leftPinInfo !== null) {
+      leftSubBus = CompositeGateClass.getSubBusAndCheck(
+        input,
+        fullLeftName,
+        leftPinInfo.width,
+      );
+      leftWidth =
+        leftSubBus === null
+          ? leftPinInfo.width
+          : leftSubBus[1] - leftSubBus[0] + 1;
+    } else {
+      throw Error(`Inside addConnection, leftPinInfo is null`);
+    }
+
     bracketsPos = fullRightName.indexOf('[');
     rightName =
       bracketsPos >= 0
         ? fullRightName.substring(0, bracketsPos)
         : fullRightName;
-    let rightPinInfo: PinInfo;
+    let rightPinInfo: PinInfo | null;
     let rightNumber: number = 0;
     let rightType: number = GateClass.UNKNOWN_PIN_TYPE;
     let selfFittingWidth: boolean = false;
-    if (rightName ==== CompositeGateClass.TRUE_NODE_INFO.name) {
+    if (rightName === CompositeGateClass.TRUE_NODE_INFO.name) {
       rightPinInfo = CompositeGateClass.TRUE_NODE_INFO;
       connectionType = Connection.FROM_TRUE;
       selfFittingWidth = true;
     } else {
-      if (rightName ==== CompositeGateClass.FALSE_NODE_INFO.name) {
+      if (rightName === CompositeGateClass.FALSE_NODE_INFO.name) {
         rightPinInfo = CompositeGateClass.FALSE_NODE_INFO;
         connectionType = Connection.FROM_FALSE;
         selfFittingWidth = true;
       } else {
-        if (rightName ==== CompositeGateClass.CLOCK_NODE_INFO.name) {
+        if (rightName === CompositeGateClass.CLOCK_NODE_INFO.name) {
           rightPinInfo = CompositeGateClass.CLOCK_NODE_INFO;
           connectionType = Connection.FROM_CLOCK;
         } else {
@@ -425,7 +445,7 @@ export class CompositeGateClass extends GateClass {
           if (
             (rightType === GateClass.UNKNOWN_PIN_TYPE ||
               rightType === CompositeGateClass.INTERNAL_PIN_TYPE) &&
-            !fullRightName ==== rightName
+            fullRightName !== rightName
           ) {
             input.HDLError(
               fullRightName + ': sub bus of an internal node may not be used',
@@ -450,10 +470,13 @@ export class CompositeGateClass extends GateClass {
         }
       }
     }
-    let rightSubBus: Int8Array;
+    if (rightPinInfo === null) {
+      throw new Error(`In addConnection, rightPinInfo is null`);
+    }
+    let rightSubBus: Int8Array | null;
     let rightWidth: number;
     if (selfFittingWidth) {
-      if (!rightName ==== fullRightName) {
+      if (rightName !== fullRightName) {
         input.HDLError(rightName + ' may not be subscripted');
       }
       rightWidth = leftWidth;
@@ -469,7 +492,10 @@ export class CompositeGateClass extends GateClass {
           ? rightPinInfo.width
           : rightSubBus[1] - rightSubBus[0] + 1;
     }
-    if (leftWidth != rightWidth) {
+    if (rightSubBus === null) {
+      throw new Error(`In addConnection, rightSubBus is null`);
+    }
+    if (leftWidth !== rightWidth) {
       input.HDLError(
         leftName +
           '(' +
@@ -533,7 +559,10 @@ export class CompositeGateClass extends GateClass {
         }
         break;
     }
-    let connection: Connection = new Connection(
+    if (leftSubBus === null) {
+      throw new Error(`In addConnection, leftSubBus is null`);
+    }
+    const connection: Connection = new Connection(
       connectionType,
       rightNumber,
       partNumber,
@@ -642,7 +671,7 @@ export class CompositeGateClass extends GateClass {
     targetNode: Node,
     targetSubBus: Int8Array,
   ): void {
-    let source: Node = sourceNode;
+    const source: Node = sourceNode;
     let target: Node = targetNode;
     if (targetSubBus != null) {
       target = new SubBusListeningAdapter(
@@ -654,7 +683,7 @@ export class CompositeGateClass extends GateClass {
     if (sourceSubBus === null) {
       source.addListener(target);
     } else {
-      let subNode: Node = new SubNode(sourceSubBus[0], sourceSubBus[1]);
+      const subNode: Node = new SubNode(sourceSubBus[0], sourceSubBus[1]);
       source.addListener(subNode);
       subNode.addListener(target);
     }
